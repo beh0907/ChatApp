@@ -1,0 +1,20 @@
+package com.skymilk.chatapp.di
+
+import com.skymilk.chatapp.store.data.repository.AuthRepositoryImpl
+import com.skymilk.chatapp.store.domain.repository.AuthRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    //@Binds는 반환 타입이 interface
+    //파라미터는 interface의 구현체 클래스로 활용
+    @Binds
+    @Singleton
+    abstract fun bindWallPaperRepository(impl: AuthRepositoryImpl): AuthRepository
+}

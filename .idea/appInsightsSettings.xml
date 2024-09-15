@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.skymilk.chatapp" />
+                  <option name="mobileSdkAppId" value="1:965950864068:android:647cc11387f27e196e2791" />
+                  <option name="projectId" value="chatapp-9273a" />
+                  <option name="projectNumber" value="965950864068" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

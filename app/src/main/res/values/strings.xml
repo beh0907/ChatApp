@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ChatApp</string>
+    <string name="app_logo">App Logo</string>
+    <string name="title">Title</string>
+    <string name="find_house">Find Your House</string>
+    <string name="login">Login</string>
 </resources>
