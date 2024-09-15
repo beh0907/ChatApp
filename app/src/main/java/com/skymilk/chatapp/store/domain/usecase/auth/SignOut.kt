@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.domain.usecase
+package com.skymilk.chatapp.store.domain.usecase.auth
 
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import javax.inject.Inject

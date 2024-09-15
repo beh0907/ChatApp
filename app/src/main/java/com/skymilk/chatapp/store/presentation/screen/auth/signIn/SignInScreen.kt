@@ -16,6 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -26,6 +30,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -37,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,7 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.presentation.screen.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
-import com.skymilk.chatapp.store.presentation.screen.auth.components.LoginTextField
+import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.BlueGray
 import com.skymilk.chatapp.ui.theme.HannaPro
@@ -53,9 +61,9 @@ import com.skymilk.chatapp.ui.theme.dimens
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel(),
     onNavigateToSignUp: () -> Unit,
-    onNavigateToHome: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    onNavigateToHome: () -> Unit
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
 
@@ -84,9 +92,9 @@ fun SignInScreen(
                     .fillMaxSize()
                     .padding(30.dp)
             ) {
-                LoginSection()
+                SignInSection(viewModel::signInWithEmailAndPassword)
                 Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
-                SocialSection { viewModel.signInWithGoogle() }
+                SocialSection(viewModel::signInWithGoogle)
             }
 
             Spacer(modifier = Modifier.weight(0.8f))
@@ -157,15 +165,28 @@ private fun TopSection() {
 
 //ID,비밀번호 입력 로그인 영역
 @Composable
-private fun LoginSection() {
-    LoginTextField(modifier = Modifier.fillMaxWidth(), label = "이메일", trailing = "")
+private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    AuthTextField(
+        modifier = Modifier.fillMaxWidth(),
+        label = "이메일",
+        leadingIcon = Icons.Default.Email,
+        keyboardType = KeyboardType.Email,
+        value = email,
+        onValueChange = { email = it }
+    )
 
     Spacer(modifier = Modifier.height(MaterialTheme.dimens.small2))
 
-    LoginTextField(
+    AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "비밀번호",
-        trailing = "찾기?"
+        leadingIcon = Icons.Default.Lock,
+        keyboardType = KeyboardType.Password,
+        value = password,
+        onValueChange = { password = it }
     )
 
     Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
@@ -175,7 +196,7 @@ private fun LoginSection() {
             .fillMaxWidth()
             .height(MaterialTheme.dimens.buttonHeight),
         onClick = {
-
+            onSignInWithEmailAndPassword(email, password)
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
@@ -226,10 +247,11 @@ private fun SocialSection(onSignInWithGoogleClick: () -> Unit) {
 private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
-    TextButton(onClick = { onNavigateToSignUp() }) { }
+    TextButton(
+        modifier = Modifier.align(alignment = CenterHorizontally),
+        onClick = { onNavigateToSignUp() }) {
 
-    Text(modifier = Modifier.align(alignment = CenterHorizontally),
-        text = buildAnnotatedString {
+        Text(text = buildAnnotatedString {
             withStyle(
                 style = SpanStyle(
                     color = Color(0xff94a3b8),
@@ -253,4 +275,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
                 append("계정 등록")
             }
         })
+    }
+
+
 }

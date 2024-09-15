@@ -2,8 +2,13 @@ package com.skymilk.chatapp.store.presentation.screen.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.skymilk.chatapp.store.domain.usecase.AuthUseCases
+import com.google.firebase.auth.FirebaseUser
+import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
 import com.skymilk.chatapp.store.presentation.screen.AuthState
+import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation
+import com.skymilk.chatapp.store.presentation.util.ValidationUtil
+import com.skymilk.chatapp.utils.Event
+import com.skymilk.chatapp.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,10 +32,16 @@ class AuthViewModel @Inject constructor(
     //로그인 정보 체크
     private fun checkCurrentUser() {
         val currentUser = authUseCases.getCurrentUser()
-        _authState.value = if (currentUser != null) {
-            AuthState.Authenticated(currentUser)
-        } else {
-            AuthState.Unauthenticated
+
+        _authState.update {
+            if (currentUser != null) {
+                //토스트 메시지 전달
+                sendEvent(Event.Toast("로그인에 성공하였습니다."))
+
+                AuthState.Authenticated(currentUser)
+            } else {
+                AuthState.Unauthenticated
+            }
         }
     }
 
@@ -40,35 +51,56 @@ class AuthViewModel @Inject constructor(
             _authState.update { AuthState.Loading }
 
             val result = authUseCases.signInWithGoogle()
-            _authState.update {
-                when {
-                    result.isSuccess -> AuthState.Authenticated(result.getOrNull()!!)
-                    result.isFailure -> AuthState.Error(
-                        result.exceptionOrNull()?.message ?: "Unknown error"
-                    )
-
-                    else -> AuthState.Unauthenticated
-                }
-            }
+            checkSignInResult(result)
         }
     }
 
     //이메일,패스워드 계정정보 로그인
     fun signInWithEmailAndPassword(email: String, password: String) {
+        if (email.isBlank()) {
+            //토스트 메시지 전달
+            sendEvent(Event.Toast("이메일을 입력해주세요."))
+            return
+        }
+
+        if (password.isBlank()) {
+            //토스트 메시지 전달
+            sendEvent(Event.Toast("비밀번호를 입력해주세요."))
+            return
+        }
+
         viewModelScope.launch {
             _authState.update { AuthState.Loading }
 
             val result = authUseCases.signInWithEmailAndPassword(email, password)
-            _authState.update {
-                when {
-                    result.isSuccess -> AuthState.Authenticated(result.getOrNull()!!)
-                    result.isFailure -> AuthState.Error(
-                        result.exceptionOrNull()?.message ?: "Unknown error"
-                    )
+            checkSignInResult(result)
+        }
+    }
 
-                    else -> AuthState.Unauthenticated
-                }
-            }
+    //이메일,패스워드 계정정보 회원가입
+    fun signUpWithEmailAndPassword(email: String, password: String, passwordConfirm: String) {
+        //이메일 입력값 확인
+        val emailValidation = ValidationUtil.validateEmail(email)
+        if (emailValidation is RegisterValidation.Failed) {
+            //토스트 메시지 전달
+            sendEvent(Event.Toast(emailValidation.message))
+            return
+        }
+
+        //비밀번호 입력값 확인
+        val passwordValidation = ValidationUtil.validatePassword(password, passwordConfirm)
+        if (passwordValidation is RegisterValidation.Failed) {
+            //토스트 메시지 전달
+            sendEvent(Event.Toast(passwordValidation.message))
+            return
+        }
+
+        //입력값 확인 후 회원가입 처리
+        viewModelScope.launch {
+            _authState.update { AuthState.Loading }
+
+            val result = authUseCases.signUpWithEmailAndPassword(email, password)
+            checkSignInResult(result)
         }
     }
 
@@ -77,6 +109,34 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             authUseCases.signOut()
             _authState.update { AuthState.Unauthenticated }
+
+            //토스트 메시지 전달
+            sendEvent(Event.Toast("로그아웃 되었습니다."))
+        }
+    }
+
+    private fun checkSignInResult(result: Result<FirebaseUser>) {
+        _authState.update {
+            when {
+                result.isSuccess ->  {
+                    //토스트 메시지 전달
+                    sendEvent(Event.Toast("로그인에 성공하였습니다."))
+
+                    AuthState.Authenticated(result.getOrNull()!!)
+                }
+                result.isFailure -> {
+                    //토스트 메시지 전달
+                    sendEvent(Event.Toast("로그인에 실패하였습니다."))
+
+                    AuthState.Error(
+                        result.exceptionOrNull()?.message ?: "Unknown error"
+                    )
+                }
+
+                else ->  {
+                    AuthState.Unauthenticated
+                }
+            }
         }
     }
 }

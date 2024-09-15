@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.domain.usecase
+package com.skymilk.chatapp.store.domain.usecase.auth
 
 import com.google.firebase.auth.FirebaseUser
 import com.skymilk.chatapp.store.domain.repository.AuthRepository

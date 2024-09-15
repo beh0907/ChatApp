@@ -33,10 +33,10 @@ import com.skymilk.chatapp.ui.theme.dimens
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onSignOut: () -> Unit,
-    authViewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
+    onSignOut: () -> Unit
 ) {
-    val authState by authViewModel.authState.collectAsStateWithLifecycle()
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
     val currentUser = (authState as AuthState.Authenticated).user
 
     Surface(modifier = modifier.fillMaxSize()) {
@@ -101,10 +101,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(MaterialTheme.dimens.buttonHeight),
-                    onClick = {
-                        onSignOut()
-                        authViewModel.signOut()
-                    },
+                    onClick = { onSignOut() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
                         contentColor = Color.White

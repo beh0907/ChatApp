@@ -80,6 +80,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Material Icon Extended
+    implementation(libs.androidx.material.icons.extended)
+
     // lifecycle (생명주기 연동 flow 수집)
     implementation(libs.lifecycle.runtime.compose)
 

@@ -1,11 +1,12 @@
 package com.skymilk.chatapp.di
 
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
-import com.skymilk.chatapp.store.domain.usecase.AuthUseCases
-import com.skymilk.chatapp.store.domain.usecase.GetCurrentUser
-import com.skymilk.chatapp.store.domain.usecase.SignInWithEmailAndPassword
-import com.skymilk.chatapp.store.domain.usecase.SignInWithGoogle
-import com.skymilk.chatapp.store.domain.usecase.SignOut
+import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
+import com.skymilk.chatapp.store.domain.usecase.auth.GetCurrentUser
+import com.skymilk.chatapp.store.domain.usecase.auth.SignInWithEmailAndPassword
+import com.skymilk.chatapp.store.domain.usecase.auth.SignInWithGoogle
+import com.skymilk.chatapp.store.domain.usecase.auth.SignOut
+import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +23,7 @@ object UseCaseModule {
         AuthUseCases(
             SignInWithGoogle(authRepository),
             SignInWithEmailAndPassword(authRepository),
+            SignUpWithEmailAndPassword(authRepository),
             SignOut(authRepository),
             GetCurrentUser(authRepository)
         )

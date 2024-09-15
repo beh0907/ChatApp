@@ -21,35 +21,34 @@ class AuthRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AuthRepository {
 
-    override suspend fun signInWithGoogle(): Result<FirebaseUser> =
-        withContext(Dispatchers.IO) {
-            try {
-                val credentialManager: CredentialManager = CredentialManager.create(context)
+    override suspend fun signInWithGoogle(): Result<FirebaseUser> = withContext(Dispatchers.IO) {
+        try {
+            val credentialManager: CredentialManager = CredentialManager.create(context)
 
-                val googleIdOption = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(BuildConfig.GOOGLE_AUTH_WEB_CLIENT_ID)
-                    .build()
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(BuildConfig.GOOGLE_AUTH_WEB_CLIENT_ID)
+                .build()
 
-                val request = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleIdOption)
-                    .build()
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
 
-                val result = credentialManager.getCredential(
-                    context = context,
-                    request = request
-                )
-                val credential = result.credential
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                val googleIdToken = googleIdTokenCredential.idToken
-                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+            val result = credentialManager.getCredential(
+                context = context,
+                request = request
+            )
+            val credential = result.credential
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            val googleIdToken = googleIdTokenCredential.idToken
+            val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
 
-                val authResult = firebaseAuth.signInWithCredential(firebaseCredential).await()
-                Result.success(authResult.user!!)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            val authResult = firebaseAuth.signInWithCredential(firebaseCredential).await()
+            Result.success(authResult.user!!)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
 
     override suspend fun signInWithEmailAndPassword(
         email: String,
@@ -57,6 +56,18 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<FirebaseUser> = withContext(Dispatchers.IO) {
         try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            Result.success(result.user!!)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun signUpWithEmailAndPassword(
+        email: String,
+        password: String
+    ): Result<FirebaseUser> = withContext(Dispatchers.IO) {
+        try {
+            val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             Result.success(result.user!!)
         } catch (e: Exception) {
             Result.failure(e)
