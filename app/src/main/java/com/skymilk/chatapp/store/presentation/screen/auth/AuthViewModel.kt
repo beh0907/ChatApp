@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
-import com.skymilk.chatapp.store.presentation.screen.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation
 import com.skymilk.chatapp.store.presentation.util.ValidationUtil
 import com.skymilk.chatapp.utils.Event
@@ -35,9 +34,6 @@ class AuthViewModel @Inject constructor(
 
         _authState.update {
             if (currentUser != null) {
-                //토스트 메시지 전달
-                sendEvent(Event.Toast("로그인에 성공하였습니다."))
-
                 AuthState.Authenticated(currentUser)
             } else {
                 AuthState.Unauthenticated
@@ -88,7 +84,7 @@ class AuthViewModel @Inject constructor(
         }
 
         //비밀번호 입력값 확인
-        val passwordValidation = ValidationUtil.validatePassword(password, passwordConfirm)
+        val passwordValidation = ValidationUtil.validatePasswordConfirm(password, passwordConfirm)
         if (passwordValidation is RegisterValidation.Failed) {
             //토스트 메시지 전달
             sendEvent(Event.Toast(passwordValidation.message))
@@ -126,7 +122,7 @@ class AuthViewModel @Inject constructor(
                 }
                 result.isFailure -> {
                     //토스트 메시지 전달
-                    sendEvent(Event.Toast("로그인에 실패하였습니다."))
+                    sendEvent(Event.Toast(result.exceptionOrNull()?.message.toString()))
 
                     AuthState.Error(
                         result.exceptionOrNull()?.message ?: "Unknown error"

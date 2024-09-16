@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.home
+package com.skymilk.chatapp.store.presentation.screen.main.profile
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -16,30 +16,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skymilk.chatapp.store.presentation.screen.AuthState
-import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.google.firebase.auth.FirebaseUser
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.BlueGray
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel(),
-    onSignOut: () -> Unit
-) {
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
-    val currentUser = (authState as AuthState.Authenticated).user
+fun ProfileScreen(currentUser: FirebaseUser?, onSignOut: () -> Unit) {
 
-    Surface(modifier = modifier.fillMaxSize()) {
+
+    Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -49,23 +44,23 @@ fun HomeScreen(
         ) {
             currentUser.let { user ->
                 //프로필 이미지
-                user.photoUrl?.let {
-                    //                    AsyncImage(
-                    //                        modifier = Modifier
-                    //                            .size(140.dp)
-                    //                            .clip(RoundedCornerShape(4.dp)),
-                    //                        model = ImageRequest.Builder(LocalContext.current)
-                    //                            .data(it)
-                    //                            .crossfade(true)
-                    //                            .build(),
-                    //                        contentDescription = null,
-                    //                    )
+                user?.photoUrl?.let {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(it)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                    )
 
                     Spacer(modifier = Modifier.size(16.dp))
                 }
 
                 //유저 이름
-                user.displayName?.let { name ->
+                user?.displayName?.let { name ->
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleLarge,
@@ -77,7 +72,7 @@ fun HomeScreen(
                 }
 
                 //유저 이메일
-                user.email?.let { email ->
+                user?.email?.let { email ->
                     Text(
                         text = "Email : $email",
                         style = MaterialTheme.typography.titleLarge,
@@ -90,7 +85,7 @@ fun HomeScreen(
 
                 //유저 아이디
                 Text(
-                    text = "ID : ${currentUser.uid}",
+                    text = "ID : ${currentUser?.uid}",
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

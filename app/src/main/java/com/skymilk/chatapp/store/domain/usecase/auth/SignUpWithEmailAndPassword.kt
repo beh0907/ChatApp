@@ -5,10 +5,9 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class SignUpWithEmailAndPassword @Inject constructor(
-    private val repository: AuthRepository
+    private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(email:String, password:String): Result<FirebaseUser> {
-        return repository.signUpWithEmailAndPassword(email, password)
+        return authRepository.signUpWithEmailAndPassword(email, password)
     }
-
 }

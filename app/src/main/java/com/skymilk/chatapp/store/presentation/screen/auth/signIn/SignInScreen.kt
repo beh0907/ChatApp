@@ -2,7 +2,7 @@ package com.skymilk.chatapp.store.presentation.screen.auth.signIn
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,12 +18,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,10 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -50,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.presentation.screen.AuthState
+import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.Black
@@ -69,97 +62,35 @@ fun SignInScreen(
 
     //로그인 상태일때 자동으로 홈 화면으로 이동시킨다
     LaunchedEffect(authState) {
-        if (authState is AuthState.Authenticated) {
-            onNavigateToHome()
-        }
+        if (authState is AuthState.Authenticated) onNavigateToHome()
     }
 
-    Surface(
+    Column(
         modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center
     ) {
+
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(fraction = 0.5f)
+                .align(CenterHorizontally),
+            painter = painterResource(R.drawable.bg_chat),
+            contentDescription = ""
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .padding(30.dp)
         ) {
-
-            TopSection()
-
-            Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium2))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(30.dp)
-            ) {
-                SignInSection(viewModel::signInWithEmailAndPassword)
-                Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
-                SocialSection(viewModel::signInWithGoogle)
-            }
-
-            Spacer(modifier = Modifier.weight(0.8f))
-            CreateSection(onNavigateToSignUp)
-            Spacer(modifier = Modifier.weight(0.3f))
-        }
-    }
-}
-
-
-//상단 이미지 및 로고 영역
-@Composable
-private fun TopSection() {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-
-    //상단 이미지, 로고 타이틀
-    Box(contentAlignment = Alignment.TopCenter) {
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((screenHeight / 2.12).dp),
-            painter = painterResource(id = R.drawable.shape),
-            contentScale = ContentScale.FillBounds,
-            contentDescription = "shape"
-        )
-
-        Row(
-            modifier = Modifier.padding(top = (screenHeight / 9).dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(MaterialTheme.dimens.logoSize),
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = stringResource(
-                    id = R.string.app_logo
-                ),
-                tint = uiColor
-            )
-
-            Spacer(modifier = Modifier.width(MaterialTheme.dimens.small2))
-
-            Column {
-                Text(
-                    text = stringResource(id = R.string.title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = uiColor
-                )
-
-                Text(
-                    text = stringResource(id = R.string.find_house),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = uiColor
-                )
-            }
+            SignInSection(viewModel::signInWithEmailAndPassword)
+            Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
+            SocialSection(viewModel::signInWithGoogle)
         }
 
-        Text(
-            modifier = Modifier
-                .padding(bottom = 10.dp)
-                .align(alignment = Alignment.BottomCenter),
-            text = stringResource(id = R.string.login),
-            style = MaterialTheme.typography.headlineLarge,
-            color = uiColor
-        )
+        CreateSection(onNavigateToSignUp)
     }
 }
 
@@ -212,7 +143,7 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
 //소셜 로그인 OR 회원가입 영역
 @Composable
 private fun SocialSection(onSignInWithGoogleClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = CenterHorizontally) {
         Text(
             text = "다른 방식으로 로그인 하시겠습니까?",
             style = MaterialTheme.typography.labelMedium.copy(color = Color(0xFF64748B))
@@ -276,6 +207,4 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
             }
         })
     }
-
-
 }

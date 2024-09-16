@@ -5,10 +5,10 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class SignInWithGoogle @Inject constructor(
-    private val repository: AuthRepository
+    private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(): Result<FirebaseUser> {
-        return repository.signInWithGoogle()
+        return authRepository.signInWithGoogle()
     }
 
 }

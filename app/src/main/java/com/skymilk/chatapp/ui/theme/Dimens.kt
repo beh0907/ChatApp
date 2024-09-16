@@ -28,7 +28,7 @@ val CompactSmallDimens = Dimens(
     medium2 = 26.dp,
     medium3 = 30.dp,
     large = 45.dp,
-    buttonHeight = 30.dp,
+    buttonHeight = 40.dp,
     logoSize = 36.dp,
 )
 
@@ -40,7 +40,7 @@ val CompactMediumDimens = Dimens(
     medium2 = 30.dp,
     medium3 = 35.dp,
     large = 65.dp,
-    buttonHeight = 35.dp
+    buttonHeight = 45.dp
 )
 
 val CompactDimens = Dimens(

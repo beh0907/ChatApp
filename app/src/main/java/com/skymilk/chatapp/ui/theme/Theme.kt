@@ -14,6 +14,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -26,12 +27,16 @@ import com.skymilk.composelogin.ui.theme.ExpandedDimens
 import com.skymilk.composelogin.ui.theme.MediumDimens
 
 private val DarkColorScheme = darkColorScheme(
-    primary = BlueGray,
-    surface = Black,
+    background = Black,
+    primary = Blue,
+    error = DarkRed,
+    surface = LightBlack
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Black,
+    background = Color.White,
+    primary = Blue,
+    error = LightRed,
     surface = Color.White
 )
 

@@ -5,10 +5,10 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class GetCurrentUser @Inject constructor(
-    private val repository: AuthRepository
+    private val authRepository: AuthRepository
 ) {
     operator fun invoke(): FirebaseUser? {
-        return repository.getCurrentUser()
+        return authRepository.getCurrentUser()
     }
 
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -33,7 +34,7 @@ fun AuthTextField(
         if (keyboardType == KeyboardType.Password) PasswordVisualTransformation()
         else VisualTransformation.None
 
-    TextField(
+    OutlinedTextField(
         modifier = modifier,
         singleLine = true,
         value = value,

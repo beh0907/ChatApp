@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen
+package com.skymilk.chatapp.store.presentation.screen.auth
 
 import com.google.firebase.auth.FirebaseUser
 

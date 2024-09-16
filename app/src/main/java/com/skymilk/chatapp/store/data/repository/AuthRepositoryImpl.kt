@@ -1,15 +1,18 @@
 package com.skymilk.chatapp.store.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.skymilk.chatapp.BuildConfig
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
+import com.skymilk.chatapp.utils.FirebaseAuthErrorHandler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -45,7 +48,17 @@ class AuthRepositoryImpl @Inject constructor(
 
             val authResult = firebaseAuth.signInWithCredential(firebaseCredential).await()
             Result.success(authResult.user!!)
-        } catch (e: Exception) {
+        } catch (e: FirebaseAuthException) {
+            e.printStackTrace()
+
+            // FirebaseAuthErrorHandler로 에러 메시지 처리
+            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            Log.e("AuthError", errorMessage)
+            Log.e("e.message", e.message.toString())
+
+            Result.failure(Exception(errorMessage))
+        } catch (e:Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -57,7 +70,17 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             Result.success(result.user!!)
-        } catch (e: Exception) {
+        } catch (e: FirebaseAuthException) {
+            e.printStackTrace()
+
+            // FirebaseAuthErrorHandler로 에러 메시지 처리
+            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            Log.e("AuthError", errorMessage)
+            Log.e("e.message", e.message.toString())
+
+            Result.failure(Exception(errorMessage))
+        } catch (e:Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -69,7 +92,19 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             Result.success(result.user!!)
-        } catch (e: Exception) {
+        } catch (e: FirebaseAuthException) {
+            e.printStackTrace()
+
+
+
+            // FirebaseAuthErrorHandler로 에러 메시지 처리
+            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            Log.e("AuthError", errorMessage)
+            Log.e("e.message", e.message.toString())
+
+            Result.failure(Exception(errorMessage))
+        } catch (e:Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
