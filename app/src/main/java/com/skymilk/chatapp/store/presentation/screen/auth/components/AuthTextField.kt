@@ -16,9 +16,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.focusedTextFieldText
-import com.skymilk.chatapp.ui.theme.textFieldContainer
-import com.skymilk.chatapp.ui.theme.unfocusedTextFieldText
 
 @Composable
 fun AuthTextField(
@@ -48,12 +45,6 @@ fun AuthTextField(
                 color = uiColor,
             )
         },
-        colors = TextFieldDefaults.colors(
-            unfocusedPlaceholderColor = MaterialTheme.colorScheme.unfocusedTextFieldText,
-            focusedPlaceholderColor = MaterialTheme.colorScheme.focusedTextFieldText,
-            unfocusedContainerColor = MaterialTheme.colorScheme.textFieldContainer,
-            focusedContainerColor = MaterialTheme.colorScheme.textFieldContainer
-        ),
         leadingIcon = {
             if (leadingIcon != null) {
                 Icon(

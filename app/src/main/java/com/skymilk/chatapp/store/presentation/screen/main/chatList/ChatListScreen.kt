@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chat
+package com.skymilk.chatapp.store.presentation.screen.main.chatList
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,12 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ChatRoomScreen(
-
-) {
+fun ChatListScreen(viewModel: ChatListViewModel, onChatItemClick: (String) -> Unit) {
 
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("ChatRoomScreen")
+        Text("ChatListScreen")
     }
 }

@@ -5,8 +5,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
-import com.skymilk.composelogin.ui.theme.CompactDimens
-import com.skymilk.composelogin.ui.theme.Dimens
 
 @Composable
 fun ProvideAppUtils(

@@ -47,7 +47,6 @@ import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.BlueGray
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.ui.theme.dimens
 
@@ -76,7 +75,8 @@ fun SignInScreen(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.5f)
                 .align(CenterHorizontally),
-            painter = painterResource(R.drawable.bg_chat),
+            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.bg_chat_dark)
+            else painterResource(R.drawable.bg_chat),
             contentDescription = ""
         )
 
@@ -130,7 +130,6 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
             onSignInWithEmailAndPassword(email, password)
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
             contentColor = Color.White
         ),
         shape = RoundedCornerShape(size = 4.dp)

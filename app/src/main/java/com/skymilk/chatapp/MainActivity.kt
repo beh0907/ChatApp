@@ -10,7 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import com.skymilk.chatapp.store.presentation.screen.navigation.NavGraph
+import com.skymilk.chatapp.store.presentation.navigation.NavGraph
 import com.skymilk.chatapp.ui.theme.ChatAppTheme
 import com.skymilk.chatapp.utils.Event
 import com.skymilk.chatapp.utils.EventBus.events
@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ChatAppTheme {
-
                 //메시지 수집 및 처리
                 SetObserveMessage()
 

@@ -29,7 +29,16 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String","GOOGLE_AUTH_WEB_CLIENT_ID", properties.getProperty("google.auth.web.client.id"))
+        buildConfigField(
+            "String",
+            "GOOGLE_AUTH_WEB_CLIENT_ID",
+            properties.getProperty("google.auth.web.client.id")
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_DATABASE_URL",
+            properties.getProperty("firebase.database.url")
+        )
     }
 
     buildTypes {
@@ -94,6 +103,9 @@ dependencies {
 
     //size
     implementation(libs.androidx.material3.window.size)
+
+    //lottie
+    implementation(libs.lottie.compose)
 
     //firebase
     implementation(platform(libs.firebase.bom))

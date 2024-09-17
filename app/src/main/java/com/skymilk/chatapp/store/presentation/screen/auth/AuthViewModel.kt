@@ -2,10 +2,10 @@ package com.skymilk.chatapp.store.presentation.screen.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseUser
+import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
 import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation
-import com.skymilk.chatapp.store.presentation.util.ValidationUtil
+import com.skymilk.chatapp.utils.ValidationUtil
 import com.skymilk.chatapp.utils.Event
 import com.skymilk.chatapp.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,7 +74,20 @@ class AuthViewModel @Inject constructor(
     }
 
     //이메일,패스워드 계정정보 회원가입
-    fun signUpWithEmailAndPassword(email: String, password: String, passwordConfirm: String) {
+    fun signUpWithEmailAndPassword(
+        name: String,
+        email: String,
+        password: String,
+        passwordConfirm: String
+    ) {
+        //이름 입력값 확인
+        val validateName = ValidationUtil.validateName(name)
+        if (validateName is RegisterValidation.Failed) {
+            //토스트 메시지 전달
+            sendEvent(Event.Toast(validateName.message))
+            return
+        }
+
         //이메일 입력값 확인
         val emailValidation = ValidationUtil.validateEmail(email)
         if (emailValidation is RegisterValidation.Failed) {
@@ -95,7 +108,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authState.update { AuthState.Loading }
 
-            val result = authUseCases.signUpWithEmailAndPassword(email, password)
+            val result = authUseCases.signUpWithEmailAndPassword(name, email, password)
             checkSignInResult(result)
         }
     }
@@ -111,15 +124,16 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun checkSignInResult(result: Result<FirebaseUser>) {
+    private fun checkSignInResult(result: Result<User>) {
         _authState.update {
             when {
-                result.isSuccess ->  {
+                result.isSuccess -> {
                     //토스트 메시지 전달
                     sendEvent(Event.Toast("로그인에 성공하였습니다."))
 
                     AuthState.Authenticated(result.getOrNull()!!)
                 }
+
                 result.isFailure -> {
                     //토스트 메시지 전달
                     sendEvent(Event.Toast(result.exceptionOrNull()?.message.toString()))
@@ -129,7 +143,7 @@ class AuthViewModel @Inject constructor(
                     )
                 }
 
-                else ->  {
+                else -> {
                     AuthState.Unauthenticated
                 }
             }

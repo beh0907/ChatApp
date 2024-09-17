@@ -1,11 +1,7 @@
-package com.skymilk.composelogin.ui.theme
+package com.skymilk.chatapp.ui.theme
 
-import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 data class Dimens(
     val extraSmall: Dp = 0.dp,

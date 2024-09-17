@@ -45,7 +45,6 @@ import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.BlueGray
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.ui.theme.dimens
 
@@ -74,7 +73,8 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.5f)
                 .align(CenterHorizontally),
-            painter = painterResource(R.drawable.bg_chat),
+            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.bg_chat_dark)
+            else painterResource(R.drawable.bg_chat),
             contentDescription = ""
         )
 
@@ -93,8 +93,8 @@ fun SignUpScreen(
 
 //회원가입 영역
 @Composable
-private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String) -> Unit) {
-    
+private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String, String) -> Unit) {
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -149,10 +149,9 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String)
             .fillMaxWidth()
             .height(MaterialTheme.dimens.buttonHeight),
         onClick = {
-            onSignUpWithEmailAndPassword(email, password, passwordConfirm)
+            onSignUpWithEmailAndPassword(name, email, password, passwordConfirm)
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
             contentColor = Color.White
         ),
         shape = RoundedCornerShape(size = 4.dp)

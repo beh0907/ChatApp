@@ -11,8 +11,8 @@ import javax.inject.Inject
 class GetChatRooms @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-    operator fun invoke(): Flow<List<ChatRoom>> {
-        return chatRepository.getChatRooms()
+    operator fun invoke(userId: String): Flow<List<ChatRoom>> {
+        return chatRepository.getChatRooms(userId)
     }
 
 }

@@ -1,7 +1,6 @@
-package com.skymilk.chatapp.store.presentation.screen.navigation
+package com.skymilk.chatapp.store.presentation.navigation
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,12 +22,11 @@ fun MainBottomNavigation(
 ) {
     NavigationBar(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 10.dp
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
-                label = { Text(text = item.title)},
+                label = { Text(text = item.title) },
                 selected = selected == index,
                 onClick = { onItemClick(index) },
                 icon = {

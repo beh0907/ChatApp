@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profile
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,15 +24,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.google.firebase.auth.FirebaseUser
-import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.BlueGray
+import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
-fun ProfileScreen(currentUser: FirebaseUser?, onSignOut: () -> Unit) {
-
-
+fun ProfileScreen(viewModel: ProfileViewModel, currentUser: User?, onSignOut: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -44,7 +39,7 @@ fun ProfileScreen(currentUser: FirebaseUser?, onSignOut: () -> Unit) {
         ) {
             currentUser.let { user ->
                 //프로필 이미지
-                user?.photoUrl?.let {
+                user?.profileImageUrl?.let {
                     AsyncImage(
                         modifier = Modifier
                             .size(140.dp)
@@ -56,11 +51,11 @@ fun ProfileScreen(currentUser: FirebaseUser?, onSignOut: () -> Unit) {
                         contentDescription = null,
                     )
 
-                    Spacer(modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
                 }
 
                 //유저 이름
-                user?.displayName?.let { name ->
+                user?.username?.let { name ->
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleLarge,
@@ -68,7 +63,7 @@ fun ProfileScreen(currentUser: FirebaseUser?, onSignOut: () -> Unit) {
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Spacer(modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
                 }
 
                 //유저 이메일
@@ -80,25 +75,25 @@ fun ProfileScreen(currentUser: FirebaseUser?, onSignOut: () -> Unit) {
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Spacer(modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
                 }
 
                 //유저 아이디
                 Text(
-                    text = "ID : ${currentUser?.uid}",
+                    text = "ID : ${currentUser?.id}",
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
+
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(MaterialTheme.dimens.buttonHeight),
                     onClick = { onSignOut() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(size = 4.dp)

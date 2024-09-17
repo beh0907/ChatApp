@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.navigation
+package com.skymilk.chatapp.store.presentation.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

@@ -1,16 +1,18 @@
 package com.skymilk.chatapp.store.domain.repository
 
-import com.google.firebase.auth.FirebaseUser
+import com.skymilk.chatapp.store.domain.model.User
 
 interface AuthRepository {
 
-    suspend fun signInWithGoogle(): Result<FirebaseUser>
+    suspend fun signInWithGoogle(): Result<User>
 
-    suspend fun signInWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
+    suspend fun signInWithEmailAndPassword(email: String, password: String): Result<User>
 
-    suspend fun signUpWithEmailAndPassword(email: String, password: String): Result<FirebaseUser>
+    suspend fun signUpWithEmailAndPassword(name:String, email: String, password: String): Result<User>
 
-    fun getCurrentUser(): FirebaseUser?
+    fun getCurrentUser(): User?
 
     suspend fun signOut()
+
+    suspend fun saveUserToDatabase(user: User)
 }

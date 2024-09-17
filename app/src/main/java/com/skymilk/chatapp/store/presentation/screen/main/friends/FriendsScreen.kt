@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun FriendsScreen(
-
+    viewModel: FriendsViewModel
 ) {
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

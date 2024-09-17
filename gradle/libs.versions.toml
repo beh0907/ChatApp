@@ -15,6 +15,7 @@ googleGmsGoogleServices = "4.4.2"
 hiltAndroid = "2.52"
 hiltNavigationCompose = "1.2.0"
 lifecycleRuntimeCompose = "2.8.5"
+lottieCompose = "6.5.2"
 materialIconsExtended = "1.7.1"
 navigationCompose = "2.8.0"
 googleId = "1.1.1"
@@ -51,6 +52,7 @@ firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
