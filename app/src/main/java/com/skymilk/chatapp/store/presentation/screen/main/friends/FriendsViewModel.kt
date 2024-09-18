@@ -4,13 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.skymilk.chatapp.store.domain.repository.UserRepository
+import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 class FriendsViewModel @AssistedInject constructor(
     @Assisted private val userId: String,
-    private val userRepository: UserRepository
+    private val userUseCases: UserUseCases
 ) : ViewModel() {
 
     @AssistedFactory

@@ -9,10 +9,11 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun FriendsScreen(
+    modifier: Modifier,
     viewModel: FriendsViewModel
 ) {
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text("FriendsScreen")
     }
 

@@ -96,14 +96,13 @@ fun NavGraph() {
                         MainNavGraph(
                             currentUser = currentUser,
                             onSignOut = {
-                                //로그아웃 처리
-                                authViewModel.signOut()
-
                                 navController.navigate(Routes.SignInScreen.route) {
                                     popUpTo(Routes.MainScreen.route) { inclusive = true }
                                 }
-                            },
-                            onNavigateToChatRoom = {}
+
+                                //로그아웃 처리
+                                authViewModel.signOut()
+                            }
                         )
                     } else {
                         // 로그인된 정보가 없다면 로그인 화면으로 강제 이동

@@ -11,6 +11,7 @@ import com.skymilk.chatapp.store.domain.usecase.auth.SignOut
 import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chat.CreateChatRoom
+import com.skymilk.chatapp.store.domain.usecase.chat.GetAllChatRooms
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRooms
 import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
@@ -43,6 +44,7 @@ object UseCaseModule {
     @Singleton
     fun provideChatUseCase(chatRepository: ChatRepository): ChatUseCases =
         ChatUseCases(
+            GetAllChatRooms(chatRepository),
             GetChatRooms(chatRepository),
             GetMessages(chatRepository),
             SendMessage(chatRepository),

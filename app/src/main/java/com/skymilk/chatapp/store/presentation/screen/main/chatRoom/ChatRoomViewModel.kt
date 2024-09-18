@@ -1,8 +1,9 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatList
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -12,40 +13,40 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
-class ChatListViewModel @AssistedInject constructor(
-    @Assisted private val userId: String,
+class ChatRoomViewModel @AssistedInject constructor(
+    @Assisted private val chatRoom: ChatRoomWithUsers,
     private val chatUseCases: ChatUseCases
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
-        fun create(userId: String): ChatListViewModel
+        fun create(chatRoom: ChatRoomWithUsers): ChatRoomViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: Factory,
-            userId: String
+            chatRoom: ChatRoomWithUsers
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(userId) as T
+                return assistedFactory.create(chatRoom) as T
             }
         }
     }
 
-    init {
-//        createChatRoom("채팅방 ㅎㅎㅎ", listOf("HpgwjfK6feTd5Ut0P4rn2stpgOf1", "LekzbyeX6eQMODyECMYKQVphIYF3"))
+    val chatMessages = chatUseCases.getMessages(chatRoom.id)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+
+    fun sendMessage(senderId: String, content: String) {
+        viewModelScope.launch {
+            chatUseCases.sendMessage(chatRoom.id, senderId, content)
+        }
     }
 
-//    val chatRooms = chatUseCases.getChatRooms(userId)
-//            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    val chatRooms = chatUseCases.getChatRooms(userId)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    fun createChatRoom(name: String, participants: List<String>) {
+    fun sendImageMessage(senderId: String, content: String) {
         viewModelScope.launch {
-            chatUseCases.createChatRoom(name, participants)
+            chatUseCases.sendImageMessage(chatRoom.id, senderId, content)
         }
     }
 }

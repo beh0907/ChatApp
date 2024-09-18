@@ -6,7 +6,9 @@ data class Message(
     val content: String,
     val timestamp: Long,
     val type: MessageType
-)
+) {
+    constructor() : this("", "", "", System.currentTimeMillis(), MessageType.TEXT)
+}
 
 enum class MessageType {
     TEXT, IMAGE

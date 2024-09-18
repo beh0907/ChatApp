@@ -28,10 +28,15 @@ import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel, currentUser: User?, onSignOut: () -> Unit) {
+fun ProfileScreen(
+    modifier: Modifier,
+    viewModel: ProfileViewModel,
+    currentUser: User?,
+    onSignOut: () -> Unit
+) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

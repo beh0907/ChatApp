@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import com.skymilk.chatapp.R
 
 @Composable
@@ -31,7 +32,7 @@ fun MainBottomNavigation(
                 onClick = { onItemClick(index) },
                 icon = {
                     Icon(
-                        imageVector = item.icon,
+                        imageVector = if (selected == index) item.selectedIcon else item.icon,
                         contentDescription = null,
                         modifier = Modifier.size(30.dp)
                     )

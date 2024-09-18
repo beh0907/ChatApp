@@ -1,7 +1,10 @@
 package com.skymilk.chatapp.di
 
+import com.google.android.play.integrity.internal.f
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.skymilk.chatapp.BuildConfig
 import dagger.Module
@@ -23,6 +26,11 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseDatabase() = FirebaseDatabase.getInstance(BuildConfig.FIREBASE_DATABASE_URL)
+
+    //파이어베이스 파이어스토어 초기화
+    @Provides
+    @Singleton
+    fun provideFirebaseFireStore() = Firebase.firestore
 
     //파이어스토리지 초기화
     @Provides
