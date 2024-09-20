@@ -1,13 +1,11 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.util.fastFilter
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.Message
 import com.skymilk.chatapp.store.domain.model.User

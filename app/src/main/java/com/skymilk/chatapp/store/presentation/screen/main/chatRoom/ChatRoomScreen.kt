@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import BottomSheetImagePicker
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageList
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.ComposeFileProvider
@@ -52,6 +54,7 @@ fun ChatRoomScreen(
     onNavigateToBack: () -> Unit
 ) {
     val chatMessages by viewModel.chatMessages.collectAsStateWithLifecycle()
+    val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -75,7 +78,7 @@ fun ChatRoomScreen(
             modifier = Modifier.imePadding(),
             onSendMessage = viewModel::sendMessage,
             onSendImageMessage = viewModel::sendImageMessage,
-            currentUser = currentUser
+            userId = currentUser.id,
         )
     }
 
@@ -124,8 +127,8 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
 fun BottomSection(
     modifier: Modifier = Modifier,
     onSendMessage: (String, String) -> Unit,
-    onSendImageMessage: (String, String) -> Unit,
-    currentUser: User
+    onSendImageMessage: (String, Uri) -> Unit,
+    userId: String,
 ) {
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -135,22 +138,26 @@ fun BottomSection(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    //이미지 갤러리에서 가져오기
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-
-//                onSendImageMessage(currentUser.id, path)
+            onSendImageMessage(userId, uri)
         }
     }
 
+    //카메라 이미지 가져오기
+    val cameraUri = remember { mutableStateOf(ComposeFileProvider.getImageUri(context)) }
     val cameraCapture = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success: Boolean ->
         if (success) {
-            ComposeFileProvider.getImageUri(context).let { uri ->
-                //                    onSendImageMessage(currentUser.id, path)
-            }
+            Log.d(
+                "rememberLauncherForActivityResult",
+                ComposeFileProvider.getImageUri(context).toString()
+            )
+            onSendImageMessage(userId, cameraUri.value)
         }
     }
 
@@ -179,7 +186,7 @@ fun BottomSection(
             },
             keyboardActions = KeyboardActions(onDone = {
                 //메시지 전송
-                onSendMessage(currentUser.id, message)
+                onSendMessage(userId, message)
 
                 //텍스트 필드 초기화
                 message = ""
@@ -192,7 +199,7 @@ fun BottomSection(
         IconButton(
             onClick = {
                 //메시지 전송
-                onSendMessage(currentUser.id, message)
+                onSendMessage(userId, message)
 
                 //텍스트 필드 초기화
                 message = ""
@@ -222,11 +229,9 @@ fun BottomSection(
 
         },
         onCameraCapture = {
-            ComposeFileProvider.getImageUri(context).let { uri ->
-                scope.launch {
-                    if (PermissionUtil.requestCameraPermissions()) {
-                        cameraCapture.launch(uri)
-                    }
+            scope.launch {
+                if (PermissionUtil.requestCameraPermissions()) {
+                    cameraCapture.launch(cameraUri.value)
                 }
             }
         })

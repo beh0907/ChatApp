@@ -2,6 +2,7 @@ package com.skymilk.chatapp.di
 
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
+import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
 import com.skymilk.chatapp.store.domain.usecase.auth.GetCurrentUser
@@ -16,6 +17,9 @@ import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRooms
 import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
 import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
+import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
+import com.skymilk.chatapp.store.domain.usecase.storage.SaveProfileImage
+import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.GetUser
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
@@ -58,5 +62,13 @@ object UseCaseModule {
         UserUseCases(
             UpdateProfile(userRepository),
             GetUser(userRepository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideStorageUseCase(storageRepository: StorageRepository): StorageUseCases =
+        StorageUseCases(
+            SaveProfileImage(storageRepository),
+            SaveChatMessageImage(storageRepository)
         )
 }

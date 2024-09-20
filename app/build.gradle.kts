@@ -113,6 +113,9 @@ dependencies {
     //lottie
     implementation(libs.lottie.compose)
 
+    //placeholder
+    runtimeOnly(libs.accompanist.placeholder.material)
+
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

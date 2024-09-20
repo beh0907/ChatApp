@@ -1,9 +1,10 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,14 +26,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.commit451.coiltransformations.BlurTransformation
 import com.skymilk.chatapp.store.domain.model.Message
+import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
 fun ItemOtherMessage(message: Message, sender: User) {
+    val context = LocalContext.current
 
     BoxWithConstraints(
         modifier = Modifier
@@ -71,14 +76,36 @@ fun ItemOtherMessage(message: Message, sender: User) {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     shadowElevation = 4.dp,
-                    color = Color.White
+                    color = Color.White,
+                    modifier = Modifier.widthIn(max = maxWidth * 0.7f)
                 ) {
-                    Text(
-                        color = Black,
-                        text = message.content,
-                        modifier = Modifier.padding(8.dp),
-                        fontFamily = HannaPro
-                    )
+                    when (message.type) {
+                        //텍스트 타입
+                        MessageType.TEXT -> {
+                            Text(
+                                color = Black,
+                                text = message.content,
+                                modifier = Modifier.padding(8.dp),
+                                fontFamily = HannaPro
+                            )
+                        }
+
+                        //이미지 타입
+                        MessageType.IMAGE -> {
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(message.content)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit // 이미지의 크기 조정
+                            )
+                        }
+
+                        MessageType.VIDEO -> {
+                        }
+                    }
                 }
             }
 

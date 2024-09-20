@@ -3,9 +3,9 @@ package com.skymilk.chatapp.utils
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.INTERNET
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_AUDIO
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.os.Build
 import com.gun0912.tedpermission.coroutine.TedPermission
 
@@ -21,7 +21,6 @@ object PermissionUtil {
             permissions.add(READ_EXTERNAL_STORAGE)
         } else {
             permissions.add(READ_MEDIA_IMAGES)
-            permissions.add(READ_MEDIA_AUDIO)
         }
 
         //권한 요청 및 결과 정보 리턴
@@ -33,10 +32,12 @@ object PermissionUtil {
     //코루틴 권한 요청 처리
     suspend fun requestStoragePermissions(): Boolean {
         // SDK 버전에 따라 추가 권한을 요청
-        val permissions =  if (Build.VERSION.SDK_INT <= 32) {
+        val permissions = if (Build.VERSION.SDK_INT <= 32) {
             listOf(READ_EXTERNAL_STORAGE)
-        } else {
-            listOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO)
+        } else if (Build.VERSION.SDK_INT >= 34)
+            listOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_VISUAL_USER_SELECTED)
+        else {
+            listOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO)
         }
 
         //권한 요청 및 결과 정보 리턴
