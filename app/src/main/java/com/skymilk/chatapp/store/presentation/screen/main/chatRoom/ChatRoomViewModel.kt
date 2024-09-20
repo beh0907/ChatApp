@@ -35,7 +35,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     val chatMessages = chatUseCases.getMessages(chatRoom.id)
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
 
     fun sendMessage(senderId: String, content: String) {

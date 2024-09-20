@@ -90,6 +90,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
+    //Compose permissions
+    implementation(libs.tedpermission.coroutine)
+
     // Material Icon Extended
     implementation(libs.androidx.material.icons.extended)
 
@@ -101,6 +105,7 @@ dependencies {
 
     // Coil Image
     implementation(libs.coil)
+    implementation(libs.coil.transformations)
 
     //size
     implementation(libs.androidx.material3.window.size)

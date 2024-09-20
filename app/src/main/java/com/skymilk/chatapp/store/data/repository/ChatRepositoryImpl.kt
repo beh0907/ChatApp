@@ -80,8 +80,7 @@ class ChatRepositoryImpl @Inject constructor(
                     // participants를 기반으로 User 정보를 가져오기
                     val chatRoomWithUsersList = chatRooms.mapIndexed { index, chatRoom ->
                         ChatRoomWithUsers(
-                            id = snapshots?.documents?.get(index)?.id ?: chatRoom.id,
-//                            id = chatRoom.id,
+                            id = chatRoom.id,
                             name = chatRoom.name,
                             participants = getUsersForParticipants(chatRoom.participants),
                             lastMessage = chatRoom.lastMessage,

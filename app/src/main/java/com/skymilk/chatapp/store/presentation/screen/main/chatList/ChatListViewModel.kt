@@ -7,6 +7,7 @@ import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ class ChatListViewModel @AssistedInject constructor(
 //            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val chatRooms = chatUseCases.getChatRooms(userId)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun createChatRoom(name: String, participants: List<String>) {
         viewModelScope.launch {

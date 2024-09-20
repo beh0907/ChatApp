@@ -1,5 +1,9 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
+import BottomSheetImagePicker
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,10 +26,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +39,9 @@ import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.utils.ComposeFileProvider
+import com.skymilk.chatapp.utils.PermissionUtil
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatRoomScreen(
@@ -48,11 +57,12 @@ fun ChatRoomScreen(
         modifier = modifier.fillMaxSize()
     ) {
 
-        TopSection(onNavigateToBack)
-
+        TopSection(
+            onNavigateToBack = onNavigateToBack, chatRoom = chatRoom, currentUser = currentUser
+        )
 
         // ChatRoomMessages 영역
-        ChatRoomMessages(
+        ChatMessageList(
             modifier = Modifier
                 .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
                 .fillMaxWidth(),
@@ -74,8 +84,14 @@ fun ChatRoomScreen(
 
 //상단 타이틀
 @Composable
-fun TopSection(onNavigateToBack: () -> Unit) {
+fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, currentUser: User) {
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+
+    val title = when (chatRoom.participants.size) {
+        1 -> ""
+        2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: ""
+        else -> "그룹채팅"
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -94,7 +110,7 @@ fun TopSection(onNavigateToBack: () -> Unit) {
 
         Text(
             modifier = Modifier.weight(1f),
-            text = "채팅",
+            text = title,
             fontFamily = HannaPro,
             style = MaterialTheme.typography.titleLarge,
             color = uiColor
@@ -111,17 +127,41 @@ fun BottomSection(
     onSendImageMessage: (String, String) -> Unit,
     currentUser: User
 ) {
+    var message by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+
+//                onSendImageMessage(currentUser.id, path)
+        }
+    }
+
+    val cameraCapture = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success: Boolean ->
+        if (success) {
+            ComposeFileProvider.getImageUri(context).let { uri ->
+                //                    onSendImageMessage(currentUser.id, path)
+            }
+        }
+    }
+
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        val keyboardController = LocalSoftwareKeyboardController.current
-        val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-        var message by remember { mutableStateOf("") }
 
-        IconButton(onClick = {
-
-        }) {
+        IconButton(onClick = { showBottomSheet = true }) {
             Icon(
                 modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.AttachFile, contentDescription = null, tint = uiColor
+                imageVector = Icons.Default.AttachFile,
+                contentDescription = null,
+                tint = uiColor
             )
         }
 
@@ -159,8 +199,7 @@ fun BottomSection(
 
                 //키보드 숨기기
                 keyboardController?.hide()
-            },
-            enabled = message.isNotBlank()
+            }, enabled = message.isNotBlank()
         ) {
             Icon(
                 modifier = Modifier.size(36.dp),
@@ -170,4 +209,25 @@ fun BottomSection(
             )
         }
     }
+
+    //바텀시트
+    BottomSheetImagePicker(isVisible = showBottomSheet,
+        onDismiss = { showBottomSheet = false },
+        onImagePicker = {
+            scope.launch {
+                if (PermissionUtil.requestStoragePermissions()) {
+                    imagePicker.launch("image/*")
+                }
+            }
+
+        },
+        onCameraCapture = {
+            ComposeFileProvider.getImageUri(context).let { uri ->
+                scope.launch {
+                    if (PermissionUtil.requestCameraPermissions()) {
+                        cameraCapture.launch(uri)
+                    }
+                }
+            }
+        })
 }

@@ -10,13 +10,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.skymilk.chatapp.store.presentation.navigation.NavGraph
 import com.skymilk.chatapp.ui.theme.ChatAppTheme
 import com.skymilk.chatapp.utils.Event
 import com.skymilk.chatapp.utils.EventBus.events
+import com.skymilk.chatapp.utils.PermissionUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -24,6 +27,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        lifecycleScope.launch {
+            PermissionUtil.requestAllPermissions()
+        }
 
         setContent {
             ChatAppTheme {

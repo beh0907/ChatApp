@@ -24,12 +24,3 @@ fun FirebaseUser.toUser(): User {
         profileImageUrl = photoUrl?.toString() ?: ""
     )
 }
-
-//User객체 Map 타입 변환
-fun User.toMap(): Map<String, Any?> {
-    return mapOf(
-        "username" to username,
-        "email" to email,
-        "profileImageUrl" to profileImageUrl
-    )
-}
