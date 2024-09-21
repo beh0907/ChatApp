@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
+import com.skymilk.chatapp.utils.Constants
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -16,7 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.tasks.await
 
 class ChatRoomViewModel @AssistedInject constructor(
     @Assisted private val chatRoom: ChatRoomWithUsers,
@@ -38,6 +40,10 @@ class ChatRoomViewModel @AssistedInject constructor(
                 return assistedFactory.create(chatRoom) as T
             }
         }
+    }
+
+    init {
+        subscribeForNotification()
     }
 
     //채팅 목록
@@ -78,7 +84,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     //이미지 업로드
     private fun uploadImage(id: String, uri: Uri, onSuccess: (String) -> Unit) {
         viewModelScope.launch {
-            _uploadState.value = ImageUploadState.Loading
+            _uploadState.value = ImageUploadState.Loading(imageUri = uri)
             try {
                 storageUseCases.saveChatMessageImage(id, uri).collect { progress ->
                     _uploadState.value = when {
@@ -90,13 +96,32 @@ class ChatRoomViewModel @AssistedInject constructor(
                         else -> ImageUploadState.Uploading(
                             progress = progress.progress,
                             bytesTransferred = progress.bytesTransferred,
-                            totalBytes = progress.totalBytes
+                            totalBytes = progress.totalBytes,
+                            imageUri = uri
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uploadState.value = ImageUploadState.Error(e.message ?: "Unknown error occurred")
             }
+        }
+    }
+
+    //fcm 알림 토픽 등록
+    private fun subscribeForNotification() {
+        FirebaseMessaging.getInstance()
+            .subscribeToTopic("${Constants.FCM_TOPIC_PREFIX}${chatRoom.id}")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) Log.d("FCM", "토픽 등록 성공")
+                else Log.d("FCM", "토픽 등록 실패")
+            }
+    }
+
+    //fcm 알림 토픽 제거
+    private fun unsubscribeForNotification() {
+        viewModelScope.launch {
+            FirebaseMessaging.getInstance()
+                .unsubscribeFromTopic("${Constants.FCM_TOPIC_PREFIX}${chatRoom.id}").await()
         }
     }
 }

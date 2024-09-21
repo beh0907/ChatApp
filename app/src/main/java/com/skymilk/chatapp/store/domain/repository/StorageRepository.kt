@@ -10,4 +10,5 @@ interface StorageRepository {
 
     suspend fun saveChatMessageImage(chatRoomId: String, uri: Uri): Flow<UploadProgress>
 
+    fun saveImage(path: String, uri: Uri): Flow<UploadProgress>
 }

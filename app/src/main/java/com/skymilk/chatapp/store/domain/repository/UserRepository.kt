@@ -9,5 +9,5 @@ interface UserRepository {
 
     suspend fun getUser(userId: String): Result<User> // 특정 유저 정보 가져오기
 
-    fun getFriends(userId:String):Flow<List<User>> // 나의 친구 목록 가져오기
+    fun getFriends(userId: String): Flow<List<User>> // 나의 친구 목록 가져오기
 }

@@ -20,14 +20,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.skymilk.chatapp.store.domain.model.Message
+import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
-fun ItemMyMessage(message: Message) {
+fun ItemMyMessage(chatMessage: ChatMessage) {
     val context = LocalContext.current
 
     BoxWithConstraints(
@@ -43,7 +43,7 @@ fun ItemMyMessage(message: Message) {
             verticalAlignment = Alignment.Bottom
         ) {
             Text(
-                text = DateUtil.getTime(message.timestamp),
+                text = DateUtil.getTime(chatMessage.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
                 fontFamily = HannaPro
@@ -53,14 +53,14 @@ fun ItemMyMessage(message: Message) {
                 shape = RoundedCornerShape(12.dp),
                 shadowElevation = 4.dp,
                 color = Color(0xFF90CAF9),
-                modifier = Modifier.widthIn(max = maxWidth * 0.7f)
+                modifier = Modifier.widthIn(max = maxWidth)
             ) {
-                when (message.type) {
+                when (chatMessage.type) {
                     //텍스트 타입
                     MessageType.TEXT -> {
                         Text(
                             color = Black,
-                            text = message.content,
+                            text = chatMessage.content,
                             modifier = Modifier.padding(8.dp),
                             fontFamily = HannaPro
                         )
@@ -70,7 +70,7 @@ fun ItemMyMessage(message: Message) {
                     MessageType.IMAGE -> {
                         AsyncImage(
                             model = ImageRequest.Builder(context)
-                                .data(message.content)
+                                .data(chatMessage.content)
                                 .crossfade(true)
                                 .build(),
                             contentDescription = null,

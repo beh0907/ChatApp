@@ -70,8 +70,9 @@ fun ChatRoomScreen(
                 .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
                 .fillMaxWidth(),
             chatRoom = chatRoom,
-            chatMessages = chatMessages,
-            currentUser = currentUser
+            chatChatMessages = chatMessages,
+            currentUser = currentUser,
+            uploadState = uploadState
         )
 
         BottomSection(
@@ -91,7 +92,7 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
     val title = when (chatRoom.participants.size) {
-        1 -> ""
+        1 -> chatRoom.participants.first().username
         2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: ""
         else -> "그룹채팅"
     }
@@ -182,6 +183,7 @@ fun BottomSection(
                     text = "채팅을 입력해주세요.",
                     style = MaterialTheme.typography.labelMedium,
                     color = uiColor,
+                    fontFamily = HannaPro
                 )
             },
             keyboardActions = KeyboardActions(onDone = {

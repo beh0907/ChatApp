@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -28,7 +29,7 @@ class StorageRepositoryImpl @Inject constructor(
         )
     }
 
-    private fun saveImage(path: String, uri: Uri): Flow<UploadProgress> = callbackFlow {
+    override fun saveImage(path: String, uri: Uri): Flow<UploadProgress> = callbackFlow {
         val storageRef = storageReference.child(path)
         val uploadTask = storageRef.putFile(uri)
 
@@ -39,6 +40,9 @@ class StorageRepositoryImpl @Inject constructor(
                 totalBytes = taskSnapshot.totalByteCount,
                 progress = ((100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount).toInt()
             )
+
+            Log.d("saveImage", "progress: $progress")
+
             trySend(progress)
         }
 

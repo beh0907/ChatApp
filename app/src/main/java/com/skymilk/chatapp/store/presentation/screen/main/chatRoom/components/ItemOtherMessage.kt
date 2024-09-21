@@ -26,17 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.commit451.coiltransformations.BlurTransformation
-import com.skymilk.chatapp.store.domain.model.Message
+import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
-fun ItemOtherMessage(message: Message, sender: User) {
+fun ItemOtherMessage(chatMessage: ChatMessage, sender: User) {
     val context = LocalContext.current
 
     BoxWithConstraints(
@@ -77,14 +75,14 @@ fun ItemOtherMessage(message: Message, sender: User) {
                     shape = RoundedCornerShape(12.dp),
                     shadowElevation = 4.dp,
                     color = Color.White,
-                    modifier = Modifier.widthIn(max = maxWidth * 0.7f)
+                    modifier = Modifier.widthIn(max = maxWidth)
                 ) {
-                    when (message.type) {
+                    when (chatMessage.type) {
                         //텍스트 타입
                         MessageType.TEXT -> {
                             Text(
                                 color = Black,
-                                text = message.content,
+                                text = chatMessage.content,
                                 modifier = Modifier.padding(8.dp),
                                 fontFamily = HannaPro
                             )
@@ -94,7 +92,7 @@ fun ItemOtherMessage(message: Message, sender: User) {
                         MessageType.IMAGE -> {
                             AsyncImage(
                                 model = ImageRequest.Builder(context)
-                                    .data(message.content)
+                                    .data(chatMessage.content)
                                     .crossfade(true)
                                     .build(),
                                 contentDescription = null,
@@ -112,7 +110,7 @@ fun ItemOtherMessage(message: Message, sender: User) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = DateUtil.getTime(message.timestamp),
+                text = DateUtil.getTime(chatMessage.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.align(Alignment.Bottom),
                 fontFamily = HannaPro

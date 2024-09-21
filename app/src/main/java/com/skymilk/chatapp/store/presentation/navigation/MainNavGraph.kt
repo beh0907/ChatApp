@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -178,7 +177,7 @@ fun MainNavGraph(
             }
 
             //채팅방 화면
-            composable(Routes.ChatRoomScreen.route) {
+            composable(route = Routes.ChatRoomScreen.route) {
                 val chatRoom by remember {
                     mutableStateOf(
                         navController.currentBackStackEntry?.savedStateHandle?.get<ChatRoomWithUsers>(

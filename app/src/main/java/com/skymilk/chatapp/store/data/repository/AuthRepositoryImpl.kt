@@ -13,7 +13,7 @@ import com.skymilk.chatapp.BuildConfig
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.model.toUser
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
-import com.skymilk.chatapp.utils.FirebaseAuthErrorHandler
+import com.skymilk.chatapp.utils.FirebaseUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -62,7 +62,7 @@ class AuthRepositoryImpl @Inject constructor(
             e.printStackTrace()
 
             // FirebaseAuthErrorHandler로 에러 메시지 처리
-            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            val errorMessage = FirebaseUtil.getErrorMessage(e)
 
             Result.failure(Exception(errorMessage))
         } catch (e: Exception) {
@@ -84,7 +84,7 @@ class AuthRepositoryImpl @Inject constructor(
             e.printStackTrace()
 
             // FirebaseAuthErrorHandler로 에러 메시지 처리
-            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            val errorMessage = FirebaseUtil.getErrorMessage(e)
 
             Result.failure(Exception(errorMessage))
         } catch (e: Exception) {
@@ -113,7 +113,7 @@ class AuthRepositoryImpl @Inject constructor(
             e.printStackTrace()
 
             // FirebaseAuthErrorHandler로 에러 메시지 처리
-            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            val errorMessage = FirebaseUtil.getErrorMessage(e)
 
             Result.failure(Exception(errorMessage))
         } catch (e: Exception) {

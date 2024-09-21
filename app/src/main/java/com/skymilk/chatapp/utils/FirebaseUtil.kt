@@ -1,8 +1,14 @@
 package com.skymilk.chatapp.utils
 
+import android.content.Context
+import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.auth.FirebaseAuthException
+import com.skymilk.chatapp.R
+import java.io.FileInputStream
+import java.util.Arrays
 
-object FirebaseAuthErrorHandler {
+
+object FirebaseUtil {
 
     // FirebaseAuthException에 따른 사용자 친화적인 오류 메시지를 반환
     fun getErrorMessage(exception: FirebaseAuthException?): String {
@@ -24,5 +30,12 @@ object FirebaseAuthErrorHandler {
             "ERROR_WEAK_PASSWORD" -> "비밀번호가 너무 약합니다."
             else -> "알 수 없는 오류가 발생했습니다. 다시 시도해주세요."
         }
+    }
+
+    fun getAccessToken(context: Context): String {
+        val inputSteam = context.resources.openRawResource(R.raw.service_account)
+        val googleCredentials = GoogleCredentials.fromStream(inputSteam)
+            .createScoped(listOf("https://www.googleapis.com/auth/firebase.messaging"))
+        return googleCredentials.refreshAccessToken().tokenValue
     }
 }

@@ -7,7 +7,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
-import com.skymilk.chatapp.utils.FirebaseAuthErrorHandler
+import com.skymilk.chatapp.utils.FirebaseUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -61,7 +61,7 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: FirebaseAuthException) {
             e.printStackTrace()
 
-            val errorMessage = FirebaseAuthErrorHandler.getErrorMessage(e)
+            val errorMessage = FirebaseUtil.getErrorMessage(e)
 
             Result.failure(Exception(errorMessage))
         } catch (e: Exception) {

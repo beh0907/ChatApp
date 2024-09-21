@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     kotlin("kapt")
     id("kotlin-parcelize")
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 // local.properties 사용을 위함
@@ -35,10 +36,17 @@ android {
             "GOOGLE_AUTH_WEB_CLIENT_ID",
             properties.getProperty("google.auth.web.client.id")
         )
+
         buildConfigField(
             "String",
             "FIREBASE_DATABASE_URL",
             properties.getProperty("firebase.database.url")
+        )
+
+        buildConfigField(
+            "String",
+            "FIREBASE_ADMIN_KEY",
+            properties.getProperty("firebase.admin.key")
         )
     }
 
@@ -68,6 +76,12 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/public-suffix-list.txt"
         }
     }
 }
@@ -90,6 +104,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //serialization
+    implementation (libs.kotlinx.serialization.json)
 
     //Compose permissions
     implementation(libs.tedpermission.coroutine)
@@ -124,6 +140,9 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
 
+    //google oauth2
+    implementation (libs.google.auth.library.oauth2.http)
+
     //Dagger Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
@@ -133,4 +152,9 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
+    implementation (libs.logging.interceptor)
 }

@@ -1,6 +1,6 @@
 package com.skymilk.chatapp.store.domain.model
 
-data class Message(
+data class ChatMessage(
     val id: String,
     val senderId: String,
     val content: String,
