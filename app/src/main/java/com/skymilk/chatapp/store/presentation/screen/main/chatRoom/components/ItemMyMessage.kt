@@ -1,11 +1,14 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +25,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
+import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.DateUtil
@@ -75,6 +79,7 @@ fun ItemMyMessage(chatMessage: ChatMessage) {
                                 .build(),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
+                            placeholder = null,
                             contentScale = ContentScale.Fit // 이미지의 크기 조정
                         )
                     }
@@ -83,6 +88,40 @@ fun ItemMyMessage(chatMessage: ChatMessage) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ItemMyMessageShimmer() {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 8.dp)
+    ) {
+        val maxWidth = maxWidth * 0.6f
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            // 시간 자리 표시자
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .width(50.dp)
+                    .padding(end = 8.dp)
+                    .shimmerEffect()
+            )
+
+            // 메시지 내용 자리 표시자
+            Box(
+                modifier = Modifier
+                    .height(40.dp) // 높이는 상황에 맞게 조정
+                    .shimmerEffect()
+                    .fillMaxWidth(0.6f)
+            )
         }
     }
 }

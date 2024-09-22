@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state
 
 import android.net.Uri
 

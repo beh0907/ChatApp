@@ -41,8 +41,6 @@ class StorageRepositoryImpl @Inject constructor(
                 progress = ((100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount).toInt()
             )
 
-            Log.d("saveImage", "progress: $progress")
-
             trySend(progress)
         }
 

@@ -1,9 +1,11 @@
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
@@ -50,7 +52,7 @@ fun BottomSheetImagePicker(
 
                 BottomSheetOption(
                     icon = Icons.Default.CameraAlt,
-                    text = "카메라 찍기",
+                    text = "카메라 촬영",
                     onClick = {
                         onCameraCapture()
                         onDismiss()
@@ -72,11 +74,11 @@ private fun BottomSheetOption(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(imageVector = icon, contentDescription = null)
 
-        Spacer(Modifier.width(16.dp))
+        Spacer(Modifier.size(16.dp))
 
         Text(
             text = text,

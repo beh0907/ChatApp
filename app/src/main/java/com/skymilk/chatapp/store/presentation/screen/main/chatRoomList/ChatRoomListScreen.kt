@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatList
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,13 +38,11 @@ import com.skymilk.chatapp.ui.theme.dimens
 @Composable
 fun ChatListScreen(
     modifier: Modifier,
-    viewModel: ChatListViewModel,
+    viewModel: ChatRoomListViewModel,
     currentUser: User,
-    onChatItemClick: (ChatRoomWithUsers) -> Unit
+    onChatItemClick: (String) -> Unit
 ) {
-    val chatRooms by viewModel.chatRooms.collectAsStateWithLifecycle()
-
-    Log.d("chatRooms", chatRooms.toString())
+    val chatListState by viewModel.chatRoomsState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -55,7 +51,21 @@ fun ChatListScreen(
 
         HorizontalDivider()
 
-        ChatRoomList(chatRooms, currentUser, onChatItemClick)
+        when(chatListState) {
+            is ChatRoomsState.Loading -> {
+                // 로딩 중 UI 표시
+                ChatRoomListShimmer()
+            }
+
+            is ChatRoomsState.Success -> {
+                //로딩이 완료 됐을 때 표시
+                val chatRooms = (chatListState as ChatRoomsState.Success).chatRooms
+
+                ChatRoomList(chatRooms, currentUser, onChatItemClick)
+            }
+
+            else -> Unit
+        }
     }
 }
 

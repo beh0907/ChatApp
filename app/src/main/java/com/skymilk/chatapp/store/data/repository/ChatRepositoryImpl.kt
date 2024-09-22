@@ -8,6 +8,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObject
 import com.skymilk.chatapp.store.data.dto.ChatRoom
 import com.skymilk.chatapp.store.data.dto.FcmMessage
 import com.skymilk.chatapp.store.data.dto.Message
@@ -38,24 +40,19 @@ class ChatRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ChatRepository {
 
-    // 전체 채팅방 목록 실시간으로 가져오기
-    override fun getAllChatRooms(): Flow<List<ChatRoomWithUsers>> = callbackFlow {
-        val listenerRegistration = firebaseFireStore.collection("chatRooms")
-            .addSnapshotListener { snapshots, e ->
+    //아이디로 채팅방 정보 불러오기
+    override fun getChatRoom(chatRoomId: String): Flow<ChatRoomWithUsers> = callbackFlow {
+        val listener = firebaseFireStore.collection("chatRooms").document(chatRoomId)
+            .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     close(e)
                     return@addSnapshotListener
                 }
 
-                // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보를 비동기적으로 가져오기
-                launch {
-                    val chatRooms = snapshots?.documents?.mapNotNull { doc ->
-                        doc.toObject(ChatRoom::class.java)
-                    }.orEmpty()
-
-                    // participants를 기반으로 User 정보를 가져오기
-                    val chatRoomWithUsersList = chatRooms.map { chatRoom ->
-                        ChatRoomWithUsers(
+                if (snapshot != null && snapshot.exists()) {
+                    val chatRoom = snapshot.toObject<ChatRoom>()!!
+                    launch {
+                        val chatRoomWithUsers = ChatRoomWithUsers(
                             id = chatRoom.id,
                             name = chatRoom.name,
                             participants = getUsersForParticipants(chatRoom.participants),
@@ -63,19 +60,19 @@ class ChatRepositoryImpl @Inject constructor(
                             lastMessageTimestamp = chatRoom.lastMessageTimestamp,
                             createdTimestamp = chatRoom.createdTimestamp
                         )
+                        trySend(chatRoomWithUsers)
                     }
-
-                    trySend(chatRoomWithUsersList)
                 }
             }
 
-        awaitClose { listenerRegistration.remove() }
+        awaitClose { listener.remove() }
     }
 
     // 나의 채팅방 목록 실시간으로 가져오기
     override fun getChatRooms(userId: String): Flow<List<ChatRoomWithUsers>> = callbackFlow {
-        val listenerRegistration = firebaseFireStore.collection("chatRooms")
+        val listener = firebaseFireStore.collection("chatRooms")
             .whereArrayContains("participants", userId)
+            .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
                     close(e)
@@ -104,7 +101,7 @@ class ChatRepositoryImpl @Inject constructor(
                 }
             }
 
-        awaitClose { listenerRegistration.remove() }
+        awaitClose { listener.remove() }
     }
 
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)

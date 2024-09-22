@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ImageUploadState
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.DateUtil
 import com.skymilk.chatapp.utils.FileSizeUtil

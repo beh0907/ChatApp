@@ -9,8 +9,9 @@ import androidx.compose.ui.Modifier
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ImageUploadState
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 import com.skymilk.chatapp.utils.DateUtil
+import kotlin.random.Random
 
 @Composable
 fun ChatMessageList(
@@ -43,11 +44,12 @@ fun ChatMessageList(
                     message.timestamp
                 )
             ) {
+                //중앙 날짜 정보
                 ItemFullDate(DateUtil.getFullDate(message.timestamp))
             }
 
             if (message.senderId == currentUser.id) {
-                //내가 작성한 메시지라면
+                //내가 작성한 메시지
                 ItemMyMessage(
                     chatMessage = message
                 )
@@ -57,7 +59,7 @@ fun ChatMessageList(
                 val sender = chatRoom.participants
                     .find { it.id == message.senderId }!!
 
-                //다른 사람이 작성한 메시지라면
+                //다른 사람이 작성한 메시지
                 ItemOtherMessage(
                     chatMessage = message,
                     sender = sender
@@ -71,6 +73,24 @@ fun ChatMessageList(
             item {
                 ItemMyUploadImage(uploadState)
             }
+        }
+    }
+}
+
+@Composable
+fun ChatMessageListShimmer(
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier
+    ) {
+        items(20) {
+            // 랜덤으로 아이템 선택
+            val isMyMessage = Random.nextBoolean()
+
+            if (isMyMessage) ItemMyMessageShimmer() // 사용자 메시지 로딩 아이템
+            else ItemOtherMessageShimmer() // 상대방 메시지 로딩 아이템
+
         }
     }
 }

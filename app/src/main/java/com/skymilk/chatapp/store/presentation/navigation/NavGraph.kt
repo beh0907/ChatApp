@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -84,11 +86,12 @@ fun NavGraph() {
                 }
             }
 
-
+            //메인 네비게이션
             navigation(
                 route = Routes.MainNavigation.route,
-                startDestination = Routes.MainScreen.route
+                startDestination = Routes.MainScreen.route,
             ) {
+
                 //로그인 후 메인화면
                 composable(Routes.MainScreen.route) {
                     val currentUser = (authState as? AuthState.Authenticated)?.user

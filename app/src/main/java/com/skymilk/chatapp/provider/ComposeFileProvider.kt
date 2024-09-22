@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.provider
 
 import android.content.Context
 import android.net.Uri

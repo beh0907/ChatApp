@@ -129,9 +129,6 @@ dependencies {
     //lottie
     implementation(libs.lottie.compose)
 
-    //placeholder
-    runtimeOnly(libs.accompanist.placeholder.material)
-
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
@@ -157,4 +154,7 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
     implementation (libs.logging.interceptor)
+
+    //Image Cropper
+    implementation(libs.easycrop)
 }

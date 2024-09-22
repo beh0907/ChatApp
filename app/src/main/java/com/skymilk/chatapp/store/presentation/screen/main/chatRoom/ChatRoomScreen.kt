@@ -2,18 +2,16 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import BottomSheetImagePicker
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -23,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,14 +33,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.CustomErrorConfirmDialog
+import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageList
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageListShimmer
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
-import com.skymilk.chatapp.utils.ComposeFileProvider
+import com.skymilk.chatapp.provider.ComposeFileProvider
+import com.skymilk.chatapp.utils.FileSizeUtil
 import com.skymilk.chatapp.utils.PermissionUtil
 import kotlinx.coroutines.launch
 
@@ -49,38 +56,81 @@ import kotlinx.coroutines.launch
 fun ChatRoomScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatRoomViewModel,
-    chatRoom: ChatRoomWithUsers,
     currentUser: User,
     onNavigateToBack: () -> Unit
 ) {
-    val chatMessages by viewModel.chatMessages.collectAsStateWithLifecycle()
+    val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
+    val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
     val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
     ) {
 
-        TopSection(
-            onNavigateToBack = onNavigateToBack, chatRoom = chatRoom, currentUser = currentUser
-        )
+        //채팅방 정보 체크
+        when (chatRoomState) {
+            is ChatRoomState.Initial -> {}
+            is ChatRoomState.Loading -> {
+                //로딩 알림
+                CustomProgressDialog("채팅방을 불러오고 있습니다.")
+            }
 
-        // ChatRoomMessages 영역
-        ChatMessageList(
-            modifier = Modifier
-                .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
-                .fillMaxWidth(),
-            chatRoom = chatRoom,
-            chatChatMessages = chatMessages,
-            currentUser = currentUser,
-            uploadState = uploadState
-        )
+            is ChatRoomState.Success -> {
+                //채팅방 로드 성공
+                val chatRoom = (chatRoomState as ChatRoomState.Success).chatRoom
 
-        BottomSection(
-            modifier = Modifier.imePadding(),
-            onSendMessage = viewModel::sendMessage,
-            onSendImageMessage = viewModel::sendImageMessage,
-            userId = currentUser.id,
-        )
+                //제목 영역
+                TopSection(
+                    onNavigateToBack = onNavigateToBack,
+                    chatRoom = chatRoom,
+                    currentUser = currentUser
+                )
+
+                //채팅 목록 영역
+                when (chatMessagesState) {
+                    is ChatMessagesState.Loading -> {
+                        // 로딩 중 UI 표시
+                        ChatMessageListShimmer(
+                            modifier = Modifier
+                                .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
+                                .fillMaxWidth()
+                        )
+                    }
+
+                    is ChatMessagesState.Success -> {
+                        //로딩이 완료 됐을 때 표시
+                        val chatMessages =
+                            (chatMessagesState as ChatMessagesState.Success).chatMessages
+
+                        ChatMessageList(
+                            modifier = Modifier
+                                .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
+                                .fillMaxWidth(),
+                            chatRoom = chatRoom,
+                            chatChatMessages = chatMessages,
+                            currentUser = currentUser,
+                            uploadState = uploadState
+                        )
+                    }
+
+                    else -> Unit
+                }
+
+
+                //채팅 입력 영역
+                BottomSection(
+                    modifier = Modifier,
+                    onSendMessage = viewModel::sendMessage,
+                    onSendImageMessage = viewModel::sendImageMessage,
+                    userId = currentUser.id,
+                )
+            }
+
+            is ChatRoomState.Error -> {
+                //채팅방 불러오기 실패
+                CustomErrorConfirmDialog("채팅방을 불러오지 못했습니다.", onNavigateToBack)
+            }
+        }
     }
 
 }
@@ -90,6 +140,7 @@ fun ChatRoomScreen(
 @Composable
 fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, currentUser: User) {
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+//    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
     val title = when (chatRoom.participants.size) {
         1 -> chatRoom.participants.first().username
@@ -124,6 +175,7 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
 
 
 //하단 텍스트 입력
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BottomSection(
     modifier: Modifier = Modifier,
@@ -133,7 +185,6 @@ fun BottomSection(
 ) {
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -144,7 +195,8 @@ fun BottomSection(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            onSendImageMessage(userId, uri)
+            val resizedUri = FileSizeUtil.resizeImage(context, uri)
+            onSendImageMessage(userId, resizedUri)
         }
     }
 
@@ -154,70 +206,76 @@ fun BottomSection(
         contract = ActivityResultContracts.TakePicture()
     ) { success: Boolean ->
         if (success) {
-            Log.d(
-                "rememberLauncherForActivityResult",
-                ComposeFileProvider.getImageUri(context).toString()
-            )
-            onSendImageMessage(userId, cameraUri.value)
+            val resizedUri = FileSizeUtil.resizeImage(context, cameraUri.value)
+            onSendImageMessage(userId, resizedUri)
         }
     }
 
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-
-        IconButton(onClick = { showBottomSheet = true }) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.AttachFile,
-                contentDescription = null,
-                tint = uiColor
+    OutlinedTextField(
+        modifier = modifier
+            .fillMaxWidth(),
+        maxLines = 5,
+        value = message,
+        onValueChange = { message = it },
+        placeholder = {
+            Text(
+                text = "채팅을 입력해주세요.",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.Gray,
+                fontFamily = HannaPro
             )
-        }
-
-        OutlinedTextField(
-            modifier = Modifier.weight(1f),
-            singleLine = true,
-            value = message,
-            onValueChange = { message = it },
-            label = {
-                Text(
-                    text = "채팅을 입력해주세요.",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = uiColor,
-                    fontFamily = HannaPro
+        },
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        textStyle = TextStyle(
+            fontFamily = HannaPro,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            color = Black
+        ),
+        leadingIcon = {
+            IconButton(
+                onClick = { showBottomSheet = true },
+                modifier = Modifier
+                    .size(36.dp)
+            ) {
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Default.AttachFile,
+                    contentDescription = null,
+                    tint = Black
                 )
-            },
-            keyboardActions = KeyboardActions(onDone = {
-                //메시지 전송
-                onSendMessage(userId, message)
+            }
+        },
+        trailingIcon = {
+            if (message.isNotBlank()) {
+                IconButton(
+                    onClick = {
+                        // 메시지 전송
+                        onSendMessage(userId, message)
 
-                //텍스트 필드 초기화
-                message = ""
+                        // 텍스트 필드 초기화
+                        message = ""
 
-                //키보드 숨기기
-                keyboardController?.hide()
-            })
-        )
-
-        IconButton(
-            onClick = {
-                //메시지 전송
-                onSendMessage(userId, message)
-
-                //텍스트 필드 초기화
-                message = ""
-
-                //키보드 숨기기
-                keyboardController?.hide()
-            }, enabled = message.isNotBlank()
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.AutoMirrored.Default.Send,
-                contentDescription = null,
-                tint = uiColor
-            )
+                        // 키보드 숨기기
+                        keyboardController?.hide()
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        imageVector = Icons.AutoMirrored.Default.Send,
+                        contentDescription = null,
+                        tint = Black
+                    )
+                }
+            }
         }
-    }
+    )
+
 
     //바텀시트
     BottomSheetImagePicker(isVisible = showBottomSheet,
@@ -236,5 +294,6 @@ fun BottomSection(
                     cameraCapture.launch(cameraUri.value)
                 }
             }
-        })
+        }
+    )
 }

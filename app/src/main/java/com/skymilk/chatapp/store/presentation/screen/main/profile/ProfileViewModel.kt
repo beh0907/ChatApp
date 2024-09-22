@@ -1,9 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

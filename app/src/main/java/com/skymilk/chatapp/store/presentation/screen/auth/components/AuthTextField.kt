@@ -12,10 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.sp
 import com.skymilk.chatapp.ui.theme.Black
+import com.skymilk.chatapp.ui.theme.HannaPro
 
 @Composable
 fun AuthTextField(
@@ -43,6 +46,7 @@ fun AuthTextField(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
                 color = uiColor,
+                fontFamily = HannaPro
             )
         },
         leadingIcon = {
@@ -52,6 +56,10 @@ fun AuthTextField(
                     contentDescription = "trailing icon"
                 )
             }
-        }
+        },
+        textStyle = TextStyle(
+            fontFamily = HannaPro,
+            fontSize = 16.sp, // 텍스트 크기
+        )
     )
 }

@@ -1,12 +1,16 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatList
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +28,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.ui.theme.dimens
@@ -33,12 +38,12 @@ import com.skymilk.chatapp.utils.DateUtil
 fun ChatRoomItem(
     chatRoom: ChatRoomWithUsers,
     currentUser: User,
-    onChatItemClick: (ChatRoomWithUsers) -> Unit
+    onChatItemClick: (String) -> Unit
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            onChatItemClick(chatRoom)
+            onChatItemClick(chatRoom.id)
         }
         .padding(MaterialTheme.dimens.small2)
     ) {
@@ -110,6 +115,56 @@ fun ChatRoomItem(
             text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
             fontFamily = HannaPro,
             style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
+fun ChatRoomItemShimmer() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(MaterialTheme.dimens.small2)
+    ) {
+        // 이미지 정보
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .shimmerEffect()
+                .clip(RoundedCornerShape(4.dp))
+        )
+
+        // 채팅방 정보
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .weight(1f)
+        ) {
+            // 사용자 이름 자리 표시자
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .shimmerEffect()
+                    .fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 마지막 대화 자리 표시자
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .shimmerEffect()
+                    .fillMaxWidth()
+            )
+        }
+
+        // 시간 정보 자리 표시자
+        Box(
+            modifier = Modifier
+                .height(20.dp)
+                .width(50.dp)
+                .shimmerEffect()
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -11,9 +12,9 @@ import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -21,17 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.skymilk.chatapp.di.ViewModelFactoryModule
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.chatList.ChatListScreen
-import com.skymilk.chatapp.store.presentation.screen.main.chatList.ChatListViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatListScreen
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomListViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
@@ -144,8 +147,8 @@ fun MainNavGraph(
 
             //채팅방 목록 화면
             composable(Routes.ChatListScreen.route) {
-                val chatListViewModel: ChatListViewModel = viewModel(
-                    factory = ChatListViewModel.provideFactory(
+                val chatRoomListViewModel: ChatRoomListViewModel = viewModel(
+                    factory = ChatRoomListViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
                         currentUser.id
                     )
@@ -153,10 +156,13 @@ fun MainNavGraph(
 
                 ChatListScreen(
                     modifier = Modifier.padding(innerPadding),
-                    viewModel = chatListViewModel,
+                    viewModel = chatRoomListViewModel,
                     currentUser = currentUser,
-                    onChatItemClick = { chatRoom ->
-                        navigationToChatRoom(navController, chatRoom)
+                    onChatItemClick = { chatRoomId ->
+                        navController.navigate(Routes.ChatRoomScreen.route + "/$chatRoomId") {
+                            // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
@@ -177,27 +183,22 @@ fun MainNavGraph(
             }
 
             //채팅방 화면
-            composable(route = Routes.ChatRoomScreen.route) {
-                val chatRoom by remember {
-                    mutableStateOf(
-                        navController.currentBackStackEntry?.savedStateHandle?.get<ChatRoomWithUsers>(
-                            "chatRoom"
-                        )
-                    )
-                }
-
-                chatRoom?.let {
+            composable(
+                route = Routes.ChatRoomScreen.route + "/{chatRoomId}",
+                arguments = listOf(navArgument("chatRoomId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val chatRoomId = backStackEntry.arguments?.getString("chatRoomId")
+                chatRoomId?.let {
                     val chatRoomViewModel: ChatRoomViewModel = viewModel(
                         factory = ChatRoomViewModel.provideFactory(
                             viewModelFactoryProvider.chatRoomViewModelFactory(),
-                            it
+                            chatRoomId
                         )
                     )
 
                     ChatRoomScreen(
                         modifier = Modifier.padding(innerPadding),
                         viewModel = chatRoomViewModel,
-                        chatRoom = it,
                         currentUser = currentUser,
                         onNavigateToBack = {
                             navController.popBackStack()
@@ -219,13 +220,4 @@ fun navigationToTab(navController: NavController, route: String) {
             launchSingleTop = true
         }
     }
-}
-
-fun navigationToChatRoom(navController: NavController, chatRoom: ChatRoomWithUsers) {
-    navController.navigate(Routes.ChatRoomScreen.route) {
-        // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
-        launchSingleTop = true
-    }
-    // 이동 후 백 스택 엔트리에 데이터를 설정합니다.
-    navController.currentBackStackEntry?.savedStateHandle?.set("chatRoom", chatRoom)
 }
