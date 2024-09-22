@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.ChatApp" parent="android:Theme.Material.Light.NoActionBar">
-
-<!--        기본 splash 없애기-->
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">#FFF9F9FF</item>
-    </style>
-</resources>
