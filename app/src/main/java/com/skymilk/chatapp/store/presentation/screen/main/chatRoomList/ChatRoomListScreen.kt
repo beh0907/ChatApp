@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,8 +49,6 @@ fun ChatListScreen(
         modifier = modifier.fillMaxSize()
     ) {
         TopSection()
-
-        HorizontalDivider()
 
         when(chatListState) {
             is ChatRoomsState.Loading -> {
@@ -98,6 +97,8 @@ fun TopSection() {
             )
         }
     }
+
+    HorizontalDivider()
 }
 
 @Composable

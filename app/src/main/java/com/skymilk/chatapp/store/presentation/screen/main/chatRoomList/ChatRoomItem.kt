@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFirst
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
@@ -55,7 +57,7 @@ fun ChatRoomItem(
             model = ImageRequest.Builder(
                 LocalContext.current
             )
-                .data(chatRoom.participants[1].profileImageUrl)
+                .data(chatRoom.participants.fastFirst { it.id != currentUser.id }.profileImageUrl)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
@@ -65,7 +67,8 @@ fun ChatRoomItem(
         Column(
             modifier = Modifier
                 .padding(horizontal = 10.dp)
-                .weight(1f)
+                .weight(1f),
+            verticalArrangement = Arrangement.Center
         ) {
 
             Text(text = buildAnnotatedString {

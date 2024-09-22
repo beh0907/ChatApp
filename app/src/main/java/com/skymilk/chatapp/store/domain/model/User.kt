@@ -11,9 +11,10 @@ data class User(
     var username: String,
     var email: String,
     var profileImageUrl: String? = null,
-    var fcmToken: String
+    var fcmToken: String,
+    var statusMessage: String
 ) : Parcelable {
-    constructor() : this("", "", "", "", "")
+    constructor() : this("", "", "", "", "", "")
 }
 
 // FirebaseUser 변환 함수
@@ -23,6 +24,7 @@ fun FirebaseUser.toUser(): User {
         username = displayName ?: "",
         email = email ?: "",
         profileImageUrl = photoUrl?.toString() ?: "",
-        fcmToken = ""
+        fcmToken = "",
+        statusMessage = ""
     )
 }

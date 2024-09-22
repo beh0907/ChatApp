@@ -20,6 +20,7 @@ import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveProfileImage
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
+import com.skymilk.chatapp.store.domain.usecase.user.GetFriends
 import com.skymilk.chatapp.store.domain.usecase.user.GetUser
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
@@ -61,7 +62,8 @@ object UseCaseModule {
     fun provideUserUseCase(userRepository: UserRepository): UserUseCases =
         UserUseCases(
             UpdateProfile(userRepository),
-            GetUser(userRepository)
+            GetUser(userRepository),
+            GetFriends(userRepository)
         )
 
     @Provides

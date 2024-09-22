@@ -3,7 +3,7 @@ package com.skymilk.chatapp.di
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomListViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
-import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
@@ -16,7 +16,7 @@ interface ViewModelFactoryModule {
 
     fun friendsViewModelFactory(): FriendsViewModel.Factory
 
-    fun profileViewModelFactory(): ProfileViewModel.Factory
+    fun profileViewModelFactory(): ProfileEditViewModel.Factory
 
     fun chatRoomViewModelFactory(): ChatRoomViewModel.Factory
 

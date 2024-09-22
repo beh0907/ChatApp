@@ -1,28 +1,19 @@
 package com.skymilk.chatapp
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.skymilk.chatapp.store.presentation.navigation.NavGraph
-import com.skymilk.chatapp.store.presentation.navigation.Routes
+import com.skymilk.chatapp.store.presentation.navigation.AppNavigation
 import com.skymilk.chatapp.ui.theme.ChatAppTheme
 import com.skymilk.chatapp.utils.Event
 import com.skymilk.chatapp.utils.EventBus.events
@@ -48,7 +39,7 @@ class MainActivity : ComponentActivity() {
                 SetObserveMessage()
 
                 //네비게이션 화면
-                NavGraph()
+                AppNavigation()
             }
         }
     }
@@ -94,3 +85,4 @@ class MainActivity : ComponentActivity() {
         return super.dispatchTouchEvent(ev)
     }
 }
+

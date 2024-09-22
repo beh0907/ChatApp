@@ -69,6 +69,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        dataBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.5"
@@ -107,8 +108,14 @@ dependencies {
     //serialization
     implementation (libs.kotlinx.serialization.json)
 
-    //Compose permissions
+    //Ted permissions
     implementation(libs.tedpermission.coroutine)
+
+    //Ted ImagePicker
+    implementation ("io.github.ParkSangGwon:tedimagepicker:1.6.1")
+
+    //Image Cropper
+    implementation(libs.easycrop)
 
     // Material Icon Extended
     implementation(libs.androidx.material.icons.extended)
@@ -154,7 +161,4 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
     implementation (libs.logging.interceptor)
-
-    //Image Cropper
-    implementation(libs.easycrop)
 }

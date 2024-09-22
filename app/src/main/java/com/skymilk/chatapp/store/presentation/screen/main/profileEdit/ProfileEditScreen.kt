@@ -1,5 +1,7 @@
-package com.skymilk.chatapp.store.presentation.screen.main.profile
+package com.skymilk.chatapp.store.presentation.screen.main.profileEdit
 
+import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,41 +26,53 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.mr0xf00.easycrop.CropError
+import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.CropperStyle
+import com.mr0xf00.easycrop.ImageCropper
+import com.mr0xf00.easycrop.crop
+import com.mr0xf00.easycrop.rememberImageCropper
+import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
+import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileEventSection
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.ui.theme.dimens
+import gun0912.tedimagepicker.builder.TedImagePicker
+import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(
+fun ProfileEditScreen(
     modifier: Modifier,
+    viewModel: ProfileEditViewModel,
     user: User,
-    onNavigateToBack: () -> Unit,
-    onSignOut: () -> Unit,
-    onNavigateToProfileEdit: () -> Unit
+    onNavigateToBack: () -> Unit
 ) {
-    var visibleSignOutDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val imageCropper = rememberImageCropper()
+    val cropState = imageCropper.cropState
 
     Box(modifier = modifier.fillMaxSize()) {
-        //상단 아이콘
+
         TopSection(
-            modifier = Modifier
-                .padding(10.dp)
-                .align(Alignment.TopEnd),
-            onNavigateToBack = {onNavigateToBack()}
+            onNavigateToBack = { onNavigateToBack() },
+            onSubmit = viewModel::updateUserProfile
         )
 
         //프로필 정보
@@ -69,93 +83,146 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            UserProfileSection(user)
+            EditProfileSection(context, imageCropper, user)
 
             HorizontalDivider()
 
-            ProfileEventSection(
-                onNavigateToProfileEdit = onNavigateToProfileEdit,
-                visibleSignOutDialog = {
-                    visibleSignOutDialog = true
-                }
-            )
+            EditEventSection()
         }
     }
 
-    if (visibleSignOutDialog)
-        CustomAlertDialog(
-            message = "로그아웃 하시겠습니까?",
-            onConfirm = { onSignOut() },
-            onDismiss = { visibleSignOutDialog = false })
+    if (cropState != null)
+        ImageCropperDialog(
+            state = cropState,
+            style = CropperStyle(
+
+            )
+        )
 }
 
 @Composable
-private fun TopSection(
-    modifier: Modifier = Modifier,
-    onNavigateToBack: () -> Unit
+fun TopSection(
+    onNavigateToBack: () -> Unit,
+    onSubmit: (User) -> Unit
 ) {
     Row(
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(onClick = { onNavigateToBack() }) {
+
+        IconButton(onClick = {
+            onNavigateToBack()
+        }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = null
+                contentDescription = null,
+            )
+        }
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "프로필 편집",
+            fontFamily = HannaPro,
+            style = MaterialTheme.typography.titleLarge,
+        )
+
+        TextButton(onClick = {
+//            onSubmit()
+        }) {
+            Text(
+                text = "완료",
+                fontFamily = HannaPro,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
 }
 
+
 @Composable
-fun UserProfileSection(
-    user: User,
+private fun EditProfileSection(
+    context: Context,
+    imageCropper: ImageCropper,
+    user: User
 ) {
-    val context = LocalContext.current
 
     //프로필 이미지
+    val scope = rememberCoroutineScope()
+    var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
+    var error by remember { mutableStateOf<CropError?>(null) }
+
     Surface(
         shadowElevation = 4.dp,
-        shape = RoundedCornerShape(30.dp)
+        shape = RoundedCornerShape(30.dp),
+        onClick = {
+            //테드 이미지 픽커
+            TedImagePicker.with(context)
+                .start { uri ->
+                    scope.launch {
+                        when (val result = imageCropper.crop(uri = uri, context = context)) {
+                            CropResult.Cancelled -> {}
+                            is CropError -> error = result
+                            is CropResult.Success -> {
+                                selectedImage = result.bitmap
+                            }
+                        }
+                    }
+                }
+
+        }
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(100.dp),
-            model = ImageRequest.Builder(context)
-                .data(user.profileImageUrl ?: "https://via.placeholder.com/150")
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
+        if (selectedImage != null) {
+            Image(
+                modifier = Modifier
+                    .size(100.dp),
+                bitmap = selectedImage!!,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            AsyncImage(
+                modifier = Modifier
+                    .size(100.dp),
+                model = ImageRequest.Builder(context)
+                    .data(user.profileImageUrl ?: "https://via.placeholder.com/150")
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        }
     }
 
     Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
 
     //유저 이름
-    Text(
-        text = user.username,
-        style = MaterialTheme.typography.titleLarge,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+    TextField(
+        value = user.username,
+        onValueChange = {
+            user.username = it
+        },
+        placeholder = { Text("이름", fontFamily = HannaPro)}
     )
 
     Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
 
-    //유저 상대 메시지
-    Text(
-        text = "user.statusMessage",
-        style = MaterialTheme.typography.titleLarge,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+    //상태 메시지
+    TextField(
+        value = user.statusMessage,
+        onValueChange = {
+            user.statusMessage = it
+        },
+        placeholder = { Text("상태 메시지", fontFamily = HannaPro)}
     )
 
     Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
 }
 
 @Composable
-fun ProfileEventSection(
-    onNavigateToProfileEdit: () -> Unit,
-    visibleSignOutDialog: () -> Unit
+fun EditEventSection(
 ) {
     Row(
         modifier = Modifier
@@ -195,7 +262,6 @@ fun ProfileEventSection(
             modifier = Modifier
                 .fillMaxHeight()
                 .clickable {
-                    onNavigateToProfileEdit()
                 },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -220,7 +286,6 @@ fun ProfileEventSection(
             modifier = Modifier
                 .fillMaxHeight()
                 .clickable {
-                    visibleSignOutDialog()
                 },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

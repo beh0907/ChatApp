@@ -1,9 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
-import BottomSheetImagePicker
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.common.CustomErrorConfirmDialog
+import com.skymilk.chatapp.store.presentation.common.CustomConfirmDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageListShimmer
@@ -47,10 +43,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMes
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
-import com.skymilk.chatapp.provider.ComposeFileProvider
-import com.skymilk.chatapp.utils.FileSizeUtil
-import com.skymilk.chatapp.utils.PermissionUtil
-import kotlinx.coroutines.launch
+import gun0912.tedimagepicker.builder.TedImagePicker
 
 @Composable
 fun ChatRoomScreen(
@@ -128,7 +121,7 @@ fun ChatRoomScreen(
 
             is ChatRoomState.Error -> {
                 //채팅방 불러오기 실패
-                CustomErrorConfirmDialog("채팅방을 불러오지 못했습니다.", onNavigateToBack)
+                CustomConfirmDialog("채팅방을 불러오지 못했습니다.", onNavigateToBack)
             }
         }
     }
@@ -140,7 +133,6 @@ fun ChatRoomScreen(
 @Composable
 fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, currentUser: User) {
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-//    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
     val title = when (chatRoom.participants.size) {
         1 -> chatRoom.participants.first().username
@@ -175,7 +167,6 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
 
 
 //하단 텍스트 입력
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BottomSection(
     modifier: Modifier = Modifier,
@@ -187,29 +178,6 @@ fun BottomSection(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-
-    //이미지 갤러리에서 가져오기
-    val imagePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            val resizedUri = FileSizeUtil.resizeImage(context, uri)
-            onSendImageMessage(userId, resizedUri)
-        }
-    }
-
-    //카메라 이미지 가져오기
-    val cameraUri = remember { mutableStateOf(ComposeFileProvider.getImageUri(context)) }
-    val cameraCapture = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success: Boolean ->
-        if (success) {
-            val resizedUri = FileSizeUtil.resizeImage(context, cameraUri.value)
-            onSendImageMessage(userId, resizedUri)
-        }
-    }
 
     OutlinedTextField(
         modifier = modifier
@@ -239,7 +207,13 @@ fun BottomSection(
         ),
         leadingIcon = {
             IconButton(
-                onClick = { showBottomSheet = true },
+                onClick = {
+                    //테드 이미지 픽커
+                    TedImagePicker.with(context)
+                        .start { uri ->
+                            onSendImageMessage(userId, uri)
+                        }
+                },
                 modifier = Modifier
                     .size(36.dp)
             ) {
@@ -271,27 +245,6 @@ fun BottomSection(
                         contentDescription = null,
                         tint = Black
                     )
-                }
-            }
-        }
-    )
-
-
-    //바텀시트
-    BottomSheetImagePicker(isVisible = showBottomSheet,
-        onDismiss = { showBottomSheet = false },
-        onImagePicker = {
-            scope.launch {
-                if (PermissionUtil.requestStoragePermissions()) {
-                    imagePicker.launch("image/*")
-                }
-            }
-
-        },
-        onCameraCapture = {
-            scope.launch {
-                if (PermissionUtil.requestCameraPermissions()) {
-                    cameraCapture.launch(cameraUri.value)
                 }
             }
         }

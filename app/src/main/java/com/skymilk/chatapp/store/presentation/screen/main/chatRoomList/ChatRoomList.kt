@@ -22,7 +22,7 @@ fun ChatRoomList(
 @Composable
 fun ChatRoomListShimmer() {
     LazyColumn {
-        items(10) {
+        items(20) {
             ChatRoomItemShimmer()
         }
     }

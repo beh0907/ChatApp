@@ -53,7 +53,6 @@ class FirebaseMessageService : FirebaseMessagingService() {
         // 알림 클릭 시 MainActivity를 열고 채팅방 ID 전달
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("chatRoomId", data["chatRoomId"])
-            putExtra("isFromNotification", true)
             if (isAppRunning()) {
                 // 앱이 실행 중일 때는 새로운 태스크를 생성하지 않음
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_CLEAR_TOP

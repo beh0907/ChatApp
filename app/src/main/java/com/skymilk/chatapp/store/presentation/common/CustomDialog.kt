@@ -44,7 +44,7 @@ fun CustomProgressDialog(message: String) {
 }
 
 @Composable
-fun CustomErrorConfirmDialog(message: String, onConfirm: () -> Unit) {
+fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
     AlertDialog(
         onDismissRequest = {},
         text = {
@@ -55,6 +55,31 @@ fun CustomErrorConfirmDialog(message: String, onConfirm: () -> Unit) {
                 onClick = { onConfirm() }
             ) {
                 Text("확인", fontSize = MaterialTheme.typography.titleMedium.fontSize, fontFamily = HannaPro)
+            }
+        },
+        shape = RoundedCornerShape(24.dp)
+    )
+}
+
+@Composable
+fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {},
+        text = {
+            Text(text = message, fontSize = MaterialTheme.typography.titleMedium.fontSize, fontFamily = HannaPro)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm() }
+            ) {
+                Text("확인", fontSize = MaterialTheme.typography.titleMedium.fontSize, fontFamily = HannaPro)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = { onDismiss() }
+            ) {
+                Text("취소", fontSize = MaterialTheme.typography.titleMedium.fontSize, fontFamily = HannaPro)
             }
         },
         shape = RoundedCornerShape(24.dp)

@@ -52,6 +52,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="chatapp" />
+                <data android:host="chatrooms" />
             </intent-filter>
         </activity>
 
