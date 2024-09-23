@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
@@ -93,14 +94,19 @@ fun ItemOtherMessage(chatMessage: ChatMessage, sender: User) {
 
                         //이미지 타입
                         MessageType.IMAGE -> {
-                            AsyncImage(
+                            SubcomposeAsyncImage(
                                 model = ImageRequest.Builder(context)
                                     .data(chatMessage.content)
                                     .crossfade(true)
                                     .build(),
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Fit // 이미지의 크기 조정
+                                modifier = Modifier.size(maxWidth),
+                                loading = {
+                                    Box(modifier = Modifier
+                                        .fillMaxSize()
+                                        .shimmerEffect())
+                                },
+                                contentScale = ContentScale.Crop // 이미지의 크기 조정
                             )
                         }
 

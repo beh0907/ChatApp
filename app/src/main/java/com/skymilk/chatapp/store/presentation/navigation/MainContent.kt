@@ -162,16 +162,18 @@ fun MainContent(
             }
 
             //프로필 화면
-            composable(MainNavigation.ProfileScreen.route) {
+            composable(
+                route = MainNavigation.ProfileScreen.route,
+            ) {
                 ProfileScreen(
                     modifier = Modifier,
                     user = currentUser,
                     onNavigateToBack = {
-                      navController.popBackStack()
+                        navController.popBackStack()
                     },
                     onSignOut = onSignOut,
                     onNavigateToProfileEdit = {
-                        navController.navigate(MainNavigation.ProfileEditScreen.route){
+                        navController.navigate(MainNavigation.ProfileEditScreen.route) {
                             launchSingleTop = true
                         }
                     }
@@ -198,15 +200,11 @@ fun MainContent(
             }
 
 
-
             //채팅방 화면
             composable(
                 route = MainNavigation.ChatRoomScreen.route + "/{chatRoomId}",
                 arguments = listOf(navArgument("chatRoomId") { type = NavType.StringType }),
                 deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "https://example.com/chatrooms/{chatRoomId}"
-                    },
                     navDeepLink {
                         uriPattern = "chatapp://chatrooms/{chatRoomId}"
                     }

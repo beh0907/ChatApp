@@ -36,11 +36,10 @@ fun FriendsItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(MaterialTheme.dimens.small2)
             .clickable {
                 onUserItemClick()
-            },
-
+            }
+            .padding(MaterialTheme.dimens.small2),
     ) {
         //이미지 정보
         AsyncImage(

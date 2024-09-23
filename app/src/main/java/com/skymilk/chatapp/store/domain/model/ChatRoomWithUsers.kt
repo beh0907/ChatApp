@@ -1,10 +1,9 @@
 package com.skymilk.chatapp.store.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 
-@Parcelize
+@Serializable
 data class ChatRoomWithUsers(
     val id: String,
     val name: String,
@@ -12,4 +11,4 @@ data class ChatRoomWithUsers(
     val lastMessage: String,
     val lastMessageTimestamp: Long,
     val createdTimestamp: Long
-) : Parcelable
+)

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,8 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -27,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,24 +32,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.mr0xf00.easycrop.CropError
+import com.mr0xf00.easycrop.AspectRatio
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.ImageCropper
+import com.mr0xf00.easycrop.RoundRectCropShape
 import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileEventSection
+import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.ui.theme.HannaPro
-import com.skymilk.chatapp.ui.theme.dimens
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -65,12 +62,23 @@ fun ProfileEditScreen(
     onNavigateToBack: () -> Unit
 ) {
     val context = LocalContext.current
+
+    //이미지 자르기
     val imageCropper = rememberImageCropper()
     val cropState = imageCropper.cropState
 
+    //텍스트 편집 정보
+    var showEditDialog by remember { mutableStateOf(false) }
+    var editingField by remember { mutableStateOf("") }
+    var editName by remember { mutableStateOf(user.username) }
+    var editStatusMessage by remember { mutableStateOf(user.statusMessage) }
+
     Box(modifier = modifier.fillMaxSize()) {
 
+        //편집 다이얼로그가 나타날 때는
+        //타이틀이 겹치기 때문에 임시로 숨긴다
         TopSection(
+            modifier = if (showEditDialog) Modifier.alpha(0f) else Modifier,
             onNavigateToBack = { onNavigateToBack() },
             onSubmit = viewModel::updateUserProfile
         )
@@ -78,37 +86,65 @@ fun ProfileEditScreen(
         //프로필 정보
         Column(
             modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            EditProfileSection(context, imageCropper, user)
+            EditProfileSection(
+                context = context,
+                imageCropper = imageCropper,
+                profileImageUrl = user.profileImageUrl,
+                editName = editName,
+                editStatusMessage = editStatusMessage,
+                onNameClick = {
+                    editingField = "name"
+                    showEditDialog = true
+                },
+                onStatusClick = {
+                    editingField = "status"
+                    showEditDialog = true
+                }
+            )
 
-            HorizontalDivider()
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
 
             EditEventSection()
         }
     }
 
-    if (cropState != null)
+    //이미지 크롭 다이얼로그
+    if (cropState != null) {
         ImageCropperDialog(
             state = cropState,
-            style = CropperStyle(
-
-            )
+            style = CropperStyle()
         )
+    }
+
+    //텍스트 편집 다이얼로그
+    if (showEditDialog) {
+        CustomFullScreenEditDialog(
+            initText = if (editingField == "name") editName else editStatusMessage,
+            onDismiss = { showEditDialog = false },
+            onConfirm = { newText ->
+                if (editingField == "name") editName = newText
+                else editStatusMessage = newText
+
+                showEditDialog = false
+            }
+        )
+    }
 }
 
 @Composable
 fun TopSection(
+    modifier: Modifier = Modifier,
     onNavigateToBack: () -> Unit,
     onSubmit: (User) -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+        modifier = modifier
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -146,13 +182,15 @@ fun TopSection(
 private fun EditProfileSection(
     context: Context,
     imageCropper: ImageCropper,
-    user: User
+    profileImageUrl: String?,
+    editName: String,
+    editStatusMessage: String,
+    onNameClick: () -> Unit,
+    onStatusClick: () -> Unit
 ) {
-
-    //프로필 이미지
     val scope = rememberCoroutineScope()
+
     var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
-    var error by remember { mutableStateOf<CropError?>(null) }
 
     Surface(
         shadowElevation = 4.dp,
@@ -163,18 +201,20 @@ private fun EditProfileSection(
                 .start { uri ->
                     scope.launch {
                         when (val result = imageCropper.crop(uri = uri, context = context)) {
-                            CropResult.Cancelled -> {}
-                            is CropError -> error = result
                             is CropResult.Success -> {
                                 selectedImage = result.bitmap
                             }
+
+                            else -> {}
                         }
                     }
                 }
-
         }
     ) {
+
+        //프로필 이미지
         if (selectedImage != null) {
+            //Coil Image는 ImageBitmap을 적용시키지 못함
             Image(
                 modifier = Modifier
                     .size(100.dp),
@@ -187,7 +227,7 @@ private fun EditProfileSection(
                 modifier = Modifier
                     .size(100.dp),
                 model = ImageRequest.Builder(context)
-                    .data(user.profileImageUrl ?: "https://via.placeholder.com/150")
+                    .data(profileImageUrl ?: "https://via.placeholder.com/150")
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -196,29 +236,65 @@ private fun EditProfileSection(
         }
     }
 
-    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
+    Spacer(modifier = Modifier.height(17.dp))
 
     //유저 이름
-    TextField(
-        value = user.username,
-        onValueChange = {
-            user.username = it
-        },
-        placeholder = { Text("이름", fontFamily = HannaPro)}
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth()
+            .clickable {
+                onNameClick()
+            }
+    ) {
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            style = MaterialTheme.typography.titleLarge,
+            text = editName,
+            fontFamily = HannaPro,
+            textAlign = TextAlign.Center
+        )
+
+        Icon(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            imageVector = Icons.Default.Edit,
+            contentDescription = null
+        )
+
+    }
+
+    HorizontalDivider(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .height(24.dp)
     )
 
-    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
 
     //상태 메시지
-    TextField(
-        value = user.statusMessage,
-        onValueChange = {
-            user.statusMessage = it
-        },
-        placeholder = { Text("상태 메시지", fontFamily = HannaPro)}
-    )
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth()
+            .clickable {
+                onStatusClick()
+            }
+    ) {
 
-    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            style = MaterialTheme.typography.titleMedium,
+            text = editStatusMessage,
+            fontFamily = HannaPro,
+            textAlign = TextAlign.Center
+        )
+
+        Icon(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            imageVector = Icons.Default.Edit,
+            contentDescription = null
+        )
+    }
 }
 
 @Composable
@@ -232,77 +308,6 @@ fun EditEventSection(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        //나와의 채팅
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
 
-                },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Default.ChatBubble,
-                contentDescription = null
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = "나와의 채팅",
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                fontFamily = HannaPro
-            )
-        }
-
-        //프로필 편집
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = null
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = "프로필 편집",
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                fontFamily = HannaPro
-            )
-        }
-
-        //로그아웃
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.Logout,
-                contentDescription = null
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = "로그아웃",
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                fontFamily = HannaPro
-            )
-        }
     }
 }

@@ -17,12 +17,12 @@ properties.load(FileInputStream(rootProject.file("local.properties")))
 
 android {
     namespace = "com.skymilk.chatapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.skymilk.chatapp"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -108,11 +108,12 @@ dependencies {
     //serialization
     implementation (libs.kotlinx.serialization.json)
 
-    //Ted permissions
-    implementation(libs.tedpermission.coroutine)
+    //ConstraintLayout
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.0-beta01")
 
-    //Ted ImagePicker
-    implementation ("io.github.ParkSangGwon:tedimagepicker:1.6.1")
+    //Ted
+    implementation(libs.tedpermission.coroutine) // permissions
+    implementation (libs.tedimagepicker) // ImagePicker
 
     //Image Cropper
     implementation(libs.easycrop)

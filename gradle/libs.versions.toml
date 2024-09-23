@@ -24,6 +24,7 @@ materialIconsExtended = "1.7.2"
 navigationCompose = "2.8.1"
 googleId = "1.1.1"
 retrofit = "2.11.0"
+tedimagepicker = "1.6.1"
 tedpermissionCoroutine = "3.4.2"
 transformations = "2.0.3"
 loggingInterceptor = "4.12.0"
@@ -66,6 +67,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+tedimagepicker = { module = "io.github.ParkSangGwon:tedimagepicker", version.ref = "tedimagepicker" }
 tedpermission-coroutine = { module = "io.github.ParkSangGwon:tedpermission-coroutine", version.ref = "tedpermissionCoroutine" }
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }

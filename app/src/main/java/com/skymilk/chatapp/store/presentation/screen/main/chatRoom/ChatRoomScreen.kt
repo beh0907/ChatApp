@@ -1,10 +1,10 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,11 +27,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
@@ -176,77 +180,110 @@ fun BottomSection(
 ) {
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-
     val context = LocalContext.current
 
-    OutlinedTextField(
+    val constraints = ConstraintSet {
+        val messageTextField = createRefFor("messageTextField")
+        val attachIcon = createRefFor("attachIcon")
+        val sendIcon = createRefFor("sendIcon")
+
+        constrain(messageTextField) {
+            top.linkTo(parent.top)
+            bottom.linkTo(parent.bottom)
+            start.linkTo(attachIcon.end)
+            end.linkTo(sendIcon.start)
+            width = Dimension.fillToConstraints
+            height = Dimension.wrapContent
+        }
+        constrain(attachIcon) {
+            top.linkTo(messageTextField.top)
+            bottom.linkTo(messageTextField.bottom)
+            start.linkTo(parent.start)
+            height = Dimension.fillToConstraints
+        }
+        constrain(sendIcon) {
+            top.linkTo(messageTextField.top)
+            bottom.linkTo(messageTextField.bottom)
+            end.linkTo(parent.end)
+            height = Dimension.fillToConstraints
+        }
+    }
+
+    ConstraintLayout(
+        constraintSet = constraints,
         modifier = modifier
-            .fillMaxWidth(),
-        maxLines = 5,
-        value = message,
-        onValueChange = { message = it },
-        placeholder = {
-            Text(
-                text = "채팅을 입력해주세요.",
-                style = MaterialTheme.typography.labelMedium,
-                color = Color.Gray,
-                fontFamily = HannaPro
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        //이미지 첨부 버튼
+        IconButton(
+            modifier = Modifier.layoutId("attachIcon"),
+            onClick = {
+                TedImagePicker.with(context)
+                    .start { uri ->
+                        onSendImageMessage(userId, uri)
+                    }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.AttachFile,
+                contentDescription = null,
+                tint = Black
             )
-        },
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        textStyle = TextStyle(
-            fontFamily = HannaPro,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            color = Black
-        ),
-        leadingIcon = {
+        }
+
+        //채팅 입력
+        OutlinedTextField(
+            modifier = Modifier.layoutId("messageTextField"),
+            maxLines = 5,
+            value = message,
+            onValueChange = { message = it },
+            placeholder = {
+                Text(
+                    text = "채팅을 입력해주세요.",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.Gray,
+                    fontFamily = HannaPro
+                )
+            },
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent
+            ),
+            textStyle = TextStyle(
+                fontFamily = HannaPro,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                color = Black
+            )
+        )
+
+        //메시지 전송 버튼
+        if (message.isNotBlank()) {
             IconButton(
-                onClick = {
-                    //테드 이미지 픽커
-                    TedImagePicker.with(context)
-                        .start { uri ->
-                            onSendImageMessage(userId, uri)
-                        }
-                },
                 modifier = Modifier
-                    .size(36.dp)
+                    .layoutId("sendIcon")
+                    .background(MaterialTheme.colorScheme.inversePrimary),
+                onClick = {
+                    //메시지 전송
+                    onSendMessage(userId, message)
+
+                    //메시지 초기화
+                    message = ""
+
+                    //키보드 숨기기
+                    keyboardController?.hide()
+                }
             ) {
                 Icon(
-                    modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Default.AttachFile,
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.AutoMirrored.Default.Send,
                     contentDescription = null,
                     tint = Black
                 )
             }
-        },
-        trailingIcon = {
-            if (message.isNotBlank()) {
-                IconButton(
-                    onClick = {
-                        // 메시지 전송
-                        onSendMessage(userId, message)
-
-                        // 텍스트 필드 초기화
-                        message = ""
-
-                        // 키보드 숨기기
-                        keyboardController?.hide()
-                    }
-                ) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.AutoMirrored.Default.Send,
-                        contentDescription = null,
-                        tint = Black
-                    )
-                }
-            }
         }
-    )
+    }
 }

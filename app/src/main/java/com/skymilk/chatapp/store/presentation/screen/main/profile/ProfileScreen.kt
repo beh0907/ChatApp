@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,17 +55,14 @@ fun ProfileScreen(
     Box(modifier = modifier.fillMaxSize()) {
         //상단 아이콘
         TopSection(
-            modifier = Modifier
-                .padding(10.dp)
-                .align(Alignment.TopEnd),
-            onNavigateToBack = {onNavigateToBack()}
+            modifier = Modifier,
+            onNavigateToBack = { onNavigateToBack() }
         )
 
         //프로필 정보
         Column(
             modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
@@ -99,7 +96,7 @@ private fun TopSection(
     ) {
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                imageVector = Icons.Default.Close,
                 contentDescription = null
             )
         }
@@ -129,27 +126,29 @@ fun UserProfileSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
+    Spacer(modifier = Modifier.height(17.dp))
 
     //유저 이름
     Text(
         text = user.username,
         style = MaterialTheme.typography.titleLarge,
+        fontFamily = HannaPro,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
 
-    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
+    Spacer(modifier = Modifier.height(24.dp))
 
     //유저 상대 메시지
     Text(
-        text = "user.statusMessage",
-        style = MaterialTheme.typography.titleLarge,
+        text = user.statusMessage,
+        style = MaterialTheme.typography.titleMedium,
+        fontFamily = HannaPro,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
 
-    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
+    Spacer(modifier = Modifier.height(10.dp))
 }
 
 @Composable
@@ -171,7 +170,8 @@ fun ProfileEventSection(
                 .fillMaxHeight()
                 .clickable {
 
-                },
+                }
+                .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -196,7 +196,8 @@ fun ProfileEventSection(
                 .fillMaxHeight()
                 .clickable {
                     onNavigateToProfileEdit()
-                },
+                }
+                .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -221,7 +222,8 @@ fun ProfileEventSection(
                 .fillMaxHeight()
                 .clickable {
                     visibleSignOutDialog()
-                },
+                }
+                .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

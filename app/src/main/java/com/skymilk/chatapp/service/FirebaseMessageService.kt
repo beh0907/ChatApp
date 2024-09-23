@@ -7,7 +7,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.net.Uri
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.getSystemService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -28,9 +30,13 @@ class FirebaseMessageService : FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         //받은 메시지는 알림 출력
-        message.notification?.let {
-            showNotification(it.title, it.body, message.data)
-        }
+//        message.notification?.let {
+//            showNotification(it.title, it.body, message.data)
+//        }
+
+        val title = message.notification?.title ?: message.data["title"]
+        val body = message.notification?.body ?: message.data["body"]
+        showNotification(title, body, message.data)
     }
 
     private fun showNotification(
@@ -51,15 +57,11 @@ class FirebaseMessageService : FirebaseMessagingService() {
         notificationManager.createNotificationChannel(channel)
 
         // 알림 클릭 시 MainActivity를 열고 채팅방 ID 전달
-        val intent = Intent(this, MainActivity::class.java).apply {
+        val deepLinkUri = "chatapp://chatrooms/${data["chatRoomId"]}"
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLinkUri)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("chatRoomId", data["chatRoomId"])
-            if (isAppRunning()) {
-                // 앱이 실행 중일 때는 새로운 태스크를 생성하지 않음
-                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_CLEAR_TOP
-            } else {
-                // 앱이 실행 중이지 않을 때는 새로운 태스크 생성
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
         }
 
         val pendingIntent = PendingIntent.getActivity(

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
@@ -72,15 +73,19 @@ fun ItemMyMessage(chatMessage: ChatMessage) {
 
                     //이미지 타입
                     MessageType.IMAGE -> {
-                        AsyncImage(
+                        SubcomposeAsyncImage(
                             model = ImageRequest.Builder(context)
                                 .data(chatMessage.content)
                                 .crossfade(true)
                                 .build(),
                             contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            placeholder = null,
-                            contentScale = ContentScale.Fit // 이미지의 크기 조정
+                            modifier = Modifier.size(maxWidth),
+                            loading = {
+                                Box(modifier = Modifier
+                                    .fillMaxSize()
+                                    .shimmerEffect())
+                            },
+                            contentScale = ContentScale.Crop // 이미지의 크기 조정
                         )
                     }
 
