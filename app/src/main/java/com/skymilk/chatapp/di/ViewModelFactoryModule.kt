@@ -16,8 +16,6 @@ interface ViewModelFactoryModule {
 
     fun friendsViewModelFactory(): FriendsViewModel.Factory
 
-    fun profileViewModelFactory(): ProfileEditViewModel.Factory
-
     fun chatRoomViewModelFactory(): ChatRoomViewModel.Factory
 
 }

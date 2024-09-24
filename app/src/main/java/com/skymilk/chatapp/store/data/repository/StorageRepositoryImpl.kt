@@ -1,15 +1,16 @@
 package com.skymilk.chatapp.store.data.repository
 
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.skymilk.chatapp.store.domain.model.UploadProgress
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import javax.inject.Inject
@@ -18,20 +19,27 @@ class StorageRepositoryImpl @Inject constructor(
     private val storageReference: StorageReference
 ) : StorageRepository {
 
-    override suspend fun saveProfileImage(userid: String, uri: Uri): Flow<UploadProgress> {
-        return saveImage("profile_images/$userid", uri)
+    //프로필 이미지 저장
+    override fun saveProfileImage(userid: String, byteArray: ByteArray): Flow<UploadProgress> {
+        return saveImage("profile_images/$userid", byteArray)
     }
 
-    override suspend fun saveChatMessageImage(chatRoomId: String, uri: Uri): Flow<UploadProgress> {
+    //채팅방 이미지 저장
+    override fun saveChatMessageImage(chatRoomId: String, uri: Uri): Flow<UploadProgress> {
         return saveImage(
             "chat_images/$chatRoomId/${System.currentTimeMillis()}-${UUID.randomUUID()}",
             uri
         )
     }
 
-    override fun saveImage(path: String, uri: Uri): Flow<UploadProgress> = callbackFlow {
+    override fun <T> saveImage(path: String, imageData: T): Flow<UploadProgress> = callbackFlow {
         val storageRef = storageReference.child(path)
-        val uploadTask = storageRef.putFile(uri)
+
+        val uploadTask = when (imageData) {
+            is ByteArray -> storageRef.putBytes(imageData)
+            is Uri -> storageRef.putFile(imageData)
+            else -> throw IllegalArgumentException("Unsupported image type")
+        }
 
         val progressListener = OnProgressListener<UploadTask.TaskSnapshot> { taskSnapshot ->
             //상태 현황 업데이트
@@ -56,6 +64,5 @@ class StorageRepositoryImpl @Inject constructor(
         awaitClose {
             uploadTask.removeOnProgressListener(progressListener)
         }
-    }
-
+    }.flowOn(Dispatchers.IO)
 }

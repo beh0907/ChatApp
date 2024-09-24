@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -49,6 +50,12 @@ fun ChatRoomItem(
         }
         .padding(MaterialTheme.dimens.small2)
     ) {
+        //참여자가 한명이라면 나의 방, 아니라면 타인의 이미지를 찾아 적용
+        val image = when (chatRoom.participants.size) {
+            1 -> chatRoom.participants.first().profileImageUrl
+            else -> chatRoom.participants.fastFirst { it.id != currentUser.id }.profileImageUrl
+        }
+
         //이미지 정보
         AsyncImage(
             modifier = Modifier
@@ -57,9 +64,10 @@ fun ChatRoomItem(
             model = ImageRequest.Builder(
                 LocalContext.current
             )
-                .data(chatRoom.participants.fastFirst { it.id != currentUser.id }.profileImageUrl)
+                .data(image)
                 .crossfade(true)
                 .build(),
+            contentScale = ContentScale.Crop,
             contentDescription = null,
         )
 
@@ -70,22 +78,39 @@ fun ChatRoomItem(
                 .weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
-
             Text(text = buildAnnotatedString {
-                chatRoom.participants.forEach { participant ->
-                    if (participant.id != currentUser.id) {
+
+                //참여자 이름 정보 표시
+                when (chatRoom.participants.size) {
+                    1 -> {
                         withStyle(
                             style = SpanStyle(
                                 color = if (isSystemInDarkTheme()) Color.White else Black,
                                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                fontFamily = HannaPro,
-
-                                )
+                                fontFamily = HannaPro
+                            )
                         ) {
-                            append("${participant.username} ")
+                            append("${chatRoom.participants.first().username} ")
+                        }
+                    }
+
+                    else -> {
+                        chatRoom.participants.forEach { participant ->
+                            if (participant.id != currentUser.id) {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = if (isSystemInDarkTheme()) Color.White else Black,
+                                        fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
+                                        fontFamily = HannaPro
+                                    )
+                                ) {
+                                    append("${participant.username} ")
+                                }
+                            }
                         }
                     }
                 }
+
 
                 //1대1이 아닌 다수의 채팅방일 경우 참여자 수 표시
                 if (chatRoom.participants.size > 2) {

@@ -30,15 +30,18 @@ class AuthViewModel @Inject constructor(
 
     //로그인 정보 체크
     private fun checkCurrentUser() {
-        val currentUser = authUseCases.getCurrentUser()
+        viewModelScope.launch {
+            val currentUser = authUseCases.getCurrentUser()
 
-        _authState.update {
-            if (currentUser != null) {
-                AuthState.Authenticated(currentUser)
-            } else {
-                AuthState.Unauthenticated
+            _authState.update {
+                if (currentUser != null) {
+                    AuthState.Authenticated(currentUser)
+                } else {
+                    AuthState.Unauthenticated
+                }
             }
         }
+
     }
 
     //구글 로그인

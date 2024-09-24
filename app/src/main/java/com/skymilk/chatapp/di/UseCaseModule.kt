@@ -13,6 +13,7 @@ import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chat.CreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRoom
+import com.skymilk.chatapp.store.domain.usecase.chat.GetOrCreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRooms
 import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
@@ -51,6 +52,7 @@ object UseCaseModule {
         ChatUseCases(
             GetChatRoom(chatRepository),
             GetChatRooms(chatRepository),
+            GetOrCreateChatRoom(chatRepository),
             GetMessages(chatRepository),
             SendMessage(chatRepository),
             SendImageMessage(chatRepository),

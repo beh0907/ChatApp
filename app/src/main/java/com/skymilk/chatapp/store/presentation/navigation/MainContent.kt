@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.fastMap
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -30,6 +31,7 @@ import androidx.navigation.navDeepLink
 import com.skymilk.chatapp.di.ViewModelFactoryModule
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
+import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatListScreen
@@ -37,6 +39,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomL
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
+import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditViewModel
 import dagger.hilt.android.EntryPointAccessors
@@ -165,29 +168,35 @@ fun MainContent(
             composable(
                 route = MainNavigation.ProfileScreen.route,
             ) {
+                val profileViewModel: ProfileViewModel = hiltViewModel()
+
                 ProfileScreen(
                     modifier = Modifier,
+                    viewModel = profileViewModel,
                     user = currentUser,
                     onNavigateToBack = {
                         navController.popBackStack()
                     },
-                    onSignOut = onSignOut,
                     onNavigateToProfileEdit = {
                         navController.navigate(MainNavigation.ProfileEditScreen.route) {
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    onNavigateToChatRoom = { chatRoomId ->
+                        navController.navigate(MainNavigation.ChatRoomScreen.route + "/$chatRoomId") {
+                            popUpTo(MainNavigation.ProfileScreen.route) { inclusive = false }
+
+                            // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
+                            launchSingleTop = true
+                        }
+                    },
+                    onSignOut = onSignOut
                 )
             }
 
             //프로필 편집 화면
             composable(MainNavigation.ProfileEditScreen.route) {
-                val profileEditViewModel: ProfileEditViewModel = viewModel(
-                    factory = ProfileEditViewModel.provideFactory(
-                        viewModelFactoryProvider.profileViewModelFactory(),
-                        currentUser.id
-                    )
-                )
+                val profileEditViewModel: ProfileEditViewModel = hiltViewModel()
 
                 ProfileEditScreen(
                     modifier = Modifier,

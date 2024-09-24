@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,22 +36,34 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.ui.theme.HannaPro
-import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier,
+    viewModel: ProfileViewModel,
     user: User,
     onNavigateToBack: () -> Unit,
-    onSignOut: () -> Unit,
-    onNavigateToProfileEdit: () -> Unit
+    onNavigateToProfileEdit: () -> Unit,
+    onNavigateToChatRoom: (String) -> Unit,
+    onSignOut: () -> Unit
 ) {
     var visibleSignOutDialog by remember { mutableStateOf(false) }
+    val mySoloChatRoomId by viewModel.mySoloChatRoomId.collectAsStateWithLifecycle()
+
+    LaunchedEffect(mySoloChatRoomId) {
+        mySoloChatRoomId?.let {
+            onNavigateToChatRoom(it)
+
+            //채팅방 값을 초기화 시켜야 함
+            viewModel.initMySoloChatRoomId()
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         //상단 아이콘
@@ -71,6 +84,7 @@ fun ProfileScreen(
             HorizontalDivider()
 
             ProfileEventSection(
+                onNavigateToMyChatRoom = { viewModel.getMySoloChatRoomId(user.id) },
                 onNavigateToProfileEdit = onNavigateToProfileEdit,
                 visibleSignOutDialog = {
                     visibleSignOutDialog = true
@@ -121,8 +135,8 @@ fun UserProfileSection(
                 .data(user.profileImageUrl ?: "https://via.placeholder.com/150")
                 .crossfade(true)
                 .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            contentDescription = null
         )
     }
 
@@ -153,6 +167,7 @@ fun UserProfileSection(
 
 @Composable
 fun ProfileEventSection(
+    onNavigateToMyChatRoom: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     visibleSignOutDialog: () -> Unit
 ) {
@@ -169,7 +184,7 @@ fun ProfileEventSection(
             modifier = Modifier
                 .fillMaxHeight()
                 .clickable {
-
+                    onNavigateToMyChatRoom()
                 }
                 .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,

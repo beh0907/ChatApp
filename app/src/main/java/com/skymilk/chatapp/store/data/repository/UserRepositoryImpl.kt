@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -21,30 +22,40 @@ class UserRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : UserRepository {
 
-    override suspend fun updateProfile(user: User): Result<Unit> {
-        return try {
-            // Firestore에서 사용자 정보 업데이트
-            firebaseFireStore.collection("users")
-                .document(user.id)
-                .set(user)
-                .await()
+    override suspend fun updateProfile(
+        userId: String,
+        name: String,
+        statusMessage: String,
+        imageUrl: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val currentUser = firebaseAuth.currentUser ?: throw Exception("현재 사용자가 없습니다")
+            val userRef = firebaseFireStore.collection("users").document(userId)
 
-            // Firebase Auth에서 프로필 업데이트
-            val currentUser = firebaseAuth.currentUser ?: throw Exception("No current user")
+            // Firestore 업데이트
+            val updates = hashMapOf<String, Any>(
+                "username" to name,
+                "statusMessage" to statusMessage
+            )
+            if (imageUrl.isNotEmpty()) {
+                updates["profileImageUrl"] = imageUrl
+            }
+            userRef.update(updates).await()
 
-            // photoUrl이 null이 아닐 경우 Uri로 변환
-            val photoUri = user.profileImageUrl?.let { Uri.parse(it) }
-
+            // Firebase Auth 프로필 업데이트
             val profileUpdates = UserProfileChangeRequest.Builder()
-                .setDisplayName(user.username)
-                .setPhotoUri(photoUri)
+                .setDisplayName(name)
+                .apply {
+                    if (imageUrl.isNotEmpty()) {
+                        photoUri = Uri.parse(imageUrl)
+                    }
+                }
                 .build()
-
             currentUser.updateProfile(profileUpdates).await()
 
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(Exception("프로필 업데이트 중 오류가 발생했습니다"))
+            handleUserError(e)
         }
     }
 
@@ -58,15 +69,8 @@ class UserRepositoryImpl @Inject constructor(
             } else {
                 Result.failure(Exception("사용자를 찾을 수 없습니다"))
             }
-        } catch (e: FirebaseAuthException) {
-            e.printStackTrace()
-
-            val errorMessage = FirebaseUtil.getErrorMessage(e)
-
-            Result.failure(Exception(errorMessage))
         } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
+            handleUserError(e)
         }
     }
 
@@ -101,5 +105,16 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose {
             listener.remove()
         }
+    }
+
+
+    //오류 체크
+    private fun <T> handleUserError(e: Exception): Result<T> {
+        e.printStackTrace()
+        val errorMessage = when (e) {
+            is FirebaseAuthException -> FirebaseUtil.getErrorMessage(e)
+            else -> e.message ?: "An unknown error occurred"
+        }
+        return Result.failure(Exception(errorMessage))
     }
 }

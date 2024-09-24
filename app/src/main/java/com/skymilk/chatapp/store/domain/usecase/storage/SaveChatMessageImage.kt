@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SaveChatMessageImage @Inject constructor(
     private val storageRepository: StorageRepository
 ) {
-    suspend operator fun invoke(chatRoomId: String, uri: Uri): Flow<UploadProgress> {
+    operator fun invoke(chatRoomId: String, uri: Uri): Flow<UploadProgress> {
         return storageRepository.saveChatMessageImage(chatRoomId, uri)
     }
 

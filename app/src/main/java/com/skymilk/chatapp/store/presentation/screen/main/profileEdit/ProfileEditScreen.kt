@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profileEdit
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,11 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.mr0xf00.easycrop.AspectRatio
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.ImageCropper
-import com.mr0xf00.easycrop.RoundRectCropShape
 import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
@@ -67,20 +66,27 @@ fun ProfileEditScreen(
     val imageCropper = rememberImageCropper()
     val cropState = imageCropper.cropState
 
-    //텍스트 편집 정보
+    //프로필 편집 정보
     var showEditDialog by remember { mutableStateOf(false) }
     var editingField by remember { mutableStateOf("") }
     var editName by remember { mutableStateOf(user.username) }
     var editStatusMessage by remember { mutableStateOf(user.statusMessage) }
+    var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
     Box(modifier = modifier.fillMaxSize()) {
-
         //편집 다이얼로그가 나타날 때는
         //타이틀이 겹치기 때문에 임시로 숨긴다
         TopSection(
             modifier = if (showEditDialog) Modifier.alpha(0f) else Modifier,
             onNavigateToBack = { onNavigateToBack() },
-            onSubmit = viewModel::updateUserProfile
+            onProfileUpdate = {
+                viewModel.updateUserProfile(
+                    userId = user.id,
+                    name = editName,
+                    statusMessage = editStatusMessage,
+                    imageBitmap = selectedImage
+                )
+            }
         )
 
         //프로필 정보
@@ -96,6 +102,7 @@ fun ProfileEditScreen(
                 profileImageUrl = user.profileImageUrl,
                 editName = editName,
                 editStatusMessage = editStatusMessage,
+                selectedImage = selectedImage,
                 onNameClick = {
                     editingField = "name"
                     showEditDialog = true
@@ -103,9 +110,11 @@ fun ProfileEditScreen(
                 onStatusClick = {
                     editingField = "status"
                     showEditDialog = true
+                },
+                onSelectedImage = { imageBitmap ->
+                    selectedImage = imageBitmap
                 }
             )
-
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
 
@@ -140,7 +149,7 @@ fun ProfileEditScreen(
 fun TopSection(
     modifier: Modifier = Modifier,
     onNavigateToBack: () -> Unit,
-    onSubmit: (User) -> Unit
+    onProfileUpdate: () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -166,7 +175,7 @@ fun TopSection(
         )
 
         TextButton(onClick = {
-//            onSubmit()
+            onProfileUpdate()
         }) {
             Text(
                 text = "완료",
@@ -185,12 +194,12 @@ private fun EditProfileSection(
     profileImageUrl: String?,
     editName: String,
     editStatusMessage: String,
+    selectedImage:ImageBitmap?,
     onNameClick: () -> Unit,
-    onStatusClick: () -> Unit
+    onStatusClick: () -> Unit,
+    onSelectedImage: (ImageBitmap) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-
-    var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
     Surface(
         shadowElevation = 4.dp,
@@ -202,7 +211,7 @@ private fun EditProfileSection(
                     scope.launch {
                         when (val result = imageCropper.crop(uri = uri, context = context)) {
                             is CropResult.Success -> {
-                                selectedImage = result.bitmap
+                                onSelectedImage(result.bitmap)
                             }
 
                             else -> {}
@@ -218,7 +227,7 @@ private fun EditProfileSection(
             Image(
                 modifier = Modifier
                     .size(100.dp),
-                bitmap = selectedImage!!,
+                bitmap = selectedImage,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
@@ -230,8 +239,8 @@ private fun EditProfileSection(
                     .data(profileImageUrl ?: "https://via.placeholder.com/150")
                     .crossfade(true)
                     .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                contentDescription = null
             )
         }
     }

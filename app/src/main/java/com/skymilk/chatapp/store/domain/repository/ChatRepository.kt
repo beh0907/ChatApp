@@ -12,6 +12,8 @@ interface ChatRepository {
 
     fun getChatRooms(userId: String): Flow<List<ChatRoomWithUsers>>
 
+    suspend fun getOrCreateChatRoom(participants: List<String>): Result<String?>
+
     fun getMessages(chatRoomId: String): Flow<List<ChatMessage>>
 
     suspend fun sendMessage(chatRoomId: String, senderId: String, content: String): Result<Unit>

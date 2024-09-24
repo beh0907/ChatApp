@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.util.fastMap
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -40,7 +41,7 @@ class ChatRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ChatRepository {
 
-    //아이디로 채팅방 정보 불러오기
+    //채팅방 아이디로 채팅방 정보 불러오기
     override fun getChatRoom(chatRoomId: String): Flow<ChatRoomWithUsers> = callbackFlow {
         val listener = firebaseFireStore.collection("chatRooms").document(chatRoomId)
             .addSnapshotListener { snapshot, e ->
@@ -103,6 +104,43 @@ class ChatRepositoryImpl @Inject constructor(
 
         awaitClose { listener.remove() }
     }
+
+    //채팅방 참가자가 일치한 채팅방 아이디 가져오기
+    override suspend fun getOrCreateChatRoom(participants: List<String>): Result<String?> =
+        withContext(Dispatchers.IO) {
+            try {
+                // 참가자 목록을 정렬하여 일관성 있는 쿼리를 보장합니다.
+                val sortedParticipants = participants.sorted()
+
+                // 기존 채팅방 검색
+                val existingChatRoom = firebaseFireStore.collection("chatRooms")
+                    .whereEqualTo("participants", sortedParticipants)
+                    .get()
+                    .await()
+                    .documents
+                    .firstOrNull()
+
+                if (existingChatRoom != null) {
+                    // 기존 채팅방이 있으면 해당 ID 반환
+                    return@withContext Result.success(existingChatRoom.id)
+                } else {
+                    // 기존 채팅방이 없으면 새로 생성
+                    val newChatRoom = createChatRoom(
+                        name = "새로운 채팅방", // 또는 참가자 이름을 조합하여 생성할 수 있습니다.
+                        participants = sortedParticipants
+                    )
+
+                    return@withContext when {
+                        newChatRoom.isSuccess -> {
+                            Result.success(newChatRoom.getOrThrow().id)
+                        }
+                        else -> Result.failure(Exception("채팅방을 생성할 수 없습니다"))
+                    }
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
 
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)
     override fun getMessages(chatRoomId: String): Flow<List<ChatMessage>> = callbackFlow {

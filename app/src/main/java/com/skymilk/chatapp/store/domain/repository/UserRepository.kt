@@ -5,7 +5,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
-    suspend fun updateProfile(user: User): Result<Unit> // 프로필 정보 갱신
+    suspend fun updateProfile(
+        userId: String,
+        name: String,
+        statusMessage: String,
+        imageUrl: String
+    ): Result<Unit> // 프로필 정보 갱신
 
     suspend fun getUser(userId: String): Result<User> // 특정 유저 정보 가져오기
 

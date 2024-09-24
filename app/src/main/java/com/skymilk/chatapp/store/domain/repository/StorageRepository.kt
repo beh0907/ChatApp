@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface StorageRepository {
 
-    suspend fun saveProfileImage(userid: String, uri: Uri): Flow<UploadProgress>
+    fun saveProfileImage(userid: String, byteArray: ByteArray): Flow<UploadProgress>
 
-    suspend fun saveChatMessageImage(chatRoomId: String, uri: Uri): Flow<UploadProgress>
+    fun saveChatMessageImage(chatRoomId: String, uri: Uri): Flow<UploadProgress>
 
-    fun saveImage(path: String, uri: Uri): Flow<UploadProgress>
+    fun <T> saveImage(path: String, imageData:T): Flow<UploadProgress>
 }
