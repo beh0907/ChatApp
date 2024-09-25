@@ -2,16 +2,19 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -136,8 +139,6 @@ fun ChatRoomScreen(
 //상단 타이틀
 @Composable
 fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, currentUser: User) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-
     val title = when (chatRoom.participants.size) {
         1 -> chatRoom.participants.first().username
         2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: ""
@@ -155,7 +156,7 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
                 contentDescription = null,
-                tint = uiColor
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -164,7 +165,7 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
             text = title,
             fontFamily = HannaPro,
             style = MaterialTheme.typography.titleLarge,
-            color = uiColor
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -216,17 +217,22 @@ fun BottomSection(
             .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         //이미지 첨부 버튼
-        IconButton(
-            modifier = Modifier.layoutId("attachIcon"),
-            onClick = {
-                TedImagePicker.with(context)
-                    .start { uri ->
-                        onSendImageMessage(userId, uri)
-                    }
-            }
+        Box(
+            modifier = Modifier
+                .layoutId("attachIcon")
+                .clickable {
+                    TedImagePicker.with(context)
+                        .start { uri ->
+                            onSendImageMessage(userId, uri)
+                        }
+                },
+            contentAlignment = Alignment.BottomCenter
         ) {
             Icon(
-                imageVector = Icons.Default.AttachFile,
+                modifier = Modifier
+                    .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
+                    .size(24.dp),
+                imageVector = Icons.Default.Add,
                 contentDescription = null,
                 tint = Black
             )
@@ -261,24 +267,27 @@ fun BottomSection(
         )
 
         //메시지 전송 버튼
-        if (message.isNotBlank()) {
-            IconButton(
+        if (message.isNotEmpty()) {
+            Box(
                 modifier = Modifier
                     .layoutId("sendIcon")
-                    .background(MaterialTheme.colorScheme.inversePrimary),
-                onClick = {
-                    //메시지 전송
-                    onSendMessage(userId, message)
+                    .background(MaterialTheme.colorScheme.inversePrimary)
+                    .clickable {
+                        //메시지 전송
+                        onSendMessage(userId, message)
 
-                    //메시지 초기화
-                    message = ""
+                        //메시지 초기화
+                        message = ""
 
-                    //키보드 숨기기
-                    keyboardController?.hide()
-                }
+                        //키보드 숨기기
+                        keyboardController?.hide()
+                    },
+                contentAlignment = Alignment.BottomCenter
             ) {
                 Icon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
+                        .size(24.dp),
                     imageVector = Icons.AutoMirrored.Default.Send,
                     contentDescription = null,
                     tint = Black

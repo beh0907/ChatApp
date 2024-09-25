@@ -1,9 +1,10 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profileEdit
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,11 +35,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mr0xf00.easycrop.CropResult
@@ -49,6 +52,7 @@ import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
+import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.ui.theme.HannaPro
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
@@ -60,6 +64,7 @@ fun ProfileEditScreen(
     user: User,
     onNavigateToBack: () -> Unit
 ) {
+    val editProfileState by viewModel.editProfileState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     //이미지 자르기
@@ -73,7 +78,9 @@ fun ProfileEditScreen(
     var editStatusMessage by remember { mutableStateOf(user.statusMessage) }
     var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.secondary)) {
         //편집 다이얼로그가 나타날 때는
         //타이틀이 겹치기 때문에 임시로 숨긴다
         TopSection(
@@ -116,10 +123,18 @@ fun ProfileEditScreen(
                 }
             )
 
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                color = Color.White
+            )
 
             EditEventSection()
         }
+    }
+
+    //이미지 업데이트 로딩 표시
+    if (editProfileState is EditProfileState.Loading) {
+        CustomProgressDialog("프로필을 업데이트 하고 있습니다.")
     }
 
     //이미지 크롭 다이얼로그
@@ -164,6 +179,7 @@ fun TopSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
                 contentDescription = null,
+                tint = Color.White
             )
         }
 
@@ -172,6 +188,7 @@ fun TopSection(
             text = "프로필 편집",
             fontFamily = HannaPro,
             style = MaterialTheme.typography.titleLarge,
+            color = Color.White
         )
 
         TextButton(onClick = {
@@ -194,7 +211,7 @@ private fun EditProfileSection(
     profileImageUrl: String?,
     editName: String,
     editStatusMessage: String,
-    selectedImage:ImageBitmap?,
+    selectedImage: ImageBitmap?,
     onNameClick: () -> Unit,
     onStatusClick: () -> Unit,
     onSelectedImage: (ImageBitmap) -> Unit
@@ -252,7 +269,11 @@ private fun EditProfileSection(
         modifier = Modifier
             .padding(horizontal = 24.dp)
             .fillMaxWidth()
-            .clickable {
+            .clickable(
+                //리플 효과 제거
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
                 onNameClick()
             }
     ) {
@@ -262,21 +283,26 @@ private fun EditProfileSection(
             style = MaterialTheme.typography.titleLarge,
             text = editName,
             fontFamily = HannaPro,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = Color.White
         )
 
         Icon(
             modifier = Modifier.align(Alignment.CenterEnd),
             imageVector = Icons.Default.Edit,
-            contentDescription = null
+            contentDescription = null,
+            tint = Color.White
         )
 
     }
 
+    Spacer(modifier = Modifier.height(5.dp))
+
     HorizontalDivider(
         modifier = Modifier
             .padding(horizontal = 24.dp)
-            .height(24.dp)
+            .height(24.dp),
+        color = Color.White
     )
 
 
@@ -285,7 +311,11 @@ private fun EditProfileSection(
         modifier = Modifier
             .padding(horizontal = 24.dp)
             .fillMaxWidth()
-            .clickable {
+            .clickable(
+                //리플 효과 제거
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
                 onStatusClick()
             }
     ) {
@@ -295,15 +325,18 @@ private fun EditProfileSection(
             style = MaterialTheme.typography.titleMedium,
             text = editStatusMessage,
             fontFamily = HannaPro,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = Color.White
         )
 
         Icon(
             modifier = Modifier.align(Alignment.CenterEnd),
             imageVector = Icons.Default.Edit,
-            contentDescription = null
+            contentDescription = null,
+            tint = Color.White
         )
     }
+    Spacer(modifier = Modifier.height(5.dp))
 }
 
 @Composable

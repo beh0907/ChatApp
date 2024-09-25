@@ -80,7 +80,8 @@ class UserRepositoryImpl @Inject constructor(
 
         val listener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                Log.d("getFriends error", error.message.toString())
+                close()
                 return@addSnapshotListener
             }
 

@@ -71,8 +71,6 @@ fun ChatListScreen(
 //상단 타이틀
 @Composable
 fun TopSection() {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,7 +82,7 @@ fun TopSection() {
             text = "채팅",
             fontFamily = HannaPro,
             style = MaterialTheme.typography.titleLarge,
-            color = uiColor
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         IconButton(onClick = {
@@ -93,7 +91,7 @@ fun TopSection() {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
-                tint = uiColor
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }

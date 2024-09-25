@@ -208,7 +208,7 @@ fun CustomFullScreenEditDialog(
                         textStyle = TextStyle(
                             fontFamily = HannaPro,
                             fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = Color.White
                         ),
                         modifier = Modifier
                             .fillMaxWidth()

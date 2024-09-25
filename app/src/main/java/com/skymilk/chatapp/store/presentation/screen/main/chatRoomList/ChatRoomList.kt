@@ -14,7 +14,10 @@ fun ChatRoomList(
 ) {
     LazyColumn {
         items(chatRooms, key = { chatRoom -> chatRoom.id }) { chatRoom ->
-            ChatRoomItem(chatRoom, currentUser, onChatItemClick)
+            when(chatRoom.participants.size) {
+                1 -> ChatSoloRoomItem(chatRoom, currentUser, onChatItemClick) // 나의 채팅방
+                else -> ChatRoomItem(chatRoom, currentUser, onChatItemClick) // 한명 이상의 대상이 있는 채팅방
+            }
         }
     }
 }

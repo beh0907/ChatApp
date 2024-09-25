@@ -46,7 +46,7 @@ class ChatRepositoryImpl @Inject constructor(
         val listener = firebaseFireStore.collection("chatRooms").document(chatRoomId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    close(e)
+                    close()
                     return@addSnapshotListener
                 }
 
@@ -74,9 +74,10 @@ class ChatRepositoryImpl @Inject constructor(
         val listener = firebaseFireStore.collection("chatRooms")
             .whereArrayContains("participants", userId)
             .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshots, e ->
-                if (e != null) {
-                    close(e)
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    Log.d("getChatRooms error", error.message.toString())
+                    close()
                     return@addSnapshotListener
                 }
 
@@ -134,6 +135,7 @@ class ChatRepositoryImpl @Inject constructor(
                         newChatRoom.isSuccess -> {
                             Result.success(newChatRoom.getOrThrow().id)
                         }
+
                         else -> Result.failure(Exception("채팅방을 생성할 수 없습니다"))
                     }
                 }
@@ -272,22 +274,23 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     // 참가자 아이디를 사용하여 User 정보를 가져오는 함수
-    override suspend fun getUsersForParticipants(participants: List<String>): List<User> {
-        return if (participants.isNotEmpty()) {
-            // 사용자 정보를 한 번에 가져오기
-            val usersRef = firebaseFireStore.collection("users")
-            val userDocuments = usersRef
-                .whereIn(FieldPath.documentId(), participants)
-                .get()
-                .await()
+    override suspend fun getUsersForParticipants(participants: List<String>): List<User> =
+        withContext(Dispatchers.IO) {
+            if (participants.isNotEmpty()) {
+                // 사용자 정보를 한 번에 가져오기
+                val usersRef = firebaseFireStore.collection("users")
+                val userDocuments = usersRef
+                    .whereIn(FieldPath.documentId(), participants)
+                    .get()
+                    .await()
 
-            userDocuments.documents.mapNotNull { doc ->
-                doc.toObject(User::class.java)
+                userDocuments.documents.mapNotNull { doc ->
+                    doc.toObject(User::class.java)
+                }
+            } else {
+                emptyList()
             }
-        } else {
-            emptyList()
         }
-    }
 
     //FCM 메시지 전송
     override suspend fun sendFcmMessage(

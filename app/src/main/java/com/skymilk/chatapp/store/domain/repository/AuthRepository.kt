@@ -1,16 +1,17 @@
 package com.skymilk.chatapp.store.domain.repository
 
 import com.skymilk.chatapp.store.domain.model.User
+import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
 
-    suspend fun signInWithGoogle(): Result<User>
+    fun signInWithGoogle(): Flow<User>
 
-    suspend fun signInWithEmailAndPassword(email: String, password: String): Result<User>
+    fun signInWithEmailAndPassword(email: String, password: String): Flow<User>
 
-    suspend fun signUpWithEmailAndPassword(name:String, email: String, password: String): Result<User>
+    fun signUpWithEmailAndPassword(name:String, email: String, password: String): Flow<User>
 
-    suspend fun getCurrentUser(): User?
+    fun getCurrentUser(): Flow<User>
 
     suspend fun signOut()
 

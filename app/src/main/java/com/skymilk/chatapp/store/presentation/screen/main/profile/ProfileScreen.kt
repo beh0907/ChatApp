@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.commit451.coiltransformations.BlurTransformation
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.ui.theme.HannaPro
@@ -65,7 +68,8 @@ fun ProfileScreen(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.secondary)) {
+
         //상단 아이콘
         TopSection(
             modifier = Modifier,
@@ -81,7 +85,9 @@ fun ProfileScreen(
         ) {
             UserProfileSection(user)
 
-            HorizontalDivider()
+            HorizontalDivider(
+                color =  Color.White
+            )
 
             ProfileEventSection(
                 onNavigateToMyChatRoom = { viewModel.getMySoloChatRoomId(user.id) },
@@ -111,7 +117,8 @@ private fun TopSection(
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White
             )
         }
     }
@@ -148,10 +155,11 @@ fun UserProfileSection(
         style = MaterialTheme.typography.titleLarge,
         fontFamily = HannaPro,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+        overflow = TextOverflow.Ellipsis,
+        color = Color.White
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(29.dp))
 
     //유저 상대 메시지
     Text(
@@ -159,10 +167,11 @@ fun UserProfileSection(
         style = MaterialTheme.typography.titleMedium,
         fontFamily = HannaPro,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+        overflow = TextOverflow.Ellipsis,
+        color = Color.White
     )
 
-    Spacer(modifier = Modifier.height(10.dp))
+    Spacer(modifier = Modifier.height(15.dp))
 }
 
 @Composable
@@ -192,7 +201,8 @@ fun ProfileEventSection(
         ) {
             Icon(
                 imageVector = Icons.Default.ChatBubble,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White
             )
 
             Spacer(Modifier.height(10.dp))
@@ -201,7 +211,8 @@ fun ProfileEventSection(
                 text = "나와의 채팅",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro
+                fontFamily = HannaPro,
+                color = Color.White
             )
         }
 
@@ -218,7 +229,8 @@ fun ProfileEventSection(
         ) {
             Icon(
                 imageVector = Icons.Default.Edit,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White
             )
 
             Spacer(Modifier.height(10.dp))
@@ -227,7 +239,8 @@ fun ProfileEventSection(
                 text = "프로필 편집",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro
+                fontFamily = HannaPro,
+                color = Color.White
             )
         }
 
@@ -244,7 +257,8 @@ fun ProfileEventSection(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.Logout,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White
             )
 
             Spacer(Modifier.height(10.dp))
@@ -253,7 +267,8 @@ fun ProfileEventSection(
                 text = "로그아웃",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro
+                fontFamily = HannaPro,
+                color = Color.White
             )
         }
     }

@@ -184,7 +184,7 @@ fun MainContent(
                     },
                     onNavigateToChatRoom = { chatRoomId ->
                         navController.navigate(MainNavigation.ChatRoomScreen.route + "/$chatRoomId") {
-                            popUpTo(MainNavigation.ProfileScreen.route) { inclusive = false }
+                            popUpTo(MainNavigation.ProfileScreen.route) { inclusive = true }
 
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true

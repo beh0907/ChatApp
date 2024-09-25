@@ -164,8 +164,6 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
 //하단 계정 생성 문구
 @Composable
 private fun ColumnScope.CreateSection(onNavigateToSignIn: () -> Unit) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-
     TextButton(
         modifier = Modifier.align(alignment = CenterHorizontally),
         onClick = { onNavigateToSignIn() }) {
@@ -184,7 +182,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignIn: () -> Unit) {
 
             withStyle(
                 style = SpanStyle(
-                    color = uiColor,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = MaterialTheme.typography.labelMedium.fontSize,
                     fontFamily = HannaPro,
                     fontWeight = FontWeight.Medium

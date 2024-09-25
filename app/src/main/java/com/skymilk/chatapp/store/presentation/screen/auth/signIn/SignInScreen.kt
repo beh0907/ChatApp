@@ -175,8 +175,6 @@ private fun SocialSection(onSignInWithGoogleClick: () -> Unit) {
 //하단 계정 생성 문구
 @Composable
 private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
-
     TextButton(
         modifier = Modifier.align(alignment = CenterHorizontally),
         onClick = { onNavigateToSignUp() }) {
@@ -195,7 +193,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
 
             withStyle(
                 style = SpanStyle(
-                    color = uiColor,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = MaterialTheme.typography.labelMedium.fontSize,
                     fontFamily = HannaPro,
                     fontWeight = FontWeight.Medium

@@ -29,7 +29,6 @@ fun AuthTextField(
     value: String,
     onValueChange: (String) -> Unit
 ) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
     val visualTransformation =
         if (keyboardType == KeyboardType.Password) PasswordVisualTransformation()
         else VisualTransformation.None
@@ -45,7 +44,7 @@ fun AuthTextField(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                color = uiColor,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = HannaPro
             )
         },

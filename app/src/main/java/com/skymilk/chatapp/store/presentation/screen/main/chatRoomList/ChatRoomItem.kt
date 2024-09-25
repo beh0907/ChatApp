@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -32,7 +32,6 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
@@ -50,11 +49,9 @@ fun ChatRoomItem(
         }
         .padding(MaterialTheme.dimens.small2)
     ) {
-        //참여자가 한명이라면 나의 방, 아니라면 타인의 이미지를 찾아 적용
-        val image = when (chatRoom.participants.size) {
-            1 -> chatRoom.participants.first().profileImageUrl
-            else -> chatRoom.participants.fastFirst { it.id != currentUser.id }.profileImageUrl
-        }
+
+        //타인의 이미지를 찾아 적용
+        val image = chatRoom.participants.fastFirst { it.id != currentUser.id }.profileImageUrl
 
         //이미지 정보
         AsyncImage(
@@ -81,69 +78,58 @@ fun ChatRoomItem(
             Text(text = buildAnnotatedString {
 
                 //참여자 이름 정보 표시
-                when (chatRoom.participants.size) {
-                    1 -> {
+                chatRoom.participants.forEach { participant ->
+                    if (participant.id != currentUser.id) { // 내 이름은 표시 X
                         withStyle(
                             style = SpanStyle(
-                                color = if (isSystemInDarkTheme()) Color.White else Black,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
                                 fontFamily = HannaPro
                             )
                         ) {
-                            append("${chatRoom.participants.first().username} ")
-                        }
-                    }
-
-                    else -> {
-                        chatRoom.participants.forEach { participant ->
-                            if (participant.id != currentUser.id) {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = if (isSystemInDarkTheme()) Color.White else Black,
-                                        fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                        fontFamily = HannaPro
-                                    )
-                                ) {
-                                    append("${participant.username} ")
-                                }
-                            }
+                            append("${participant.username} ")
                         }
                     }
                 }
 
 
-                //1대1이 아닌 다수의 채팅방일 경우 참여자 수 표시
-                if (chatRoom.participants.size > 2) {
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color.Gray,
-                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                            fontFamily = HannaPro,
-                            fontWeight = FontWeight.Medium
-                        )
-                    ) {
-                        append("${chatRoom.participants.size}")
-                    }
+                //다수의 채팅방은 경우 참여자 수 표시
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.Gray,
+                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
+                        fontFamily = HannaPro,
+                        fontWeight = FontWeight.Medium
+                    )
+                ) {
+                    append("${chatRoom.participants.size}")
                 }
             })
+
+            Spacer(Modifier.height(5.dp))
 
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
                 fontFamily = HannaPro,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.DarkGray,
+                color = MaterialTheme.colorScheme.secondary,
                 maxLines = 1
             )
         }
 
 
-        //시간 정보
-        Text(
-            text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-            fontFamily = HannaPro,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            //시간 정보
+            Text(
+                text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
+                fontFamily = HannaPro,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+
     }
 }
 

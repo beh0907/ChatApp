@@ -11,15 +11,19 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.skymilk.chatapp.BuildConfig
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.model.toUser
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.utils.FirebaseUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -29,70 +33,83 @@ class AuthRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AuthRepository {
 
-    override suspend fun signInWithGoogle(): Result<User> = try {
+    private var authListener: ListenerRegistration? = null
+
+    override fun signInWithGoogle(): Flow<User> = flow {
         val googleIdTokenCredential = getGoogleIdTokenCredential()
-        val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+        val firebaseCredential =
+            GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
         val authResult = firebaseAuth.signInWithCredential(firebaseCredential).await()
         val authUser = authResult.user?.toUser() ?: throw IllegalStateException("유저 정보가 없습니다.")
 
         //구글 회원가입이라면
         if (isFirstTimeLogin(authResult)) {
             saveUserToDatabase(authUser)
-            Result.success(authUser)
-        } else {
-            //이미 저장된 회원이라면
-            val document = firebaseFireStore.collection("users").document(authUser.id).get().await()
-            val user = document.toObject(User::class.java)
-
-            Result.success(user ?: throw IllegalStateException("유저 정보가 없습니다."))
         }
 
-    } catch (e: Exception) {
-        handleAuthError(e)
+        emitAll(getUserFlow(authUser.id))
     }
 
     //아이디 / 이메일 로그인
-    override suspend fun signInWithEmailAndPassword(
+    override fun signInWithEmailAndPassword(
         email: String,
         password: String
-    ): Result<User> = try {
+    ): Flow<User> = flow {
         val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-        val document = firebaseFireStore.collection("users").document(result.user?.uid!!).get().await()
-        val user = document.toObject(User::class.java)
+        val userId = result.user?.uid ?: throw IllegalStateException("로그인에 실패하였습니다")
 
-        Result.success(user ?: throw IllegalStateException("유저 정보가 없습니다."))
-    } catch (e: Exception) {
-        handleAuthError(e)
+        emitAll(getUserFlow(userId))
     }
 
     //아이디/이메일 회원가입 처리
-    override suspend fun signUpWithEmailAndPassword(
+    override fun signUpWithEmailAndPassword(
         name: String,
         email: String,
         password: String
-    ): Result<User> = try {
+    ): Flow<User> = flow {
         val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
         val user = result.user?.toUser()?.apply { username = name }
-            ?: throw IllegalStateException("유저 정보가 없습니다.")
+            ?: throw IllegalStateException("회원 가입에 실패하였습니다")
 
+        //회원가입 정보 저장
         saveUserToDatabase(user)
 
-        Result.success(user)
-    } catch (e: Exception) {
-        handleAuthError(e)
+        emitAll(getUserFlow(user.id))
     }
 
     //현재 인증된 유저정보 가져오기
-    override suspend fun getCurrentUser(): User? = runCatching {
-        val document = firebaseFireStore.collection("users").document(firebaseAuth.currentUser?.uid!!).get().await()
-        document.toObject(User::class.java)
-    }.getOrElse {
-        null
+    override fun getCurrentUser(): Flow<User> = flow {
+        val userId = firebaseAuth.currentUser?.uid
+
+        if (userId != null) {
+            emitAll(getUserFlow(userId))
+        }
+    }
+
+    // Firebase Firestore에서 유저 정보를 Flow로 가져오는 함수
+    private fun getUserFlow(userId: String): Flow<User> = callbackFlow {
+        authListener = firebaseFireStore.collection("users")
+            .document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                snapshot?.toObject(User::class.java)?.let { updatedUser ->
+                    trySend(updatedUser)
+                }
+            }
+        awaitClose { authListener?.remove() }
     }
 
     //로그아웃
     override suspend fun signOut() {
+        //로그아웃
         firebaseAuth.signOut()
+
+        //실시간 내 정보 가져오는 리스너 제거
+        authListener?.remove()
     }
 
     override suspend fun saveUserToDatabase(user: User) {

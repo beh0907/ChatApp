@@ -68,7 +68,7 @@ fun FriendsItem(
             //유저 이름
             Text(
                 text = user.username,
-                color = if (isSystemInDarkTheme()) Color.White else Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
                 fontFamily = HannaPro
             )
@@ -79,7 +79,7 @@ fun FriendsItem(
                 //유저 이름
                 Text(
                     text = user.statusMessage,
-                    color = if (isSystemInDarkTheme()) Color.White else Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
                     fontFamily = HannaPro
                 )
