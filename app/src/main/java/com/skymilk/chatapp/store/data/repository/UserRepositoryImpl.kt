@@ -5,6 +5,8 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
@@ -77,6 +79,7 @@ class UserRepositoryImpl @Inject constructor(
     //친구 목록 가져오기
     override fun getFriends(userId: String): Flow<List<User>> = callbackFlow {
         val query = firebaseFireStore.collection("friends").document(userId)
+        val usersCollection = firebaseFireStore.collection("users")
 
         val listener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -86,17 +89,22 @@ class UserRepositoryImpl @Inject constructor(
             }
 
             if (snapshot != null && snapshot.exists()) {
-                val friendIds = snapshot.data?.keys?.toList() ?: emptyList()
+                val friendIds = snapshot.get("friendList") as? List<String> ?: emptyList()
 
-                // 친구 정보 가져오기
-                firebaseFireStore.collection("users").get().addOnSuccessListener { usersSnapshot ->
-                    val friends = friendIds.mapNotNull { friendId ->
-                        usersSnapshot.documents.find { it.id == friendId }
-                            ?.toObject(User::class.java)
-                    }
-                    trySend(friends)
-                }.addOnFailureListener { exception ->
-                    close(exception)
+                if (friendIds.isNotEmpty()) {
+                    usersCollection.whereIn(FieldPath.documentId(), friendIds).get()
+                        .addOnSuccessListener { querySnapshot ->
+                            val userList = querySnapshot.documents.mapNotNull { doc ->
+                                doc.toObject(User::class.java)
+                            }
+                            trySend(userList)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.d("getFriends users error", e.message.toString())
+                            close(e)
+                        }
+                } else {
+                    trySend(emptyList())
                 }
             } else {
                 trySend(emptyList())
@@ -105,6 +113,49 @@ class UserRepositoryImpl @Inject constructor(
 
         awaitClose {
             listener.remove()
+        }
+    }
+
+    override fun getIsFriend(myUserId: String, otherUserId: String): Flow<Boolean> = callbackFlow {
+        val query = FirebaseFirestore.getInstance().collection("friends").document(myUserId)
+
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close()
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                val friendList = snapshot.get("friendList") as? List<String> ?: emptyList()
+                trySend(otherUserId in friendList)
+            } else {
+                trySend(false)
+            }
+        }
+
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun setFriend(
+        myUserId: String,
+        otherUserId: String,
+        isFriend: Boolean
+    ) {
+        val query = firebaseFireStore.collection("friends").document(myUserId)
+
+        // 문서가 존재하는지 확인
+        val documentSnapshot = query.get().await()
+        if (!documentSnapshot.exists()) {
+            // friendList 필드가 없는 경우 초기화
+            query.set(mapOf("friendList" to listOf<String>()))
+        }
+
+        if (isFriend) {
+            // otherUserId를 친구 목록에 추가
+            query.update("friendList", FieldValue.arrayUnion(otherUserId))
+        } else {
+            // otherUserId를 친구 목록에서 제거
+            query.update("friendList", FieldValue.arrayRemove(otherUserId))
         }
     }
 

@@ -1,9 +1,12 @@
 package com.skymilk.chatapp.store.domain.model
 
+import android.os.Parcelable
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 
+@Parcelize
 @Serializable
 data class User(
     var id: String,
@@ -12,7 +15,7 @@ data class User(
     var profileImageUrl: String? = null,
     var fcmToken: String,
     var statusMessage: String
-) {
+) : Parcelable {
     constructor() : this("", "", "", "", "", "")
 }
 

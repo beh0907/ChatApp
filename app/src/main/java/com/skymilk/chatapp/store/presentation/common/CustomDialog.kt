@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -134,6 +133,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
 @Composable
 fun CustomFullScreenEditDialog(
     initText: String,
+    maxLength: Int,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ) {

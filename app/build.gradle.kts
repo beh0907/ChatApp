@@ -115,8 +115,20 @@ dependencies {
     implementation(libs.tedpermission.coroutine) // permissions
     implementation (libs.tedimagepicker) // ImagePicker
 
+    // Coil Image
+    implementation(libs.coil)
+    implementation(libs.coil.transformations)
+
     //Image Cropper
     implementation(libs.easycrop)
+
+    //Image Viewer
+    implementation("com.jvziyaoyao.scale:image-viewer:1.1.0-alpha.5")
+    implementation("com.jvziyaoyao.scale:sampling-decoder:1.1.0-alpha.5")
+
+    //lottie
+    implementation(libs.lottie.compose)
+
 
     // Material Icon Extended
     implementation(libs.androidx.material.icons.extended)
@@ -127,15 +139,8 @@ dependencies {
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)
 
-    // Coil Image
-    implementation(libs.coil)
-    implementation(libs.coil.transformations)
-
     //size
     implementation(libs.androidx.material3.window.size)
-
-    //lottie
-    implementation(libs.lottie.compose)
 
     //firebase
     implementation(platform(libs.firebase.bom))

@@ -19,7 +19,9 @@ fun ChatMessageList(
     chatRoom: ChatRoomWithUsers,
     chatChatMessages: List<ChatMessage>,
     currentUser: User,
-    uploadState: ImageUploadState
+    uploadState: ImageUploadState,
+    onNavigateToProfile: (User) -> Unit,
+    onNavigateToImageViewer: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -51,7 +53,8 @@ fun ChatMessageList(
             if (message.senderId == currentUser.id) {
                 //내가 작성한 메시지
                 ItemMyMessage(
-                    chatMessage = message
+                    chatMessage = message,
+                    onNavigateToImageViewer = onNavigateToImageViewer
                 )
 
             } else {
@@ -62,7 +65,9 @@ fun ChatMessageList(
                 //다른 사람이 작성한 메시지
                 ItemOtherMessage(
                     chatMessage = message,
-                    sender = sender
+                    sender = sender,
+                    onNavigateToProfile = onNavigateToProfile,
+                    onNavigateToImageViewer = onNavigateToImageViewer
                 )
             }
         }

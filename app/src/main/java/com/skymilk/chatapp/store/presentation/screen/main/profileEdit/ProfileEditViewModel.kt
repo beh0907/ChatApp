@@ -20,8 +20,10 @@ class ProfileEditViewModel @Inject constructor(
     private val storageUseCases: StorageUseCases
 ) : ViewModel() {
 
-    private val _editProfileState = MutableStateFlow<EditProfileState>(EditProfileState.Initial)
-    val editProfileState = _editProfileState.asStateFlow()
+    private val _profileEditState = MutableStateFlow<ProfileEditState>(ProfileEditState.Initial)
+    val profileEditState = _profileEditState.asStateFlow()
+
+
 
     fun updateUserProfile(
         userId: String,
@@ -37,7 +39,7 @@ class ProfileEditViewModel @Inject constructor(
                     result.isSuccess -> {
                         sendEvent(Event.Toast("프로필이 업데이트 되었습니다."))
 
-                        _editProfileState.update { EditProfileState.Success }
+                        _profileEditState.update { ProfileEditState.Success }
                     }
 
                     result.isFailure -> {
@@ -47,7 +49,7 @@ class ProfileEditViewModel @Inject constructor(
                             )
                         )
 
-                        _editProfileState.update { EditProfileState.Error }
+                        _profileEditState.update { ProfileEditState.Error }
                     }
                 }
 
@@ -58,7 +60,7 @@ class ProfileEditViewModel @Inject constructor(
     //이미지 업로드
     private fun uploadImage(id: String, imageBitmap: ImageBitmap?, onComplete: (String) -> Unit) {
         viewModelScope.launch {
-            _editProfileState.update { EditProfileState.Loading }
+            _profileEditState.update { ProfileEditState.Loading }
 
             try {
                 //imageBitmap가 에러가 발생한다

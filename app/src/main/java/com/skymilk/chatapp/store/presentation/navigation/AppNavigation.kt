@@ -27,57 +27,55 @@ fun AppNavigation() {
     //화면 네비게이션 설정
     val navController = rememberNavController()
     val startDestination =
-        if (authState is AuthState.Authenticated) Navigations.Main.route else Navigations.Auth.route
+        if (authState is AuthState.Authenticated) Navigations.Main else Navigations.Auth
 
     NavHost(
         navController = navController,
-        startDestination = Navigations.Start.route
+        startDestination = Navigations.Start
     ) {
         //시작 네비게이션
-        navigation(
-            route = Navigations.Start.route,
-            startDestination = StartNavigation.SplashScreen.route
+        navigation<Navigations.Start>(
+            startDestination = StartNavigation.SplashScreen
         ) {
             //로딩 화면
-            composable(StartNavigation.SplashScreen.route) {
+            composable<StartNavigation.SplashScreen> {
                 SplashScreen(
                     onAnimationFinished = {
                         //완료 후 시작 화면 이동
                         navController.navigate(startDestination) {
-                            popUpTo(Navigations.Start.route) { inclusive = false }
+                            popUpTo(Navigations.Start) { inclusive = false }
                         }
                     })
             }
         }
 
         //인증 네비게이션
-        navigation(
-            route = Navigations.Auth.route,
-            startDestination = AuthNavigation.SignInScreen.route
+        navigation<Navigations.Auth>(
+            startDestination = AuthNavigation.SignInScreen
         ) {
             //로그인 화면
-            composable(AuthNavigation.SignInScreen.route) {
+            composable<AuthNavigation.SignInScreen> {
                 SignInScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
-                    onNavigateToSignUp = { navController.navigate(AuthNavigation.SignUpScreen.route) },
+                    onNavigateToSignUp = { navController.navigate(AuthNavigation.SignUpScreen) },
                     onNavigateToHome = {
-                        navController.navigate(Navigations.Main.route) {
-                            popUpTo(Navigations.Auth.route) { inclusive = true }
+                        navController.navigate(Navigations.Main) {
+                            popUpTo(Navigations.Auth) { inclusive = true }
                         }
                     }
                 )
             }
 
             //회원가입 화면
-            composable(AuthNavigation.SignUpScreen.route) {
+            composable<AuthNavigation.SignUpScreen> {
                 SignUpScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
                     onNavigateToSignIn = { navController.popBackStack() },
                     onNavigateToHome = {
-                        navController.navigate(Navigations.Main.route) {
-                            popUpTo(Navigations.Auth.route) { inclusive = true }
+                        navController.navigate(Navigations.Main) {
+                            popUpTo(Navigations.Auth) { inclusive = true }
                         }
                     }
                 )
@@ -85,14 +83,14 @@ fun AppNavigation() {
         }
 
         //메인 네비게이션
-        composable(Navigations.Main.route) {
+        composable<Navigations.Main> {
             val currentUser = (authState as? AuthState.Authenticated)?.user
             if (currentUser != null) {
                 MainContent(
                     currentUser = currentUser,
                     onSignOut = {
-                        navController.navigate(AuthNavigation.SignInScreen.route) {
-                            popUpTo(Navigations.Main.route) { inclusive = true }
+                        navController.navigate(AuthNavigation.SignInScreen) {
+                            popUpTo(Navigations.Main) { inclusive = true }
                         }
 
                         //로그아웃 처리
@@ -103,8 +101,8 @@ fun AppNavigation() {
             } else {
                 // 로그인된 정보가 없다면 로그인 화면으로 강제 이동
                 LaunchedEffect(Unit) {
-                    navController.navigate(AuthNavigation.SignInScreen.route) {
-                        popUpTo(Navigations.Main.route) { inclusive = true }
+                    navController.navigate(AuthNavigation.SignInScreen) {
+                        popUpTo(Navigations.Main) { inclusive = true }
                     }
                 }
             }

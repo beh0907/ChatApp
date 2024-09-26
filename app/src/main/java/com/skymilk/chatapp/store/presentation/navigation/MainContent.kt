@@ -10,39 +10,35 @@ import androidx.compose.material.icons.outlined.People
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.util.fastMap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.navigation.toRoute
 import com.skymilk.chatapp.di.ViewModelFactoryModule
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
-import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatListScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomListViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.imageViewer.ImageViewerScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlin.reflect.typeOf
 
 @Composable
 fun MainContent(
@@ -57,13 +53,13 @@ fun MainContent(
                 icon = Icons.Outlined.People,
                 selectedIcon = Icons.Filled.People,
                 title = "친구",
-                route = MainNavigation.FriendsScreen.route
+                route = MainNavigation.FriendsScreen
             ),
             BottomNavigationItem(
                 icon = Icons.AutoMirrored.Outlined.Chat,
                 selectedIcon = Icons.AutoMirrored.Default.Chat,
                 title = "채팅",
-                route = MainNavigation.ChatsScreen.route
+                route = MainNavigation.ChatsScreen
             ),
 //            BottomNavigationItem(
 //                icon = Icons.Outlined.Person,
@@ -76,18 +72,15 @@ fun MainContent(
 
     val navController = rememberNavController()
     val backStackState by navController.currentBackStackEntryAsState()
-    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-
-    //현재 선택된 탭 위치
-    selectedItem = remember(key1 = backStackState) {
+    val selectedItem = remember(key1 = backStackState) {
         val selectedIndex =
-            bottomNavigationItems.indexOfFirst { it.route == backStackState?.destination?.route }
+            bottomNavigationItems.indexOfFirst { it.route::class.qualifiedName == backStackState?.destination?.route }
         if (selectedIndex != -1) selectedIndex else 0
     }
 
     //하단 바에 표시된 탭 메뉴 화면이 아닐 시 하단 바가 보이지 않게 하기 위해 설정
     val isBottomBarVisible = remember(key1 = backStackState) {
-        backStackState?.destination?.route in bottomNavigationItems.fastMap { it.route }
+        bottomNavigationItems.find { it.route::class.qualifiedName == backStackState?.destination?.route } != null
     }
 
     //뷰모델 프로바이더
@@ -114,14 +107,13 @@ fun MainContent(
             )
         }
     ) { innerPadding ->
-
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDestination = MainNavigation.FriendsScreen.route
+            startDestination = MainNavigation.FriendsScreen
         ) {
             //친구 목록 화면
-            composable(MainNavigation.FriendsScreen.route) {
+            composable<MainNavigation.FriendsScreen> {
                 val friendsViewModel: FriendsViewModel = viewModel(
                     factory = FriendsViewModel.provideFactory(
                         viewModelFactoryProvider.friendsViewModelFactory(),
@@ -130,11 +122,12 @@ fun MainContent(
                 )
 
                 FriendsScreen(
-                    modifier = Modifier,
                     currentUser = currentUser,
                     viewModel = friendsViewModel,
-                    onNavigateToProfile = {
-                        navController.navigate(MainNavigation.ProfileScreen.route) {
+                    onNavigateToProfile = { user ->
+                        navController.navigate(
+                            MainNavigation.ProfileScreen(user = user)
+                        ) {
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
@@ -143,7 +136,7 @@ fun MainContent(
             }
 
             //채팅방 목록 화면
-            composable(MainNavigation.ChatsScreen.route) {
+            composable<MainNavigation.ChatsScreen> {
                 val chatRoomListViewModel: ChatRoomListViewModel = viewModel(
                     factory = ChatRoomListViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
@@ -152,11 +145,10 @@ fun MainContent(
                 )
 
                 ChatListScreen(
-                    modifier = Modifier,
                     viewModel = chatRoomListViewModel,
                     currentUser = currentUser,
-                    onChatItemClick = { chatRoomId ->
-                        navController.navigate(MainNavigation.ChatRoomScreen.route + "/$chatRoomId") {
+                    onNavigateToChatRoom = { chatRoomId ->
+                        navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
@@ -165,41 +157,46 @@ fun MainContent(
             }
 
             //프로필 화면
-            composable(
-                route = MainNavigation.ProfileScreen.route,
+            composable<MainNavigation.ProfileScreen>(
+                typeMap = mapOf(
+                    typeOf<User>() to CustomNavType.UserType
+                )
             ) {
+                val args = it.toRoute<MainNavigation.ProfileScreen>()
                 val profileViewModel: ProfileViewModel = hiltViewModel()
 
                 ProfileScreen(
-                    modifier = Modifier,
                     viewModel = profileViewModel,
-                    user = currentUser,
+                    user = args.user,
+                    loginUserId = currentUser.id,
                     onNavigateToBack = {
                         navController.popBackStack()
                     },
                     onNavigateToProfileEdit = {
-                        navController.navigate(MainNavigation.ProfileEditScreen.route) {
+                        navController.navigate(MainNavigation.ProfileEditScreen) {
                             launchSingleTop = true
                         }
                     },
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(MainNavigation.ChatRoomScreen.route + "/$chatRoomId") {
-                            popUpTo(MainNavigation.ProfileScreen.route) { inclusive = true }
-
-                            // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
+                        navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                            popUpTo(bottomNavigationItems[selectedItem].route) {
+                                inclusive = false
+                            }
                             launchSingleTop = true
                         }
+                    },
+                    onNavigateToImageViewer = { imageUrl ->
+                        navController.navigate(MainNavigation.ImageViewerScreen(imageUrl = imageUrl))
                     },
                     onSignOut = onSignOut
                 )
             }
 
             //프로필 편집 화면
-            composable(MainNavigation.ProfileEditScreen.route) {
+            composable<MainNavigation.ProfileEditScreen> {
                 val profileEditViewModel: ProfileEditViewModel = hiltViewModel()
 
                 ProfileEditScreen(
-                    modifier = Modifier,
                     viewModel = profileEditViewModel,
                     user = currentUser,
                     onNavigateToBack = {
@@ -210,40 +207,54 @@ fun MainContent(
 
 
             //채팅방 화면
-            composable(
-                route = MainNavigation.ChatRoomScreen.route + "/{chatRoomId}",
-                arguments = listOf(navArgument("chatRoomId") { type = NavType.StringType }),
+            composable<MainNavigation.ChatRoomScreen>(
                 deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "chatapp://chatrooms/{chatRoomId}"
+                    navDeepLink<MainNavigation.ChatRoomScreen>(
+                        basePath = "chatapp://chatrooms"
+                    )
+                )
+            ) {
+                val args = it.toRoute<MainNavigation.ChatRoomScreen>()
+
+                val chatRoomViewModel: ChatRoomViewModel = viewModel(
+                    factory = ChatRoomViewModel.provideFactory(
+                        viewModelFactoryProvider.chatRoomViewModelFactory(),
+                        args.chatRoomId
+                    )
+                )
+
+                ChatRoomScreen(
+                    viewModel = chatRoomViewModel,
+                    currentUser = currentUser,
+                    onNavigateToBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToProfile = { user: User ->
+                        navController.navigate(
+                            MainNavigation.ProfileScreen(user = user)
+                        )
+                    },
+                    onNavigateToImageViewer = { imageUrl ->
+                        navController.navigate(MainNavigation.ImageViewerScreen(imageUrl = imageUrl))
                     }
                 )
-            ) { backStackEntry ->
+            }
 
-                val chatRoomId = backStackEntry.arguments?.getString("chatRoomId")
-                chatRoomId?.let {
-                    val chatRoomViewModel: ChatRoomViewModel = viewModel(
-                        factory = ChatRoomViewModel.provideFactory(
-                            viewModelFactoryProvider.chatRoomViewModelFactory(),
-                            chatRoomId
-                        )
-                    )
+            composable<MainNavigation.ImageViewerScreen> {
+                val args = it.toRoute<MainNavigation.ImageViewerScreen>()
 
-                    ChatRoomScreen(
-                        modifier = Modifier,
-                        viewModel = chatRoomViewModel,
-                        currentUser = currentUser,
-                        onNavigateToBack = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
+                ImageViewerScreen(
+                    imageUrl = args.imageUrl,
+                    onNavigateToBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
 }
 
-fun navigationToTab(navController: NavController, route: String) {
+fun navigationToTab(navController: NavController, route: MainNavigation) {
     navController.navigate(route) {
         navController.graph.startDestinationRoute?.let { screen ->
             popUpTo(screen) {

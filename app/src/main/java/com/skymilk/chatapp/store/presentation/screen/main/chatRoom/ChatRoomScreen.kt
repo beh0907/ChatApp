@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +56,9 @@ fun ChatRoomScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatRoomViewModel,
     currentUser: User,
-    onNavigateToBack: () -> Unit
+    onNavigateToBack: () -> Unit,
+    onNavigateToProfile: (User) -> Unit,
+    onNavigateToImageViewer: (String) -> Unit
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
@@ -109,7 +110,9 @@ fun ChatRoomScreen(
                             chatRoom = chatRoom,
                             chatChatMessages = chatMessages,
                             currentUser = currentUser,
-                            uploadState = uploadState
+                            uploadState = uploadState,
+                            onNavigateToProfile = onNavigateToProfile,
+                            onNavigateToImageViewer = onNavigateToImageViewer
                         )
                     }
 

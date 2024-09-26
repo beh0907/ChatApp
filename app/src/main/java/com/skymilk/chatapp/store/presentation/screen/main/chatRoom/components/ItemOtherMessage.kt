@@ -1,5 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,7 +41,12 @@ import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
-fun ItemOtherMessage(chatMessage: ChatMessage, sender: User) {
+fun ItemOtherMessage(
+    chatMessage: ChatMessage,
+    sender: User,
+    onNavigateToProfile: (User) -> Unit,
+    onNavigateToImageViewer: (String) -> Unit
+) {
     val context = LocalContext.current
 
     BoxWithConstraints(
@@ -61,7 +69,10 @@ fun ItemOtherMessage(chatMessage: ChatMessage, sender: User) {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .align(Alignment.Top),
+                    .align(Alignment.Top)
+                    .clickable {
+                        onNavigateToProfile(sender)
+                    },
                 contentScale = ContentScale.Crop
             )
 
@@ -95,18 +106,23 @@ fun ItemOtherMessage(chatMessage: ChatMessage, sender: User) {
                         //이미지 타입
                         MessageType.IMAGE -> {
                             SubcomposeAsyncImage(
+                                modifier = Modifier
+                                    .widthIn(max = maxWidth)
+                                    .heightIn(max = maxWidth)
+                                    .clickable {
+                                        onNavigateToImageViewer(chatMessage.content)
+                                    },
                                 model = ImageRequest.Builder(context)
                                     .data(chatMessage.content)
                                     .crossfade(true)
                                     .build(),
                                 contentDescription = null,
-                                modifier = Modifier.size(maxWidth),
                                 loading = {
                                     Box(modifier = Modifier
                                         .fillMaxSize()
                                         .shimmerEffect())
                                 },
-                                contentScale = ContentScale.Crop // 이미지의 크기 조정
+                                contentScale = ContentScale.FillWidth // 이미지의 크기 조정
                             )
                         }
 

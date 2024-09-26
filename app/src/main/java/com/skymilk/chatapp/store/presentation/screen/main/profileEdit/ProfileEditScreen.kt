@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,7 +24,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -59,12 +60,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileEditScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     viewModel: ProfileEditViewModel,
     user: User,
     onNavigateToBack: () -> Unit
 ) {
-    val editProfileState by viewModel.editProfileState.collectAsStateWithLifecycle()
+    val profileEditState by viewModel.profileEditState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     //이미지 자르기
@@ -78,9 +79,11 @@ fun ProfileEditScreen(
     var editStatusMessage by remember { mutableStateOf(user.statusMessage) }
     var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
-    Box(modifier = modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.secondary)) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.secondary)
+    ) {
         //편집 다이얼로그가 나타날 때는
         //타이틀이 겹치기 때문에 임시로 숨긴다
         TopSection(
@@ -133,7 +136,7 @@ fun ProfileEditScreen(
     }
 
     //이미지 업데이트 로딩 표시
-    if (editProfileState is EditProfileState.Loading) {
+    if (profileEditState is ProfileEditState.Loading) {
         CustomProgressDialog("프로필을 업데이트 하고 있습니다.")
     }
 
@@ -149,6 +152,7 @@ fun ProfileEditScreen(
     if (showEditDialog) {
         CustomFullScreenEditDialog(
             initText = if (editingField == "name") editName else editStatusMessage,
+            maxLength = if (editingField == "name") 20 else 60,
             onDismiss = { showEditDialog = false },
             onConfirm = { newText ->
                 if (editingField == "name") editName = newText
@@ -217,33 +221,32 @@ private fun EditProfileSection(
     onSelectedImage: (ImageBitmap) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    Box(
+        modifier = Modifier
+            .shadow(4.dp, RoundedCornerShape(30.dp))
+            .clickable {
+                //테드 이미지 픽커
+                TedImagePicker
+                    .with(context)
+                    .start { uri ->
+                        scope.launch {
+                            when (val result = imageCropper.crop(uri = uri, context = context)) {
+                                is CropResult.Success -> {
+                                    onSelectedImage(result.bitmap)
+                                }
 
-    Surface(
-        shadowElevation = 4.dp,
-        shape = RoundedCornerShape(30.dp),
-        onClick = {
-            //테드 이미지 픽커
-            TedImagePicker.with(context)
-                .start { uri ->
-                    scope.launch {
-                        when (val result = imageCropper.crop(uri = uri, context = context)) {
-                            is CropResult.Success -> {
-                                onSelectedImage(result.bitmap)
+                                else -> {}
                             }
-
-                            else -> {}
                         }
                     }
-                }
-        }
+            }
     ) {
-
         //프로필 이미지
         if (selectedImage != null) {
             //Coil Image는 ImageBitmap을 적용시키지 못함
             Image(
                 modifier = Modifier
-                    .size(100.dp),
+                    .size(120.dp),
                 bitmap = selectedImage,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
@@ -251,7 +254,7 @@ private fun EditProfileSection(
         } else {
             AsyncImage(
                 modifier = Modifier
-                    .size(100.dp),
+                    .size(120.dp),
                 model = ImageRequest.Builder(context)
                     .data(profileImageUrl ?: "https://via.placeholder.com/150")
                     .crossfade(true)
@@ -260,6 +263,18 @@ private fun EditProfileSection(
                 contentDescription = null
             )
         }
+
+        Text(
+            modifier = Modifier
+                .width(120.dp)
+                .background(Color(0x88888888))
+                .align(Alignment.BottomCenter),
+            textAlign = TextAlign.Center,
+            text = "편집",
+            fontFamily = HannaPro,
+            color = Color.White,
+
+            )
     }
 
     Spacer(modifier = Modifier.height(17.dp))

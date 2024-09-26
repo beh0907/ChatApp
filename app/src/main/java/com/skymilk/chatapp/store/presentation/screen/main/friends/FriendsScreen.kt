@@ -1,16 +1,11 @@
 package com.skymilk.chatapp.store.presentation.screen.main.friends
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.PersonAddAlt1
-import androidx.compose.material.icons.outlined.PersonAdd
-import androidx.compose.material.icons.outlined.PersonAddAlt
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -21,20 +16,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.HannaPro
 
 @Composable
 fun FriendsScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     currentUser: User,
     viewModel: FriendsViewModel,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: (User) -> Unit
 ) {
     val friendsState by viewModel.friendsState.collectAsStateWithLifecycle()
 
@@ -47,7 +40,7 @@ fun FriendsScreen(
 
         //내 정보
         FriendsItem(user = currentUser, onUserItemClick = {
-            onNavigateToProfile()
+            onNavigateToProfile(currentUser)
         })
 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 10.dp))
@@ -68,7 +61,9 @@ fun FriendsScreen(
                     fontSize = 14.sp
                 )
 
-                FriendsList(friends)
+                FriendsList(friends, onUserItemClick = { user ->
+                    onNavigateToProfile(user)
+                })
             }
         }
     }

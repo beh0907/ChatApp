@@ -22,7 +22,9 @@ import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveProfileImage
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.GetFriends
+import com.skymilk.chatapp.store.domain.usecase.user.GetIsFriend
 import com.skymilk.chatapp.store.domain.usecase.user.GetUser
+import com.skymilk.chatapp.store.domain.usecase.user.SetFriend
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import dagger.Module
@@ -65,7 +67,9 @@ object UseCaseModule {
         UserUseCases(
             UpdateProfile(userRepository),
             GetUser(userRepository),
-            GetFriends(userRepository)
+            GetFriends(userRepository),
+            GetIsFriend(userRepository),
+            SetFriend(userRepository)
         )
 
     @Provides

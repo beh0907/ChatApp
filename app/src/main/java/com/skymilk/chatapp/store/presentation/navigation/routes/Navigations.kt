@@ -1,7 +1,16 @@
 package com.skymilk.chatapp.store.presentation.navigation.routes
 
-sealed class Navigations(val route: String) {
-    data object Start : Navigations("StartNavigation")
-    data object Auth : Navigations("AuthNavigation")
-    data object Main : Navigations("MainNavigation")
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class Navigations {
+
+    @Serializable
+    data object Start : Navigations()
+
+    @Serializable
+    data object Auth : Navigations()
+
+    @Serializable
+    data object Main : Navigations()
 }

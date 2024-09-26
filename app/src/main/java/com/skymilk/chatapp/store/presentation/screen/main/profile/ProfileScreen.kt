@@ -18,7 +18,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeviceUnknown
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PersonAddAlt1
+import androidx.compose.material.icons.filled.PersonRemoveAlt1
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,45 +39,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.commit451.coiltransformations.BlurTransformation
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.ui.theme.HannaPro
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     viewModel: ProfileViewModel,
     user: User,
+    loginUserId: String,
     onNavigateToBack: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToChatRoom: (String) -> Unit,
+    onNavigateToImageViewer: (String) -> Unit,
     onSignOut: () -> Unit
 ) {
     var visibleSignOutDialog by remember { mutableStateOf(false) }
-    val mySoloChatRoomId by viewModel.mySoloChatRoomId.collectAsStateWithLifecycle()
 
-    LaunchedEffect(mySoloChatRoomId) {
-        mySoloChatRoomId?.let {
+    val chatRoomId by viewModel.chatRoomId.collectAsStateWithLifecycle()
+
+    LaunchedEffect(chatRoomId) {
+        chatRoomId?.let {
             onNavigateToChatRoom(it)
-
-            //채팅방 값을 초기화 시켜야 함
-            viewModel.initMySoloChatRoomId()
         }
     }
 
-    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.secondary)) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.secondary)
+    ) {
 
         //상단 아이콘
         TopSection(
             modifier = Modifier,
-            onNavigateToBack = { onNavigateToBack() }
+            onNavigateToBack = onNavigateToBack
         )
 
         //프로필 정보
@@ -83,19 +88,48 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            UserProfileSection(user)
+            UserProfileSection(
+                user = user,
+                onNavigateToImageViewer = onNavigateToImageViewer
+            )
 
             HorizontalDivider(
-                color =  Color.White
+                color = Color.White
             )
 
-            ProfileEventSection(
-                onNavigateToMyChatRoom = { viewModel.getMySoloChatRoomId(user.id) },
-                onNavigateToProfileEdit = onNavigateToProfileEdit,
-                visibleSignOutDialog = {
-                    visibleSignOutDialog = true
+            // 로그인한 아이디와 선택한 유저 아이디를 비교
+            // 이벤트 UI과 동작을 별개로 구현
+            when (user.id == loginUserId) {
+                true -> {
+                    MyProfileEventSection(
+                        onNavigateToMyChatRoom = { viewModel.getChatRoomId(listOf(user.id)) },
+                        onNavigateToProfileEdit = onNavigateToProfileEdit,
+                        visibleSignOutDialog = {
+                            visibleSignOutDialog = true
+                        }
+                    )
                 }
-            )
+
+                else -> {
+                    OtherProfileEventSection(
+                        viewModel = viewModel,
+                        onNavigateToMyChatRoom = {
+                            viewModel.getChatRoomId(
+                                listOf(
+                                    user.id,
+                                    loginUserId
+                                )
+                            )
+                        },
+                        getFriendState = {
+                            viewModel.getFriendState(loginUserId, user.id)
+                        },
+                        setFriendState = { state ->
+                            viewModel.setFriendState(loginUserId, user.id, state)
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -127,9 +161,8 @@ private fun TopSection(
 @Composable
 fun UserProfileSection(
     user: User,
+    onNavigateToImageViewer: (String) -> Unit,
 ) {
-    val context = LocalContext.current
-
     //프로필 이미지
     Surface(
         shadowElevation = 4.dp,
@@ -137,11 +170,14 @@ fun UserProfileSection(
     ) {
         AsyncImage(
             modifier = Modifier
-                .size(100.dp),
-            model = ImageRequest.Builder(context)
-                .data(user.profileImageUrl ?: "https://via.placeholder.com/150")
-                .crossfade(true)
-                .build(),
+                .size(120.dp)
+                .clickable {
+                    //프로필 이미지가 있다면 이동
+                    user.profileImageUrl?.let {
+                        onNavigateToImageViewer(it)
+                    }
+                },
+            model = user.profileImageUrl ?: "https://via.placeholder.com/150",
             contentScale = ContentScale.Crop,
             contentDescription = null
         )
@@ -175,7 +211,7 @@ fun UserProfileSection(
 }
 
 @Composable
-fun ProfileEventSection(
+fun MyProfileEventSection(
     onNavigateToMyChatRoom: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     visibleSignOutDialog: () -> Unit
@@ -265,6 +301,124 @@ fun ProfileEventSection(
 
             Text(
                 text = "로그아웃",
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 1,
+                fontFamily = HannaPro,
+                color = Color.White
+            )
+        }
+    }
+}
+
+@Composable
+fun OtherProfileEventSection(
+    viewModel: ProfileViewModel,
+    onNavigateToMyChatRoom: () -> Unit,
+    getFriendState: () -> Unit,
+    setFriendState: (Boolean) -> Unit,
+) {
+    //친구 상태 정보
+    val isFriendState by viewModel.isFriendState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(true) {
+        getFriendState()
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+
+        //나와의 채팅
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable {
+                    onNavigateToMyChatRoom()
+                }
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.ChatBubble,
+                contentDescription = null,
+                tint = Color.White
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = "1:1 채팅",
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 1,
+                fontFamily = HannaPro,
+                color = Color.White
+            )
+        }
+
+        when (isFriendState) {
+            is FriendState.Success -> {
+                val isFriend = (isFriendState as FriendState.Success).isFriend
+
+                //친구 추가
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clickable {
+                            setFriendState(isFriend)
+                        }
+                        .padding(horizontal = 10.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = if (isFriend) Icons.Default.PersonRemoveAlt1 else Icons.Default.PersonAddAlt1,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Text(
+                        text = if (isFriend) "친구 삭제" else "친구 추가",
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        fontFamily = HannaPro,
+                        color = Color.White
+                    )
+                }
+            }
+
+            else -> {
+                // 로딩 중 또는 오류 처리
+                CircularProgressIndicator(color = Color.White)
+            }
+        }
+
+        //미구현
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable {
+                }
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.DeviceUnknown,
+                contentDescription = null,
+                tint = Color.White
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = "미구현",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
                 fontFamily = HannaPro,

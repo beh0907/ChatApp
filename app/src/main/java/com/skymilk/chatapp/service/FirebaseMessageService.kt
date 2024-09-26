@@ -6,11 +6,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.net.Uri
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -42,13 +41,13 @@ class FirebaseMessageService : FirebaseMessagingService() {
     private fun showNotification(
         title: String? = "",
         message: String? = "",
-        data: MutableMap<String, String>
+        messageData: MutableMap<String, String>
     ) {
         //로그인 상태가 아니라면 알림X
         if (firebaseAuth.currentUser == null) return
 
         //내가 보낸 메시지라면 알림X
-        if (firebaseAuth.currentUser?.uid == data["senderId"]) return
+        if (firebaseAuth.currentUser?.uid == messageData["senderId"]) return
 
         val notificationManager = getSystemService<NotificationManager>()!!
 
@@ -57,19 +56,14 @@ class FirebaseMessageService : FirebaseMessagingService() {
         notificationManager.createNotificationChannel(channel)
 
         // 알림 클릭 시 MainActivity를 열고 채팅방 ID 전달
-        val deepLinkUri = "chatapp://chatrooms/${data["chatRoomId"]}"
-
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLinkUri)).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("chatRoomId", data["chatRoomId"])
+        val activityIntent = Intent(this, MainActivity::class.java).apply {
+            this.data = "chatapp://chatrooms/${messageData["chatRoomId"]}".toUri()
         }
 
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(activityIntent)
+            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+        }
 
         val notificationId = Random.nextInt(1000)
         val notification = NotificationCompat.Builder(this, "messages")
