@@ -109,7 +109,7 @@ dependencies {
     implementation (libs.kotlinx.serialization.json)
 
     //ConstraintLayout
-    implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.0-beta01")
+    implementation (libs.androidx.constraintlayout.compose)
 
     //Ted
     implementation(libs.tedpermission.coroutine) // permissions
@@ -123,8 +123,7 @@ dependencies {
     implementation(libs.easycrop)
 
     //Image Viewer
-    implementation("com.jvziyaoyao.scale:image-viewer:1.1.0-alpha.5")
-    implementation("com.jvziyaoyao.scale:sampling-decoder:1.1.0-alpha.5")
+    implementation(libs.image.viewer)
 
     //lottie
     implementation(libs.lottie.compose)

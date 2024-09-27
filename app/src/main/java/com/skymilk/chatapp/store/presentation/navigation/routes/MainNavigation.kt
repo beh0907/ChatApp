@@ -25,4 +25,7 @@ sealed class MainNavigation {
     @Serializable
     data class ImageViewerScreen(val imageUrl: String) : MainNavigation() // 이미지 뷰어 화면
 
+    @Serializable
+    data object UserSearchScreen : MainNavigation() // 유저 검색 화면
+
 }

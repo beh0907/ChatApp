@@ -5,5 +5,6 @@ data class UserUseCases(
     val getUser: GetUser,
     val getFriends: GetFriends,
     val getIsFriend: GetIsFriend,
-    val setFriend: SetFriend
+    val setFriend: SetFriend,
+    val searchUser:SearchUser
 )

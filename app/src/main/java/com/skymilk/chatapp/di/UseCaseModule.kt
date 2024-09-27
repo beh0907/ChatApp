@@ -24,6 +24,7 @@ import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.GetFriends
 import com.skymilk.chatapp.store.domain.usecase.user.GetIsFriend
 import com.skymilk.chatapp.store.domain.usecase.user.GetUser
+import com.skymilk.chatapp.store.domain.usecase.user.SearchUser
 import com.skymilk.chatapp.store.domain.usecase.user.SetFriend
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
@@ -69,7 +70,8 @@ object UseCaseModule {
             GetUser(userRepository),
             GetFriends(userRepository),
             GetIsFriend(userRepository),
-            SetFriend(userRepository)
+            SetFriend(userRepository),
+            SearchUser(userRepository)
         )
 
     @Provides

@@ -152,7 +152,7 @@ class ChatRepositoryImpl @Inject constructor(
         val listener = query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val chatMessages =
-                    snapshot.children.mapNotNull { it.getValue(ChatMessage::class.java) }
+                    snapshot.children.mapNotNull { it.getValue(ChatMessage::class.java) }.reversed()
                 trySend(chatMessages)
             }
 
@@ -171,8 +171,11 @@ class ChatRepositoryImpl @Inject constructor(
         content: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
+            val messagesRef = firebaseDatabase.getReference("messages").child(chatRoomId)
+            val newMessageRef = messagesRef.push()
+
             val chatMessage = ChatMessage(
-                id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
+                id = newMessageRef.key ?: UUID.randomUUID().toString(),
                 senderId = senderId,
                 content = content, // 메시지 내용
                 timestamp = System.currentTimeMillis(),
@@ -180,11 +183,7 @@ class ChatRepositoryImpl @Inject constructor(
             )
 
             // 메시지를 Realtime Database에 저장
-            firebaseDatabase.getReference("messages")
-                .child(chatRoomId)
-                .push()
-                .setValue(chatMessage)
-                .await()
+            newMessageRef.setValue(chatMessage).await()
 
             // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
             val chatRoomUpdates = mapOf(
@@ -302,13 +301,14 @@ class ChatRepositoryImpl @Inject constructor(
         val fcmMessage = FcmMessage(
             message = Message(
                 topic = "${Constants.FCM_TOPIC_PREFIX}$chatRoomId",
-                notification = Notification(
-                    title = title,
-                    body = body
-                ),
                 data = mapOf(
                     "chatRoomId" to chatRoomId,
-                    "senderId" to senderId
+                    "senderId" to senderId,
+
+                    //notification에 담기면 백그라운드일 경우 자동 처리하는 문제가 생김
+                    //data에 담아야 백그라운드에서 onMessageReceived를 통할 수 있다
+                    "title" to title,
+                    "body" to body
                 )
             )
         )

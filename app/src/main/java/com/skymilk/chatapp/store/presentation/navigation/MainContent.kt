@@ -37,6 +37,8 @@ import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.userSearch.UserSearchScreen
+import com.skymilk.chatapp.store.presentation.screen.main.userSearch.UserSearchViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.reflect.typeOf
 
@@ -131,6 +133,9 @@ fun MainContent(
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
+                    },
+                    onNavigateToUserSearch = {
+                        navController.navigate(MainNavigation.UserSearchScreen)
                     }
                 )
             }
@@ -240,6 +245,7 @@ fun MainContent(
                 )
             }
 
+            //이미지 뷰어 화면
             composable<MainNavigation.ImageViewerScreen> {
                 val args = it.toRoute<MainNavigation.ImageViewerScreen>()
 
@@ -247,6 +253,24 @@ fun MainContent(
                     imageUrl = args.imageUrl,
                     onNavigateToBack = {
                         navController.popBackStack()
+                    }
+                )
+            }
+
+            //유저 검색 화면
+            composable<MainNavigation.UserSearchScreen> {
+                val userSearchViewModel: UserSearchViewModel = hiltViewModel()
+
+                UserSearchScreen(
+                    currentUser = currentUser,
+                    viewModel = userSearchViewModel,
+                    onNavigateToBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToProfile = {
+                        navController.navigate(
+                            MainNavigation.ProfileScreen(user = currentUser)
+                        )
                     }
                 )
             }

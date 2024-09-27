@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.friends
+package com.skymilk.chatapp.store.presentation.screen.main.userSearch
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -30,15 +30,15 @@ import com.skymilk.chatapp.ui.theme.HannaPro
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
-fun FriendsItem(
+fun UserSearchItem(
     user: User,
-    onUserItemClick: () -> Unit
+    onUserItemClick: (User) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                onUserItemClick()
+                onUserItemClick(user)
             }
             .padding(MaterialTheme.dimens.small2),
     ) {
@@ -89,7 +89,7 @@ fun FriendsItem(
 }
 
 @Composable
-fun FriendsItemShimmer() {
+fun UserSearchItemShimmer() {
     Row(
         modifier = Modifier
             .fillMaxWidth()

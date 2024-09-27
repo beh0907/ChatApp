@@ -6,8 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Message(
-    @SerialName("notification")
-    val notification: Notification,
     @SerialName("topic")
     val topic: String,
     @SerialName("data")

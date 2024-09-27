@@ -1,11 +1,12 @@
 [versions]
-accompanistPlaceholderMaterial = "0.36.0"
 agp = "8.6.1"
 coil = "2.7.0"
+constraintlayoutCompose = "1.1.0-beta01"
 credential = "1.2.2"
 easycrop = "0.1.1"
 firebaseBom = "33.3.0"
 googleAuthLibraryOauth2Http = "1.11.0"
+imageViewer = "1.1.0-alpha.5"
 kotlin = "1.9.20"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -31,6 +32,7 @@ loggingInterceptor = "4.12.0"
 
 
 [libraries]
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -55,6 +57,7 @@ google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-librar
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coil-transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformations" }
+image-viewer = { module = "com.jvziyaoyao.scale:image-viewer", version.ref = "imageViewer" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }

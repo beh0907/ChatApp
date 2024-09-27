@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -158,6 +159,33 @@ class UserRepositoryImpl @Inject constructor(
             query.update("friendList", FieldValue.arrayRemove(otherUserId))
         }
     }
+
+    override suspend fun searchUser(query: String, condition: String): Result<List<User>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val usersRef = firebaseFireStore.collection("users")
+                val querySnapshot = usersRef.whereGreaterThanOrEqualTo(condition, query)
+                    .whereLessThanOrEqualTo(condition, query + '\uf8ff')
+                    .get()
+                    .await()
+
+                val regex = query.lowercase(Locale.getDefault()).toRegex()
+                val users = querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(User::class.java)?.let { user ->
+                        when (condition.lowercase()) {
+                            "id" -> if (user.id.lowercase(Locale.getDefault()).contains(regex)) user else null
+                            "username" -> if (user.username.lowercase(Locale.getDefault()).contains(regex)) user else null
+                            else -> null
+                        }
+                    }
+                }
+
+                Result.success(users)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+
+        }
 
 
     //오류 체크

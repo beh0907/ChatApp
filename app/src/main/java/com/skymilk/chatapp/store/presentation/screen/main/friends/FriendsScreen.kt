@@ -27,7 +27,8 @@ fun FriendsScreen(
     modifier: Modifier = Modifier,
     currentUser: User,
     viewModel: FriendsViewModel,
-    onNavigateToProfile: (User) -> Unit
+    onNavigateToProfile: (User) -> Unit,
+    onNavigateToUserSearch: () -> Unit
 ) {
     val friendsState by viewModel.friendsState.collectAsStateWithLifecycle()
 
@@ -36,7 +37,7 @@ fun FriendsScreen(
         modifier = modifier.fillMaxSize()
     ) {
         //헤더
-        TopSection()
+        TopSection(onNavigateToUserSearch = onNavigateToUserSearch)
 
         //내 정보
         FriendsItem(user = currentUser, onUserItemClick = {
@@ -73,7 +74,7 @@ fun FriendsScreen(
 
 //상단 타이틀
 @Composable
-fun TopSection() {
+fun TopSection(onNavigateToUserSearch: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,7 +90,7 @@ fun TopSection() {
         )
 
         IconButton(onClick = {
-
+            onNavigateToUserSearch()
         }) {
             Icon(
                 imageVector = Icons.Outlined.PersonAddAlt1,

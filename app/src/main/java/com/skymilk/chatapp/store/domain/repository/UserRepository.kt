@@ -19,4 +19,6 @@ interface UserRepository {
     fun getIsFriend(myUserId: String, otherUserId: String): Flow<Boolean> // 친구 여부 상태 정보 가져오기
 
     suspend fun setFriend(myUserId: String, otherUserId: String, isFriend: Boolean) // 친구 상태 저장하기
+
+    suspend fun searchUser(query: String, condition:String): Result<List<User>> //유저 정보 검색
 }

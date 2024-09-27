@@ -108,7 +108,7 @@ fun ChatRoomScreen(
                                 .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
                                 .fillMaxWidth(),
                             chatRoom = chatRoom,
-                            chatChatMessages = chatMessages,
+                            chatMessages = chatMessages,
                             currentUser = currentUser,
                             uploadState = uploadState,
                             onNavigateToProfile = onNavigateToProfile,

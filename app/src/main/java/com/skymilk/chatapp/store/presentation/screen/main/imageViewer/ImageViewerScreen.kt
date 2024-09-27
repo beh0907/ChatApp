@@ -3,7 +3,6 @@ package com.skymilk.chatapp.store.presentation.screen.main.imageViewer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import coil.compose.rememberAsyncImagePainter
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.scale.zoomable.zoomable.rememberZoomableState
-import com.skymilk.chatapp.ui.theme.Black
 
 @Composable
 fun ImageViewerScreen(
@@ -26,6 +24,15 @@ fun ImageViewerScreen(
     imageUrl: String,
     onNavigateToBack: () -> Unit,
 ) {
+//    val images = remember {
+//        mutableStateListOf(
+//            "https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF",
+//            "https://t7.baidu.com/it/u=4198287529,2774471735&fm=193&f=GIF",
+//            imageUrl
+//        )
+//    }
+//    val pagerState = rememberZoomablePagerState { images.size }
+
     val painter = rememberAsyncImagePainter(imageUrl)
     val state = rememberZoomableState(contentSize = painter.intrinsicSize)
 
@@ -45,26 +52,48 @@ fun ImageViewerScreen(
             )
         }
 
+//        ZoomablePager(state = pagerState) { page ->
+//            val imageRequest = ImageRequest.Builder(LocalContext.current)
+//                .data(images[page])
+//                .size(coil.size.Size.ORIGINAL)
+//                .build()
+//            val painter = rememberAsyncImagePainter(imageRequest)
+//
+//            if (painter.intrinsicSize.isSpecified) {
+//                ZoomablePolicy(intrinsicSize = painter.intrinsicSize) { _ ->
+//                    Image(
+//                        modifier = Modifier.fillMaxSize(),
+//                        painter = painter,
+//                        contentDescription = null
+//                    )
+//                }
+//
+//                if (!painter.intrinsicSize.isSpecified) {
+//                    Box(modifier = Modifier.fillMaxSize()) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
+//            }
+//        }
+
         TopSection(
-            modifier = Modifier,
-            onNavigateToBack = onNavigateToBack
+            modifier = Modifier, onNavigateToBack = onNavigateToBack
         )
     }
 }
 
 @Composable
 private fun TopSection(
-    modifier: Modifier = Modifier,
-    onNavigateToBack: () -> Unit
+    modifier: Modifier = Modifier, onNavigateToBack: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = null,
-                tint = Color.White
+                imageVector = Icons.Default.Close, contentDescription = null, tint = Color.White
             )
         }
     }
