@@ -203,7 +203,7 @@ fun CustomFullScreenEditDialog(
                         value = inputText,
                         onValueChange = {
                             //20자로 이름 제한
-                            if (it.length <= 20) inputText = it
+                            if (it.length <= maxLength) inputText = it
                         },
                         textStyle = TextStyle(
                             fontFamily = HannaPro,
@@ -233,7 +233,7 @@ fun CustomFullScreenEditDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
 
-                    Text("${inputText.length} / 20", fontFamily = HannaPro, color = Color.White)
+                    Text("${inputText.length} / $maxLength", fontFamily = HannaPro, color = Color.White)
                 }
             }
         }

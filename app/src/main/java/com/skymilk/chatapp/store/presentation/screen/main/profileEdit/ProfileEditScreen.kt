@@ -152,7 +152,7 @@ fun ProfileEditScreen(
     if (showEditDialog) {
         CustomFullScreenEditDialog(
             initText = if (editingField == "name") editName else editStatusMessage,
-            maxLength = if (editingField == "name") 20 else 60,
+            maxLength = 20,
             onDismiss = { showEditDialog = false },
             onConfirm = { newText ->
                 if (editingField == "name") editName = newText
@@ -294,7 +294,9 @@ private fun EditProfileSection(
     ) {
 
         Text(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleLarge,
             text = editName,
             fontFamily = HannaPro,
@@ -336,7 +338,9 @@ private fun EditProfileSection(
     ) {
 
         Text(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleMedium,
             text = editStatusMessage,
             fontFamily = HannaPro,

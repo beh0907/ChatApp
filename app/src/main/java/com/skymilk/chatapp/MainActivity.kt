@@ -39,7 +39,9 @@ class MainActivity : ComponentActivity() {
                 SetObserveMessage()
 
                 //네비게이션 화면
-                AppNavigation()
+                AppNavigation(
+                    isDeepLink = intent.data != null
+                )
             }
         }
     }

@@ -1,6 +1,11 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -165,14 +170,29 @@ fun MainContent(
             composable<MainNavigation.ProfileScreen>(
                 typeMap = mapOf(
                     typeOf<User>() to CustomNavType.UserType
-                )
+                ),
+                enterTransition = {
+                    slideInVertically(
+                        initialOffsetY = { fullHeight -> fullHeight },
+                        animationSpec = tween(300)
+                    )
+                },
+                exitTransition = { ExitTransition.None },
+                popEnterTransition = { EnterTransition.None },
+                popExitTransition = {
+                    // 화면이 닫힐 때 위에서 아래로 슬라이드
+                    slideOutVertically(
+                        targetOffsetY = { fullHeight -> fullHeight },
+                        animationSpec = tween(300)
+                    )
+                }
             ) {
-                val args = it.toRoute<MainNavigation.ProfileScreen>()
+                val argsUser = it.toRoute<MainNavigation.ProfileScreen>().user
                 val profileViewModel: ProfileViewModel = hiltViewModel()
 
                 ProfileScreen(
                     viewModel = profileViewModel,
-                    user = args.user,
+                    user = if (currentUser.id == argsUser.id) currentUser else argsUser, //프로필 갱신 시 실시간 반영처리를 위해 currentUser를 넣는다
                     loginUserId = currentUser.id,
                     onNavigateToBack = {
                         navController.popBackStack()
@@ -264,12 +284,9 @@ fun MainContent(
                 UserSearchScreen(
                     currentUser = currentUser,
                     viewModel = userSearchViewModel,
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    },
-                    onNavigateToProfile = {
+                    onNavigateToProfile = { user ->
                         navController.navigate(
-                            MainNavigation.ProfileScreen(user = currentUser)
+                            MainNavigation.ProfileScreen(user = user)
                         )
                     }
                 )

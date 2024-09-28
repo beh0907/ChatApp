@@ -77,11 +77,4 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
         notificationManager.notify(notificationId, notification)
     }
-
-    private fun isAppRunning(): Boolean {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val runningAppProcesses = activityManager.runningAppProcesses ?: return false
-        return runningAppProcesses.any { it.processName == packageName && it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND }
-    }
-
 }

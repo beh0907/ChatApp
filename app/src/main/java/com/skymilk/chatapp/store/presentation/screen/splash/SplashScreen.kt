@@ -39,9 +39,3 @@ fun SplashScreen(onAnimationFinished: () -> Unit) {
         )
     }
 }
-
-@Preview
-@Composable
-fun PreviewSplashScreen() {
-    SplashScreen {}
-}

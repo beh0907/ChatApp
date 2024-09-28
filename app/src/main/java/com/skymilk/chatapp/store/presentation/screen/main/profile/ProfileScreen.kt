@@ -187,11 +187,10 @@ fun UserProfileSection(
 
     //유저 이름
     Text(
+        modifier = Modifier.padding(horizontal = 48.dp),
         text = user.username,
         style = MaterialTheme.typography.titleLarge,
         fontFamily = HannaPro,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
         color = Color.White
     )
 
@@ -199,11 +198,10 @@ fun UserProfileSection(
 
     //유저 상대 메시지
     Text(
+        modifier = Modifier.padding(horizontal = 48.dp),
         text = user.statusMessage,
         style = MaterialTheme.typography.titleMedium,
         fontFamily = HannaPro,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
         color = Color.White
     )
 

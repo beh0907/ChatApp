@@ -19,33 +19,37 @@ import com.skymilk.chatapp.store.presentation.screen.auth.signUp.SignUpScreen
 import com.skymilk.chatapp.store.presentation.screen.splash.SplashScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(isDeepLink: Boolean) {
     //계정 처리 뷰모델 및 계정 상태
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     //화면 네비게이션 설정
     val navController = rememberNavController()
+    // 로딩 후 시작 화면
     val startDestination =
         if (authState is AuthState.Authenticated) Navigations.Main else Navigations.Auth
 
+    //앱 시작 시 화면
+    val appStartDestination =
+        if (isDeepLink) startDestination else Navigations.Start // 딥링크 정보가 있다면 로딩화면 스킵
+
     NavHost(
         navController = navController,
-        startDestination = Navigations.Start
+        startDestination = appStartDestination
     ) {
         //시작 네비게이션
         navigation<Navigations.Start>(
             startDestination = StartNavigation.SplashScreen
         ) {
-            //로딩 화면
             composable<StartNavigation.SplashScreen> {
                 SplashScreen(
                     onAnimationFinished = {
-                        //완료 후 시작 화면 이동
                         navController.navigate(startDestination) {
-                            popUpTo(Navigations.Start) { inclusive = false }
+                            popUpTo(Navigations.Start) { inclusive = true }
                         }
-                    })
+                    }
+                )
             }
         }
 

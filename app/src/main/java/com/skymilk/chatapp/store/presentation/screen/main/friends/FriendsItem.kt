@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -75,13 +76,14 @@ fun FriendsItem(
 
             //유저 상태 메시지가 있다면
             if (user.statusMessage.isNotBlank()) {
-
                 //유저 이름
                 Text(
                     text = user.statusMessage,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                    fontFamily = HannaPro
+                    fontFamily = HannaPro,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

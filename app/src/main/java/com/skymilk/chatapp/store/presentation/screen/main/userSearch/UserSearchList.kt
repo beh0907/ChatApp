@@ -6,16 +6,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsItem
-import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsItemShimmer
 
 @Composable
 fun UserSearchList(
+    currentUser: User,
     users: List<User>,
     onUserItemClick: (User) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(users, key = { user -> user.id }) { user ->
+
+            //내 정보를 필터링하여 표시하지 않도록 처리
+            if (user.id == currentUser.id) return@items
+
             UserSearchItem(user, onUserItemClick = onUserItemClick)
         }
     }
