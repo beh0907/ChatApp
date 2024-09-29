@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +29,7 @@ import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
@@ -56,7 +55,7 @@ fun ItemMyMessage(
                 text = DateUtil.getTime(chatMessage.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
-                fontFamily = HannaPro
+                fontFamily = LeeSeoYunFont
             )
 
             Surface(
@@ -72,7 +71,7 @@ fun ItemMyMessage(
                             color = Black,
                             text = chatMessage.content,
                             modifier = Modifier.padding(8.dp),
-                            fontFamily = HannaPro
+                            fontFamily = LeeSeoYunFont
                         )
                     }
 

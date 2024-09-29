@@ -8,8 +8,8 @@ import javax.inject.Inject
 class SearchUser @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(query: String, condition:String): Result<List<User>> {
-        return userRepository.searchUser(query, condition)
+    suspend operator fun invoke(query: String): Result<List<User>> {
+        return userRepository.searchUser(query)
     }
 
 }

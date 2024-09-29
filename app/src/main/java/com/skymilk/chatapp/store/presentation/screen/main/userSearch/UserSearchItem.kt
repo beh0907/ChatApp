@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.userSearch
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -25,8 +23,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -70,7 +67,7 @@ fun UserSearchItem(
                 text = user.username,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                fontFamily = HannaPro
+                fontFamily = LeeSeoYunFont
             )
 
             //유저 상태 메시지가 있다면
@@ -81,7 +78,7 @@ fun UserSearchItem(
                     text = user.statusMessage,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                    fontFamily = HannaPro
+                    fontFamily = LeeSeoYunFont
                 )
             }
         }

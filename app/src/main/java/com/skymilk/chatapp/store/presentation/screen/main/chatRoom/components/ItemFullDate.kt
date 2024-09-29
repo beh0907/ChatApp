@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
 fun ItemFullDate(
@@ -18,7 +18,7 @@ fun ItemFullDate(
     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp), contentAlignment = Alignment.Center) {
         Text(
             text = fullDate,
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             style = MaterialTheme.typography.bodySmall,
             maxLines = 1
         )

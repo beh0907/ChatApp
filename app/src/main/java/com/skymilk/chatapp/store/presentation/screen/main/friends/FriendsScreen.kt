@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
 fun FriendsScreen(
@@ -58,7 +58,7 @@ fun FriendsScreen(
                 Text(
                     modifier = Modifier.padding(top = 10.dp, start = 15.dp),
                     text = "친구 ${friends.size}",
-                    fontFamily = HannaPro,
+                    fontFamily = LeeSeoYunFont,
                     fontSize = 14.sp
                 )
 
@@ -84,7 +84,7 @@ fun TopSection(onNavigateToUserSearch: () -> Unit) {
         Text(
             modifier = Modifier.weight(1f),
             text = "친구",
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )

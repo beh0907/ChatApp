@@ -26,7 +26,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
 
@@ -80,7 +80,7 @@ fun ChatSoloRoomItem(
                             MaterialTheme.colorScheme.secondary
                         ),
                     text = " 나 ",
-                    fontFamily = HannaPro,
+                    fontFamily = LeeSeoYunFont,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.surface
                 )
@@ -89,7 +89,7 @@ fun ChatSoloRoomItem(
 
                 Text(
                     text = currentUser.username,
-                    fontFamily = HannaPro,
+                    fontFamily = LeeSeoYunFont,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1
@@ -102,7 +102,7 @@ fun ChatSoloRoomItem(
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 maxLines = 1
@@ -116,7 +116,7 @@ fun ChatSoloRoomItem(
             //시간 정보
             Text(
                 text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

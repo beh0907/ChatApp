@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -47,8 +48,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageListShimmer
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
-import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 
 @Composable
@@ -122,7 +122,7 @@ fun ChatRoomScreen(
 
                 //채팅 입력 영역
                 BottomSection(
-                    modifier = Modifier,
+                    modifier = Modifier.imePadding(),
                     onSendMessage = viewModel::sendMessage,
                     onSendImageMessage = viewModel::sendImageMessage,
                     userId = currentUser.id,
@@ -166,7 +166,7 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
         Text(
             modifier = Modifier.weight(1f),
             text = title,
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -224,7 +224,8 @@ fun BottomSection(
             modifier = Modifier
                 .layoutId("attachIcon")
                 .clickable {
-                    TedImagePicker.with(context)
+                    TedImagePicker
+                        .with(context)
                         .start { uri ->
                             onSendImageMessage(userId, uri)
                         }
@@ -237,7 +238,7 @@ fun BottomSection(
                     .size(24.dp),
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
-                tint = Black
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -252,7 +253,7 @@ fun BottomSection(
                     text = "채팅을 입력해주세요.",
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.Gray,
-                    fontFamily = HannaPro
+                    fontFamily = LeeSeoYunFont
                 )
             },
             colors = TextFieldDefaults.colors(
@@ -262,10 +263,10 @@ fun BottomSection(
                 unfocusedContainerColor = Color.Transparent
             ),
             textStyle = TextStyle(
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                color = Black
+                color = MaterialTheme.colorScheme.onSurface
             )
         )
 
@@ -293,7 +294,7 @@ fun BottomSection(
                         .size(24.dp),
                     imageVector = Icons.AutoMirrored.Default.Send,
                     contentDescription = null,
-                    tint = Black
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

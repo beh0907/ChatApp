@@ -20,5 +20,5 @@ interface UserRepository {
 
     suspend fun setFriend(myUserId: String, otherUserId: String, isFriend: Boolean) // 친구 상태 저장하기
 
-    suspend fun searchUser(query: String, condition:String): Result<List<User>> //유저 정보 검색
+    suspend fun searchUser(query: String): Result<List<User>> //유저 정보 검색
 }

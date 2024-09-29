@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -74,7 +74,7 @@ fun TopSection() {
         Text(
             modifier = Modifier.weight(1f),
             text = "채팅",
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )

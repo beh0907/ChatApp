@@ -1,21 +1,19 @@
 package com.skymilk.chatapp.store.presentation.screen.main.userSearch
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,18 +21,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
 fun UserSearchScreen(
     modifier: Modifier = Modifier,
     currentUser: User,
     viewModel: UserSearchViewModel,
-    onNavigateToProfile: (User) -> Unit
+    onNavigateToProfile: (User) -> Unit,
+    onNavigateToBack: () -> Unit
 ) {
     val userSearchState by viewModel.userSearchState.collectAsStateWithLifecycle()
 
@@ -42,6 +42,7 @@ fun UserSearchScreen(
         modifier = modifier
     ) {
         TopSection(
+            onNavigateToBack = onNavigateToBack,
             searchUser = viewModel::searchUser
         )
 
@@ -67,17 +68,13 @@ fun UserSearchScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopSection(
     modifier: Modifier = Modifier,
-    searchUser: (String, String) -> Unit
+    onNavigateToBack: () -> Unit,
+    searchUser: (String) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableStateOf(Pair("이름", "username")) }
-    var isDropdownExpanded by remember { mutableStateOf(false) }
-
-    val filterOptions = listOf(Pair("이름", "username"), Pair("아이디", "id")) // 필터 옵션 예시
 
     Row(
         modifier = modifier
@@ -85,58 +82,40 @@ private fun TopSection(
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 드롭다운 메뉴 (필터)
-        ExposedDropdownMenuBox(
-            expanded = isDropdownExpanded,
-            onExpandedChange = { isDropdownExpanded = it },
-        ) {
-            TextField(
-                singleLine = true,
-                value = selectedFilter.first,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) },
-                modifier = Modifier.width(100.dp).menuAnchor(type, enabled),
-                textStyle = TextStyle(
-                    fontFamily = HannaPro
-                )
-            )
-            ExposedDropdownMenu(
-                expanded = isDropdownExpanded,
-                onDismissRequest = { isDropdownExpanded = false }
-            ) {
-                filterOptions.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option.first, fontFamily = HannaPro) },
-                        onClick = {
-                            selectedFilter = option
-                            isDropdownExpanded = false
-                        },
-
-                        )
-                }
-            }
-        }
-
-
         // 검색어 입력 칸
         TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.onSecondary),
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            modifier = Modifier.weight(1f),
             singleLine = true,
-            placeholder = { Text("검색어를 입력하세요", fontFamily = HannaPro) },
+            placeholder = { Text("아이디 혹은 이름을 검색해주세요.", fontFamily = LeeSeoYunFont) },
+            leadingIcon = {
+                // 뒤로가기 버튼
+                IconButton(
+                    onClick = { onNavigateToBack() }
+                ) {
+                    Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로 가기")
+                }
+            },
             trailingIcon = {
                 // 검색 버튼
                 IconButton(
-                    onClick = { searchUser(searchQuery, selectedFilter.second) },
+                    onClick = { searchUser(searchQuery) },
                     enabled = searchQuery.isNotEmpty()
                 ) {
                     Icon(Icons.Default.Search, contentDescription = "검색")
                 }
             },
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent
+            ),
             textStyle = TextStyle(
-                fontFamily = HannaPro
+                fontFamily = LeeSeoYunFont
             )
         )
     }

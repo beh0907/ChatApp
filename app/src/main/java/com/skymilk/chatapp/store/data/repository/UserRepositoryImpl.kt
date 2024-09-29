@@ -160,25 +160,34 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchUser(query: String, condition: String): Result<List<User>> =
+    override suspend fun searchUser(query: String): Result<List<User>> =
         withContext(Dispatchers.IO) {
             try {
                 val usersRef = firebaseFireStore.collection("users")
-                val querySnapshot = usersRef.whereGreaterThanOrEqualTo(condition, query)
-                    .whereLessThanOrEqualTo(condition, query + '\uf8ff')
-                    .get()
-                    .await()
 
-                val regex = query.lowercase(Locale.getDefault()).toRegex()
-                val users = querySnapshot.documents.mapNotNull { document ->
-                    document.toObject(User::class.java)?.let { user ->
-                        when (condition.lowercase()) {
-                            "id" -> if (user.id.lowercase(Locale.getDefault()).contains(regex)) user else null
-                            "username" -> if (user.username.lowercase(Locale.getDefault()).contains(regex)) user else null
-                            else -> null
-                        }
-                    }
+                // ID에 대한 쿼리
+                val idQuery = usersRef
+                    .whereGreaterThanOrEqualTo("id", query)
+                    .whereLessThanOrEqualTo("id", query + '\uf8ff')
+
+                // 이름에 대한 쿼리
+                val nameQuery = usersRef
+                    .whereGreaterThanOrEqualTo("username", query)
+                    .whereLessThanOrEqualTo("username", query + '\uf8ff')
+
+                // 두 쿼리 실행
+                val idResults = idQuery.get().await()
+                val nameResults = nameQuery.get().await()
+
+                // 결과 합치기 및 중복 제거
+                val combinedResults = (idResults.documents + nameResults.documents).distinctBy { it.id }
+
+                // User 객체로 변환
+                val users = combinedResults.mapNotNull { document ->
+                    document.toObject(User::class.java)
                 }
+
+                Log.d("searchUser", "users : $users")
 
                 Result.success(users)
             } catch (e: Exception) {

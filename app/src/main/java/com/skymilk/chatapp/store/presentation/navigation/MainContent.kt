@@ -6,6 +6,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -288,6 +289,9 @@ fun MainContent(
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)
                         )
+                    },
+                    onNavigateToBack = {
+                        navController.popBackStack()
                     }
                 )
             }

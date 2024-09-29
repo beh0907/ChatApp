@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
@@ -36,7 +37,7 @@ import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
@@ -77,68 +78,73 @@ fun ItemOtherMessage(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Column(modifier = Modifier.widthIn(max = maxWidth)) {
+            Column {
                 Text(
                     text = sender.username,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = HannaPro
+                    fontFamily = LeeSeoYunFont
                 )
 
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    shadowElevation = 4.dp,
-                    color = Color.White,
-                    modifier = Modifier.widthIn(max = maxWidth)
-                ) {
-                    when (chatMessage.type) {
-                        //텍스트 타입
-                        MessageType.TEXT -> {
-                            Text(
-                                color = Black,
-                                text = chatMessage.content,
-                                modifier = Modifier.padding(8.dp),
-                                fontFamily = HannaPro
-                            )
-                        }
+                Row {
 
-                        //이미지 타입
-                        MessageType.IMAGE -> {
-                            SubcomposeAsyncImage(
-                                modifier = Modifier
-                                    .widthIn(max = maxWidth)
-                                    .heightIn(max = maxWidth)
-                                    .clickable {
-                                        onNavigateToImageViewer(chatMessage.content)
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        shadowElevation = 4.dp,
+                        color = Color.White,
+                        modifier = Modifier.widthIn(max = maxWidth)
+                    ) {
+                        when (chatMessage.type) {
+                            //텍스트 타입
+                            MessageType.TEXT -> {
+                                Text(
+                                    color = Black,
+                                    text = chatMessage.content,
+                                    modifier = Modifier.padding(8.dp),
+                                    fontFamily = LeeSeoYunFont
+                                )
+                            }
+
+                            //이미지 타입
+                            MessageType.IMAGE -> {
+                                SubcomposeAsyncImage(
+                                    modifier = Modifier
+                                        .widthIn(max = maxWidth)
+                                        .heightIn(max = maxWidth)
+                                        .clickable {
+                                            onNavigateToImageViewer(chatMessage.content)
+                                        },
+                                    model = ImageRequest.Builder(context)
+                                        .data(chatMessage.content)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = null,
+                                    loading = {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .shimmerEffect()
+                                        )
                                     },
-                                model = ImageRequest.Builder(context)
-                                    .data(chatMessage.content)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = null,
-                                loading = {
-                                    Box(modifier = Modifier
-                                        .fillMaxSize()
-                                        .shimmerEffect())
-                                },
-                                contentScale = ContentScale.FillWidth // 이미지의 크기 조정
-                            )
-                        }
+                                    contentScale = ContentScale.FillWidth // 이미지의 크기 조정
+                                )
+                            }
 
-                        MessageType.VIDEO -> {
+                            MessageType.VIDEO -> {
+                            }
                         }
                     }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = DateUtil.getTime(chatMessage.timestamp),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.align(Alignment.Bottom),
+                        fontFamily = LeeSeoYunFont
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = DateUtil.getTime(chatMessage.timestamp),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.align(Alignment.Bottom),
-                fontFamily = HannaPro
-            )
         }
     }
 }

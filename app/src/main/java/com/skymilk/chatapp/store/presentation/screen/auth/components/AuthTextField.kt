@@ -1,24 +1,19 @@
 package com.skymilk.chatapp.store.presentation.screen.auth.components
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
-import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
 fun AuthTextField(
@@ -45,7 +40,7 @@ fun AuthTextField(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = HannaPro
+                fontFamily = LeeSeoYunFont
             )
         },
         leadingIcon = {
@@ -57,7 +52,7 @@ fun AuthTextField(
             }
         },
         textStyle = TextStyle(
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             fontSize = 16.sp, // 텍스트 크기
         )
     )

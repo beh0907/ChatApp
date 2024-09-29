@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.ui.theme.BlueGray
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.LightBlueWhite
 import com.skymilk.chatapp.ui.theme.dimens
 
@@ -53,7 +54,8 @@ fun SignInSocialMedia(
 
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge.copy(color = Color(0xFF64748B))
+            style = MaterialTheme.typography.labelLarge.copy(color = Color(0xFF64748B)),
+            fontFamily = LeeSeoYunFont
         )
     }
 }

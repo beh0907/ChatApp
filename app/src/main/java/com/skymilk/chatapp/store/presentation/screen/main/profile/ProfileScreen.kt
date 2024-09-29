@@ -39,13 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
 fun ProfileScreen(
@@ -190,7 +189,7 @@ fun UserProfileSection(
         modifier = Modifier.padding(horizontal = 48.dp),
         text = user.username,
         style = MaterialTheme.typography.titleLarge,
-        fontFamily = HannaPro,
+        fontFamily = LeeSeoYunFont,
         color = Color.White
     )
 
@@ -201,7 +200,7 @@ fun UserProfileSection(
         modifier = Modifier.padding(horizontal = 48.dp),
         text = user.statusMessage,
         style = MaterialTheme.typography.titleMedium,
-        fontFamily = HannaPro,
+        fontFamily = LeeSeoYunFont,
         color = Color.White
     )
 
@@ -245,7 +244,7 @@ fun MyProfileEventSection(
                 text = "나와의 채팅",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 color = Color.White
             )
         }
@@ -273,7 +272,7 @@ fun MyProfileEventSection(
                 text = "프로필 편집",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 color = Color.White
             )
         }
@@ -301,7 +300,7 @@ fun MyProfileEventSection(
                 text = "로그아웃",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 color = Color.White
             )
         }
@@ -353,7 +352,7 @@ fun OtherProfileEventSection(
                 text = "1:1 채팅",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 color = Color.White
             )
         }
@@ -385,7 +384,7 @@ fun OtherProfileEventSection(
                         text = if (isFriend) "친구 삭제" else "친구 추가",
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
-                        fontFamily = HannaPro,
+                        fontFamily = LeeSeoYunFont,
                         color = Color.White
                     )
                 }
@@ -419,7 +418,7 @@ fun OtherProfileEventSection(
                 text = "미구현",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 color = Color.White
             )
         }

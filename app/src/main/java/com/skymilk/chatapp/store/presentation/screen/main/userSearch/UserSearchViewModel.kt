@@ -19,9 +19,9 @@ class UserSearchViewModel @Inject constructor(
     private val _userSearchState = MutableStateFlow<UserSearchState>(UserSearchState.Initial)
     val userSearchState = _userSearchState.asStateFlow()
 
-    fun searchUser(query: String, condition: String) {
+    fun searchUser(query: String) {
         viewModelScope.launch {
-            val result = userUseCase.searchUser(query,condition)
+            val result = userUseCase.searchUser(query)
 
             when {
                 result.isSuccess -> {

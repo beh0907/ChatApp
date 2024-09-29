@@ -46,8 +46,7 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
-import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -184,7 +183,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
                 style = SpanStyle(
                     color = Color(0xff94a3b8),
                     fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = HannaPro,
+                    fontFamily = LeeSeoYunFont,
                     fontWeight = FontWeight.Normal
                 )
             ) {
@@ -195,7 +194,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
                 style = SpanStyle(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = HannaPro,
+                    fontFamily = LeeSeoYunFont,
                     fontWeight = FontWeight.Medium
                 )
             ) {

@@ -54,7 +54,7 @@ import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
-import com.skymilk.chatapp.ui.theme.HannaPro
+import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -190,7 +190,7 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "프로필 편집",
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             style = MaterialTheme.typography.titleLarge,
             color = Color.White
         )
@@ -200,7 +200,7 @@ fun TopSection(
         }) {
             Text(
                 text = "완료",
-                fontFamily = HannaPro,
+                fontFamily = LeeSeoYunFont,
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -271,7 +271,7 @@ private fun EditProfileSection(
                 .align(Alignment.BottomCenter),
             textAlign = TextAlign.Center,
             text = "편집",
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             color = Color.White,
 
             )
@@ -299,7 +299,7 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleLarge,
             text = editName,
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             textAlign = TextAlign.Center,
             color = Color.White
         )
@@ -343,7 +343,7 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleMedium,
             text = editStatusMessage,
-            fontFamily = HannaPro,
+            fontFamily = LeeSeoYunFont,
             textAlign = TextAlign.Center,
             color = Color.White
         )
