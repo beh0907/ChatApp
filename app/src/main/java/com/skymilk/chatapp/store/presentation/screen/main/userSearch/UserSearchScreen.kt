@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -18,12 +19,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -74,7 +78,7 @@ private fun TopSection(
     onNavigateToBack: () -> Unit,
     searchUser: (String) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
 
     Row(
         modifier = modifier
@@ -82,22 +86,28 @@ private fun TopSection(
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 뒤로가기 버튼
+        IconButton(
+            onClick = { onNavigateToBack() }
+        ) {
+            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로 가기")
+        }
+
         // 검색어 입력 칸
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.onSecondary),
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer),
             value = searchQuery,
             onValueChange = { searchQuery = it },
             singleLine = true,
-            placeholder = { Text("아이디 혹은 이름을 검색해주세요.", fontFamily = LeeSeoYunFont) },
-            leadingIcon = {
-                // 뒤로가기 버튼
-                IconButton(
-                    onClick = { onNavigateToBack() }
-                ) {
-                    Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로 가기")
-                }
+            placeholder = {
+                Text(
+                    text ="아이디 혹은 이름을 검색해주세요.",
+                    fontFamily = LeeSeoYunFont,
+                    color = Color.Gray,
+                )
             },
             trailingIcon = {
                 // 검색 버튼
@@ -115,7 +125,10 @@ private fun TopSection(
                 unfocusedContainerColor = Color.Transparent
             ),
             textStyle = TextStyle(
-                fontFamily = LeeSeoYunFont
+                fontFamily = LeeSeoYunFont,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                color = MaterialTheme.colorScheme.onSurface
             )
         )
     }

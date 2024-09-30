@@ -166,4 +166,7 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
     implementation (libs.logging.interceptor)
+
+    //Datastore
+    implementation (libs.androidx.datastore.preferences)
 }

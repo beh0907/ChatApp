@@ -12,9 +12,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import com.skymilk.chatapp.store.data.dto.ChatRoom
+import com.skymilk.chatapp.store.data.dto.FcmAndroidSetting
 import com.skymilk.chatapp.store.data.dto.FcmMessage
 import com.skymilk.chatapp.store.data.dto.Message
-import com.skymilk.chatapp.store.data.dto.Notification
 import com.skymilk.chatapp.store.data.remote.FcmApi
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
@@ -167,7 +167,7 @@ class ChatRepositoryImpl @Inject constructor(
     // 메시지 전달 (Realtime Database)
     override suspend fun sendMessage(
         chatRoomId: String,
-        senderId: String,
+        sender: User,
         content: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
@@ -176,7 +176,7 @@ class ChatRepositoryImpl @Inject constructor(
 
             val chatMessage = ChatMessage(
                 id = newMessageRef.key ?: UUID.randomUUID().toString(),
-                senderId = senderId,
+                senderId = sender.id,
                 content = content, // 메시지 내용
                 timestamp = System.currentTimeMillis(),
                 type = MessageType.TEXT
@@ -198,7 +198,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .await()
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
-            sendFcmMessage(chatRoomId, senderId, senderId, content)
+            sendFcmMessage(chatRoomId, sender, content)
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -209,13 +209,13 @@ class ChatRepositoryImpl @Inject constructor(
     // 이미지 메시지 전달 (Realtime Database)
     override suspend fun sendImageMessage(
         chatRoomId: String,
-        senderId: String,
+        sender:User,
         content: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val chatMessage = ChatMessage(
                 id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
-                senderId = senderId,
+                senderId = sender.id,
                 content = content, // 이미지가 저장된 URL
                 timestamp = System.currentTimeMillis(),
                 type = MessageType.IMAGE
@@ -241,7 +241,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .await()
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
-            sendFcmMessage(chatRoomId, senderId, senderId, "이미지")
+            sendFcmMessage(chatRoomId, sender, "이미지")
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -292,10 +292,9 @@ class ChatRepositoryImpl @Inject constructor(
         }
 
     //FCM 메시지 전송
-    override suspend fun sendFcmMessage(
+    private suspend fun sendFcmMessage(
         chatRoomId: String,
-        senderId: String,
-        title: String,
+        sender: User,
         body: String
     ) {
         val fcmMessage = FcmMessage(
@@ -303,15 +302,17 @@ class ChatRepositoryImpl @Inject constructor(
                 topic = "${Constants.FCM_TOPIC_PREFIX}$chatRoomId",
                 data = mapOf(
                     "chatRoomId" to chatRoomId,
-                    "senderId" to senderId,
+                    "senderId" to sender.id,
 
                     //notification에 담기면 백그라운드일 경우 자동 처리하는 문제가 생김
                     //data에 담아야 백그라운드에서 onMessageReceived를 통할 수 있다
-                    "title" to title,
+                    "title" to sender.username,
                     "body" to body
-                )
+                ),
+                android = FcmAndroidSetting(directBootOk = true)
             )
         )
+
         val token = "Bearer ${FirebaseUtil.getAccessToken(context)}"
 
         //메시지와 토큰 전달

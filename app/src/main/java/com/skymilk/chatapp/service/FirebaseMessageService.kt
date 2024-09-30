@@ -1,10 +1,8 @@
 package com.skymilk.chatapp.service
 
-import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -15,6 +13,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.skymilk.chatapp.MainActivity
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.random.Random
@@ -24,6 +23,9 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
+
+    @Inject
+    lateinit var settingUseCases: SettingUseCases
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -43,11 +45,17 @@ class FirebaseMessageService : FirebaseMessagingService() {
         message: String? = "",
         messageData: MutableMap<String, String>
     ) {
+        val senderId = messageData["senderId"] ?: return
+        val chatRoomId = messageData["chatRoomId"] ?: return
+
         //로그인 상태가 아니라면 알림X
         if (firebaseAuth.currentUser == null) return
 
         //내가 보낸 메시지라면 알림X
-        if (firebaseAuth.currentUser?.uid == messageData["senderId"]) return
+        if (firebaseAuth.currentUser?.uid == senderId) return
+
+        //알림이 해제된 채팅방이라면 알림X
+        if (settingUseCases.getAlarmSetting(chatRoomId)) return
 
         val notificationManager = getSystemService<NotificationManager>()!!
 
@@ -57,7 +65,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
         // 알림 클릭 시 MainActivity를 열고 채팅방 ID 전달
         val activityIntent = Intent(this, MainActivity::class.java).apply {
-            this.data = "chatapp://chatrooms/${messageData["chatRoomId"]}".toUri()
+            this.data = "chatapp://chatrooms/$chatRoomId".toUri()
         }
 
         val pendingIntent = TaskStackBuilder.create(this).run {

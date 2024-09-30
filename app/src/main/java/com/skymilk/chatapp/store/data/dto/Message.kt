@@ -9,5 +9,7 @@ data class Message(
     @SerialName("topic")
     val topic: String,
     @SerialName("data")
-    val data: Map<String, String>
+    val data: Map<String, String>,
+    @SerialName("android")
+    val android: FcmAndroidSetting
 )

@@ -4,4 +4,9 @@ object Constants {
     const val FCM_SERVER_URL = "https://fcm.googleapis.com/"
 
     const val FCM_TOPIC_PREFIX = "ChatRoom_"
+
+
+    const val SETTING_DATA_STORE = "SETTING_DATA_STORE" // Datastore 이름
+
+    const val DISABLE_ALARM_SETTING_CHATROOM_KEY = "ALARM_SETTING_CHATROOM_KEY" // Datastore 채팅방 알람 비활성화 설정
 }

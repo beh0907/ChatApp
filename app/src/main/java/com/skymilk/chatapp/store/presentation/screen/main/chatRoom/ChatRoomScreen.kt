@@ -3,7 +3,6 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.AlarmOff
+import androidx.compose.material.icons.filled.AlarmOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,8 +46,6 @@ import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomConfirmDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageList
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageListShimmer
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -63,11 +63,11 @@ fun ChatRoomScreen(
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
     val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
+    val alarmState by viewModel.alarmState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-
         //채팅방 정보 체크
         when (chatRoomState) {
             is ChatRoomState.Initial -> {}
@@ -82,9 +82,11 @@ fun ChatRoomScreen(
 
                 //제목 영역
                 TopSection(
-                    onNavigateToBack = onNavigateToBack,
                     chatRoom = chatRoom,
-                    currentUser = currentUser
+                    currentUser = currentUser,
+                    alarmState = alarmState,
+                    onNavigateToBack = onNavigateToBack,
+                    toggleAlarmState = viewModel::toggleAlarmState
                 )
 
                 //채팅 목록 영역
@@ -125,7 +127,7 @@ fun ChatRoomScreen(
                     modifier = Modifier.imePadding(),
                     onSendMessage = viewModel::sendMessage,
                     onSendImageMessage = viewModel::sendImageMessage,
-                    userId = currentUser.id,
+                    user = currentUser,
                 )
             }
 
@@ -141,7 +143,13 @@ fun ChatRoomScreen(
 
 //상단 타이틀
 @Composable
-fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, currentUser: User) {
+fun TopSection(
+    chatRoom: ChatRoomWithUsers,
+    currentUser: User,
+    alarmState: Boolean,
+    onNavigateToBack: () -> Unit,
+    toggleAlarmState: () -> Unit
+) {
     val title = when (chatRoom.participants.size) {
         1 -> chatRoom.participants.first().username
         2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: ""
@@ -150,7 +158,6 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
@@ -170,6 +177,17 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
+
+
+        IconButton(onClick = {
+            toggleAlarmState()
+        }) {
+            Icon(
+                imageVector = if (alarmState) Icons.Default.AlarmOff else Icons.Default.AlarmOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 
@@ -178,9 +196,9 @@ fun TopSection(onNavigateToBack: () -> Unit, chatRoom: ChatRoomWithUsers, curren
 @Composable
 fun BottomSection(
     modifier: Modifier = Modifier,
-    onSendMessage: (String, String) -> Unit,
-    onSendImageMessage: (String, Uri) -> Unit,
-    userId: String,
+    onSendMessage: (User, String) -> Unit,
+    onSendImageMessage: (User, Uri) -> Unit,
+    user: User,
 ) {
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -227,7 +245,7 @@ fun BottomSection(
                     TedImagePicker
                         .with(context)
                         .start { uri ->
-                            onSendImageMessage(userId, uri)
+                            onSendImageMessage(user, uri)
                         }
                 },
             contentAlignment = Alignment.BottomCenter
@@ -278,7 +296,7 @@ fun BottomSection(
                     .background(MaterialTheme.colorScheme.inversePrimary)
                     .clickable {
                         //메시지 전송
-                        onSendMessage(userId, message)
+                        onSendMessage(user, message)
 
                         //메시지 초기화
                         message = ""

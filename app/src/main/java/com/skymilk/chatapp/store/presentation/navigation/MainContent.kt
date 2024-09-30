@@ -6,7 +6,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -178,8 +177,6 @@ fun MainContent(
                         animationSpec = tween(300)
                     )
                 },
-                exitTransition = { ExitTransition.None },
-                popEnterTransition = { EnterTransition.None },
                 popExitTransition = {
                     // 화면이 닫힐 때 위에서 아래로 슬라이드
                     slideOutVertically(

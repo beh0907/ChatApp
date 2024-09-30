@@ -59,6 +59,7 @@
         <!--        FCM 메시지 서비스-->
         <service
             android:name=".service.FirebaseMessageService"
+            android:directBootAware="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

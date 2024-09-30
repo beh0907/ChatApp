@@ -24,14 +24,6 @@ fun ImageViewerScreen(
     imageUrl: String,
     onNavigateToBack: () -> Unit,
 ) {
-//    val images = remember {
-//        mutableStateListOf(
-//            "https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF",
-//            "https://t7.baidu.com/it/u=4198287529,2774471735&fm=193&f=GIF",
-//            imageUrl
-//        )
-//    }
-//    val pagerState = rememberZoomablePagerState { images.size }
 
     val painter = rememberAsyncImagePainter(imageUrl)
     val state = rememberZoomableState(contentSize = painter.intrinsicSize)
@@ -51,32 +43,6 @@ fun ImageViewerScreen(
                 contentDescription = null,
             )
         }
-
-//        ZoomablePager(state = pagerState) { page ->
-//            val imageRequest = ImageRequest.Builder(LocalContext.current)
-//                .data(images[page])
-//                .size(coil.size.Size.ORIGINAL)
-//                .build()
-//            val painter = rememberAsyncImagePainter(imageRequest)
-//
-//            if (painter.intrinsicSize.isSpecified) {
-//                ZoomablePolicy(intrinsicSize = painter.intrinsicSize) { _ ->
-//                    Image(
-//                        modifier = Modifier.fillMaxSize(),
-//                        painter = painter,
-//                        contentDescription = null
-//                    )
-//                }
-//
-//                if (!painter.intrinsicSize.isSpecified) {
-//                    Box(modifier = Modifier.fillMaxSize()) {
-//                        CircularProgressIndicator(
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-//            }
-//        }
 
         TopSection(
             modifier = Modifier, onNavigateToBack = onNavigateToBack

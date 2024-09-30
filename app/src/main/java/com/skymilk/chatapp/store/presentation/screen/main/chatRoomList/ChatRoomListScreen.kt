@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddComment
+import androidx.compose.material.icons.outlined.AddComment
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -83,7 +85,7 @@ fun TopSection() {
 
         }) {
             Icon(
-                imageVector = Icons.Default.Add,
+                imageVector = Icons.Outlined.AddComment,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )

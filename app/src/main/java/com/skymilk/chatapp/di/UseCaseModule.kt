@@ -2,6 +2,7 @@ package com.skymilk.chatapp.di
 
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
+import com.skymilk.chatapp.store.domain.repository.SettingRepository
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
@@ -13,11 +14,17 @@ import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chat.CreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRoom
-import com.skymilk.chatapp.store.domain.usecase.chat.GetOrCreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRooms
 import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
+import com.skymilk.chatapp.store.domain.usecase.chat.GetOrCreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
 import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
+import com.skymilk.chatapp.store.domain.usecase.setting.DeleteAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSettingAsync
+import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmsSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.SaveAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveProfileImage
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
@@ -80,5 +87,16 @@ object UseCaseModule {
         StorageUseCases(
             SaveProfileImage(storageRepository),
             SaveChatMessageImage(storageRepository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideSettingUseCase(settingRepository: SettingRepository): SettingUseCases =
+        SettingUseCases(
+            GetAlarmSetting(settingRepository),
+            GetAlarmSettingAsync(settingRepository),
+            GetAlarmsSetting(settingRepository),
+            SaveAlarmSetting(settingRepository),
+            DeleteAlarmSetting(settingRepository)
         )
 }

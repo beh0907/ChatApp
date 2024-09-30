@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
+import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
@@ -17,16 +19,19 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class ChatRoomViewModel @AssistedInject constructor(
     @Assisted private val chatRoomId: String,
     private val chatUseCases: ChatUseCases,
-    private val storageUseCases: StorageUseCases
+    private val storageUseCases: StorageUseCases,
+    private val settingUseCases: SettingUseCases
 ) : ViewModel() {
 
     @AssistedFactory
@@ -57,6 +62,11 @@ class ChatRoomViewModel @AssistedInject constructor(
     private val _uploadState = MutableStateFlow<ImageUploadState>(ImageUploadState.Initial)
     val uploadState = _uploadState.asStateFlow()
 
+    //알람 상태
+    //저장된 값이 알람 비활성화
+    val alarmState = settingUseCases.getAlarmSettingAsync(chatRoomId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
     init {
         loadChatRoom()
 
@@ -74,6 +84,8 @@ class ChatRoomViewModel @AssistedInject constructor(
                 }
                 .catch { exception ->
                     sendEvent(Event.Toast(exception.message ?: "Unknown error"))
+
+                    _chatRoomState.value = ChatRoomState.Error
                 }
                 .collect { chatRoom ->
                     _chatRoomState.value = ChatRoomState.Success(chatRoom)
@@ -91,6 +103,8 @@ class ChatRoomViewModel @AssistedInject constructor(
                 }
                 .catch { exception ->
                     sendEvent(Event.Toast(exception.message ?: "Unknown error"))
+
+                    _chatMessagesState.value = ChatMessagesState.Error
                 }
                 .collect { messages ->
                     _chatMessagesState.value = ChatMessagesState.Success(messages)
@@ -98,23 +112,23 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
-    fun sendMessage(senderId: String, content: String) {
+    fun sendMessage(sender: User, content: String) {
         viewModelScope.launch {
             try {
-                chatUseCases.sendMessage(chatRoomId, senderId, content)
+                chatUseCases.sendMessage(chatRoomId, sender, content)
             } catch (e: Exception) {
                 //에러 처리
             }
         }
     }
 
-    fun sendImageMessage(senderId: String, imageUri: Uri) {
+    fun sendImageMessage(sender: User, imageUri: Uri) {
         //이미지 업로드 결과
-        uploadImage(senderId, imageUri) { url ->
+        uploadImage(sender.id, imageUri) { url ->
 
             viewModelScope.launch {
                 try {
-                    chatUseCases.sendImageMessage(chatRoomId, senderId, url)
+                    chatUseCases.sendImageMessage(chatRoomId, sender, url)
                 } catch (e: Exception) {
                     _uploadState.value =
                         ImageUploadState.Error("Failed to send image message: ${e.message}")
@@ -146,6 +160,25 @@ class ChatRoomViewModel @AssistedInject constructor(
                 }
             } catch (e: Exception) {
                 _uploadState.value = ImageUploadState.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    //알림 상태 저장
+    fun toggleAlarmState() {
+        viewModelScope.launch {
+            when (alarmState.value) {
+                true -> {
+                    settingUseCases.deleteAlarmSetting(chatRoomId)
+
+                    sendEvent(Event.Toast("채팅방 알람이 설정되었습니다"))
+                }
+
+                false -> {
+                    settingUseCases.saveAlarmSetting(chatRoomId)
+
+                    sendEvent(Event.Toast("채팅방 알람이 해제되었습니다"))
+                }
             }
         }
     }

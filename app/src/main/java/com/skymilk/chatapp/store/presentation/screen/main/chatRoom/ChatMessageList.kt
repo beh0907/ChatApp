@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +32,13 @@ import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemFullDate
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemMyMessage
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemMyMessageShimmer
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemMyUploadImage
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemOtherMessage
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemOtherMessageShimmer
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.utils.DateUtil
@@ -53,7 +62,7 @@ fun ChatMessageList(
     var showNewMessage by remember { mutableStateOf("") }
     var showNewMessageNotification by remember { mutableStateOf(false) }
 
-
+    //메시지가 새로 들어올때마다 이벤트 처리
     LaunchedEffect(chatMessages.size) {
         if (chatMessages.size > previousMessagesSize) {
             val newMessage = chatMessages.first()
@@ -78,6 +87,13 @@ fun ChatMessageList(
             }
         }
         previousMessagesSize = chatMessages.size
+    }
+
+    //스크롤이 최하단에 위치할 경우
+    ScrollToEndCallback(listState, isReverse = true) {
+        //최신 메시지 알림 영역을 제거한다
+        showNewMessage = ""
+        showNewMessageNotification = false
     }
 
     Box(modifier = modifier) {
