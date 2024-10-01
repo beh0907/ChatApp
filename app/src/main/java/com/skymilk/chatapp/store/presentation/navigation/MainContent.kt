@@ -1,15 +1,13 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material3.Scaffold
@@ -19,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -33,6 +32,8 @@ import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.ChatRoomCreateScreen
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.ChatRoomCreateViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatListScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomListViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
@@ -64,7 +65,7 @@ fun MainContent(
             ),
             BottomNavigationItem(
                 icon = Icons.AutoMirrored.Outlined.Chat,
-                selectedIcon = Icons.AutoMirrored.Default.Chat,
+                selectedIcon = Icons.AutoMirrored.Rounded.Chat,
                 title = "채팅",
                 route = MainNavigation.ChatsScreen
             ),
@@ -97,6 +98,14 @@ fun MainContent(
         ViewModelFactoryModule::class.java
     )
 
+    //친구 viewmodel 공유
+    val friendsViewModel: FriendsViewModel = viewModel(
+        factory = FriendsViewModel.provideFactory(
+            viewModelFactoryProvider.friendsViewModelFactory(),
+            currentUser.id
+        )
+    )
+
     Scaffold(
         bottomBar = {
             //isBottomBarVisible 상태 정보 체크 처리
@@ -121,12 +130,6 @@ fun MainContent(
         ) {
             //친구 목록 화면
             composable<MainNavigation.FriendsScreen> {
-                val friendsViewModel: FriendsViewModel = viewModel(
-                    factory = FriendsViewModel.provideFactory(
-                        viewModelFactoryProvider.friendsViewModelFactory(),
-                        currentUser.id
-                    )
-                )
 
                 FriendsScreen(
                     currentUser = currentUser,
@@ -162,6 +165,32 @@ fun MainContent(
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
+                    },
+                    onNavigateToChatRoomCreate = {
+                        navController.navigate(MainNavigation.ChatRoomCreateScreen)
+                    }
+                )
+            }
+
+            //채팅방 생성 화면
+            composable<MainNavigation.ChatRoomCreateScreen> {
+                val chatRoomCreateViewModel:ChatRoomCreateViewModel = hiltViewModel()
+                val friends by friendsViewModel.friendsState.collectAsStateWithLifecycle()
+
+                ChatRoomCreateScreen(
+                    viewModel = chatRoomCreateViewModel,
+                    friendsState = friends,
+                    currentUser = currentUser,
+                    onNavigateToChatRoom = { chatRoomId ->
+                        navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                            popUpTo(bottomNavigationItems[selectedItem].route) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateToBack = {
+                        navController.popBackStack()
                     }
                 )
             }

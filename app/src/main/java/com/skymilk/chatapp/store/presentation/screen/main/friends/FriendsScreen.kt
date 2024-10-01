@@ -32,7 +32,6 @@ fun FriendsScreen(
 ) {
     val friendsState by viewModel.friendsState.collectAsStateWithLifecycle()
 
-
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -54,13 +53,6 @@ fun FriendsScreen(
 
             is FriendsState.Success -> {
                 val friends = (friendsState as FriendsState.Success).friends
-
-                Text(
-                    modifier = Modifier.padding(top = 10.dp, start = 15.dp),
-                    text = "친구 ${friends.size}",
-                    fontFamily = LeeSeoYunFont,
-                    fontSize = 14.sp
-                )
 
                 FriendsList(friends, onUserItemClick = { user ->
                     onNavigateToProfile(user)

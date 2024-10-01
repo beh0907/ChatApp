@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -181,7 +183,7 @@ fun TopSection(
             onNavigateToBack()
         }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                 contentDescription = null,
                 tint = Color.White
             )
@@ -306,7 +308,7 @@ private fun EditProfileSection(
 
         Icon(
             modifier = Modifier.align(Alignment.CenterEnd),
-            imageVector = Icons.Default.Edit,
+            imageVector = Icons.Rounded.Edit,
             contentDescription = null,
             tint = Color.White
         )
@@ -350,7 +352,7 @@ private fun EditProfileSection(
 
         Icon(
             modifier = Modifier.align(Alignment.CenterEnd),
-            imageVector = Icons.Default.Edit,
+            imageVector = Icons.Rounded.Edit,
             contentDescription = null,
             tint = Color.White
         )

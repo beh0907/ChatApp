@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -102,7 +104,7 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
     AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "이메일",
-        leadingIcon = Icons.Default.Email,
+        leadingIcon = Icons.Rounded.Email,
         keyboardType = KeyboardType.Email,
         value = email,
         onValueChange = { email = it }
@@ -113,7 +115,7 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
     AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "비밀번호",
-        leadingIcon = Icons.Default.Lock,
+        leadingIcon = Icons.Rounded.Lock,
         keyboardType = KeyboardType.Password,
         value = password,
         onValueChange = { password = it }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +60,7 @@ private fun TopSection(
     ) {
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
-                imageVector = Icons.Default.Close, contentDescription = null, tint = Color.White
+                imageVector = Icons.Rounded.Close, contentDescription = null, tint = Color.White
             )
         }
     }

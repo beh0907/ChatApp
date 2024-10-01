@@ -16,12 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeviceUnknown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material.icons.filled.PersonRemoveAlt1
+import androidx.compose.material.icons.rounded.ChatBubble
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.DeviceUnknown
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.PersonRemoveAlt1
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -149,7 +155,7 @@ private fun TopSection(
     ) {
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
-                imageVector = Icons.Default.Close,
+                imageVector = Icons.Rounded.Close,
                 contentDescription = null,
                 tint = Color.White
             )
@@ -233,7 +239,7 @@ fun MyProfileEventSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.ChatBubble,
+                imageVector = Icons.Rounded.ChatBubble,
                 contentDescription = null,
                 tint = Color.White
             )
@@ -261,7 +267,7 @@ fun MyProfileEventSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.Edit,
+                imageVector = Icons.Rounded.Edit,
                 contentDescription = null,
                 tint = Color.White
             )
@@ -289,7 +295,7 @@ fun MyProfileEventSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.Logout,
+                imageVector = Icons.AutoMirrored.Rounded.Logout,
                 contentDescription = null,
                 tint = Color.White
             )
@@ -341,7 +347,7 @@ fun OtherProfileEventSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.ChatBubble,
+                imageVector = Icons.Rounded.ChatBubble,
                 contentDescription = null,
                 tint = Color.White
             )
@@ -373,7 +379,7 @@ fun OtherProfileEventSection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        imageVector = if (isFriend) Icons.Default.PersonRemoveAlt1 else Icons.Default.PersonAddAlt1,
+                        imageVector = if (isFriend) Icons.Rounded.PersonRemoveAlt1 else Icons.Default.PersonAddAlt1,
                         contentDescription = null,
                         tint = Color.White
                     )
@@ -407,7 +413,7 @@ fun OtherProfileEventSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.DeviceUnknown,
+                imageVector = Icons.Rounded.DeviceUnknown,
                 contentDescription = null,
                 tint = Color.White
             )

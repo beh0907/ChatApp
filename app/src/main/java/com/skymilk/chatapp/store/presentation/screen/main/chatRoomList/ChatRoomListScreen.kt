@@ -8,10 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddComment
-import androidx.compose.material.icons.outlined.AddComment
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,8 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.dimens
@@ -37,16 +36,19 @@ fun ChatListScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatRoomListViewModel,
     currentUser: User,
-    onNavigateToChatRoom: (String) -> Unit
+    onNavigateToChatRoom: (String) -> Unit,
+    onNavigateToChatRoomCreate: () -> Unit
 ) {
     val chatListState by viewModel.chatRoomsState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        TopSection()
+        TopSection(
+            onNavigateToChatRoomCreate = onNavigateToChatRoomCreate
+        )
 
-        when(chatListState) {
+        when (chatListState) {
             is ChatRoomsState.Loading -> {
                 // 로딩 중 UI 표시
                 ChatRoomListShimmer()
@@ -66,12 +68,12 @@ fun ChatListScreen(
 
 //상단 타이틀
 @Composable
-fun TopSection() {
+fun TopSection(onNavigateToChatRoomCreate: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
@@ -81,11 +83,9 @@ fun TopSection() {
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        IconButton(onClick = {
-
-        }) {
+        IconButton(onClick = { onNavigateToChatRoomCreate() }) {
             Icon(
-                imageVector = Icons.Outlined.AddComment,
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_chat_add_on),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )

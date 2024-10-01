@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,8 +45,13 @@ fun UserSearchScreen(
     Column(
         modifier = modifier
     ) {
+        //상단바 타이틀
         TopSection(
-            onNavigateToBack = onNavigateToBack,
+            onNavigateToBack = onNavigateToBack
+        )
+
+        //검색 영역
+        UserSearchSection(
             searchUser = viewModel::searchUser
         )
 
@@ -76,60 +81,72 @@ fun UserSearchScreen(
 private fun TopSection(
     modifier: Modifier = Modifier,
     onNavigateToBack: () -> Unit,
-    searchUser: (String) -> Unit
 ) {
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(10.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 뒤로가기 버튼
         IconButton(
             onClick = { onNavigateToBack() }
         ) {
-            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로 가기")
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "뒤로 가기")
         }
 
-        // 검색어 입력 칸
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            singleLine = true,
-            placeholder = {
-                Text(
-                    text ="아이디 혹은 이름을 검색해주세요.",
-                    fontFamily = LeeSeoYunFont,
-                    color = Color.Gray,
-                )
-            },
-            trailingIcon = {
-                // 검색 버튼
-                IconButton(
-                    onClick = { searchUser(searchQuery) },
-                    enabled = searchQuery.isNotEmpty()
-                ) {
-                    Icon(Icons.Default.Search, contentDescription = "검색")
-                }
-            },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
-            ),
-            textStyle = TextStyle(
-                fontFamily = LeeSeoYunFont,
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "유저 검색",
+            fontFamily = LeeSeoYunFont,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
+}
+
+@Composable
+private fun UserSearchSection(
+    modifier: Modifier = Modifier,
+    searchUser: (String) -> Unit
+) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+
+    // 검색어 입력 칸
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        value = searchQuery,
+        onValueChange = { searchQuery = it },
+        singleLine = true,
+        placeholder = {
+            Text(
+                text ="아이디 혹은 이름을 검색해주세요.",
+                fontFamily = LeeSeoYunFont,
+                color = Color.Gray,
+            )
+        },
+        trailingIcon = {
+            // 검색 버튼
+            IconButton(
+                onClick = { searchUser(searchQuery) },
+                enabled = searchQuery.isNotEmpty()
+            ) {
+                Icon(Icons.Rounded.Search, contentDescription = "검색")
+            }
+        },
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent
+        ),
+        textStyle = TextStyle(
+            fontFamily = LeeSeoYunFont,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    )
 }

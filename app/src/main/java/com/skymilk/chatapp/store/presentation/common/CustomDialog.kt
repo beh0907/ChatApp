@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -166,7 +166,7 @@ fun CustomFullScreenEditDialog(
                     ) {
                         IconButton(onClick = onDismiss) {
                             Icon(
-                                Icons.Default.Close,
+                                Icons.Rounded.Close,
                                 contentDescription = "Close",
                                 tint = Color.White
                             )
@@ -224,7 +224,7 @@ fun CustomFullScreenEditDialog(
                         trailingIcon = {
                             IconButton(onClick = { inputText = "" }) {
                                 Icon(
-                                    imageVector = Icons.Default.Clear,
+                                    imageVector = Icons.Rounded.Clear,
                                     contentDescription = "Clear",
                                     tint = Color.White
                                 )

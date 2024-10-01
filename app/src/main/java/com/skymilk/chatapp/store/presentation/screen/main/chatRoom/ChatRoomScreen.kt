@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.AlarmOff
-import androidx.compose.material.icons.filled.AlarmOn
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -164,7 +163,7 @@ fun TopSection(
             onNavigateToBack()
         }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -179,14 +178,17 @@ fun TopSection(
         )
 
 
-        IconButton(onClick = {
-            toggleAlarmState()
-        }) {
-            Icon(
-                imageVector = if (alarmState) Icons.Default.AlarmOff else Icons.Default.AlarmOn,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+        //혼자 있는 방은 알람 자체가 발생하지 않기 때문에 설정하지 않는다
+        if (chatRoom.participants.size != 1) {
+            IconButton(onClick = {
+                toggleAlarmState()
+            }) {
+                Icon(
+                    imageVector = if (alarmState) Icons.Outlined.NotificationsOff else Icons.Outlined.Notifications,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
     }
 }
@@ -254,7 +256,7 @@ fun BottomSection(
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
                     .size(24.dp),
-                imageVector = Icons.Default.Add,
+                imageVector = Icons.Rounded.Add,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -310,7 +312,7 @@ fun BottomSection(
                     modifier = Modifier
                         .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
                         .size(24.dp),
-                    imageVector = Icons.AutoMirrored.Default.Send,
+                    imageVector = Icons.AutoMirrored.Rounded.Send,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface
                 )

@@ -17,6 +17,9 @@ sealed class MainNavigation {
     data class ChatRoomScreen(val chatRoomId: String) : MainNavigation() // 채팅방 화면
 
     @Serializable
+    data object ChatRoomCreateScreen : MainNavigation() // 채팅방 생성 화면
+
+    @Serializable
     data class ProfileScreen(val user: User) : MainNavigation() // 프로필 화면
 
     @Serializable

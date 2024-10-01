@@ -14,9 +14,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -102,7 +102,7 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
     AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "이름",
-        leadingIcon = Icons.Default.Person,
+        leadingIcon = Icons.Rounded.Person,
         keyboardType = KeyboardType.Email,
         value = name,
         onValueChange = { name = it }
@@ -113,7 +113,7 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
     AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "이메일",
-        leadingIcon = Icons.Default.Email,
+        leadingIcon = Icons.Rounded.Email,
         keyboardType = KeyboardType.Email,
         value = email,
         onValueChange = { email = it }
@@ -124,7 +124,7 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
     AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "비밀번호",
-        leadingIcon = Icons.Default.Lock,
+        leadingIcon = Icons.Rounded.Lock,
         keyboardType = KeyboardType.Password,
         value = password,
         onValueChange = { password = it }
@@ -135,7 +135,7 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
     AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         label = "비밀번호 확인",
-        leadingIcon = Icons.Default.Lock,
+        leadingIcon = Icons.Rounded.Lock,
         keyboardType = KeyboardType.Password,
         value = passwordConfirm,
         onValueChange = { passwordConfirm = it }

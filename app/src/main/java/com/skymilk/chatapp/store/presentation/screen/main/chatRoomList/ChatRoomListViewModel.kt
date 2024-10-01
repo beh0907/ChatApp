@@ -43,7 +43,6 @@ class ChatRoomListViewModel @AssistedInject constructor(
 
     init {
         loadChatRooms()
-//        createChatRoom("채팅방 ㅎㅎㅎ", listOf("HpgwjfK6feTd5Ut0P4rn2stpgOf1", "LekzbyeX6eQMODyECMYKQVphIYF3"))
     }
 
     private fun loadChatRooms() {
@@ -58,12 +57,6 @@ class ChatRoomListViewModel @AssistedInject constructor(
                 .collect { chatRooms ->
                     _chatRoomsState.value = ChatRoomsState.Success(chatRooms) // 성공 상태 설정
                 }
-        }
-    }
-
-    fun createChatRoom(name: String, participants: List<String>) {
-        viewModelScope.launch {
-            chatUseCases.createChatRoom(name, participants)
         }
     }
 }
