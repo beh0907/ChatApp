@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -124,8 +125,12 @@ fun ChatRoomScreen(
                 //채팅 입력 영역
                 BottomSection(
                     modifier = Modifier.imePadding(),
-                    onSendMessage = viewModel::sendMessage,
-                    onSendImageMessage = viewModel::sendImageMessage,
+                    onSendMessage = { sender, content ->
+                        viewModel.sendMessage(sender, content, chatRoom.participants)
+                    },
+                    onSendImageMessage = { sender, uri ->
+                        viewModel.sendImageMessage(sender, uri, chatRoom.participants)
+                    },
                     user = currentUser,
                 )
             }

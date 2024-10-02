@@ -34,6 +34,7 @@ fun AppNavigation(isDeepLink: Boolean) {
     val appStartDestination =
         if (isDeepLink) startDestination else Navigations.Start // 딥링크 정보가 있다면 로딩화면 스킵
 
+
     NavHost(
         navController = navController,
         startDestination = appStartDestination

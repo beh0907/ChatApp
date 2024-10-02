@@ -2,7 +2,11 @@ package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -129,7 +133,34 @@ fun MainContent(
             startDestination = MainNavigation.FriendsScreen
         ) {
             //친구 목록 화면
-            composable<MainNavigation.FriendsScreen> {
+            composable<MainNavigation.FriendsScreen>(
+                popEnterTransition = {
+                    when (initialState.destination.route) {
+                        MainNavigation.ChatsScreen::class.qualifiedName -> {
+                            slideInHorizontally(
+                                initialOffsetX = { -it },
+                                animationSpec = tween(300)
+                            )
+                        }
+
+                        else -> fadeIn()
+                    }
+
+
+                },
+                exitTransition = {
+                    when (targetState.destination.route) {
+                        MainNavigation.ChatsScreen::class.qualifiedName -> {
+                            slideOutHorizontally(
+                                targetOffsetX = { -it },
+                                animationSpec = tween(300)
+                            )
+                        }
+
+                        else -> fadeOut()
+                    }
+                }
+            ) {
 
                 FriendsScreen(
                     currentUser = currentUser,
@@ -149,7 +180,34 @@ fun MainContent(
             }
 
             //채팅방 목록 화면
-            composable<MainNavigation.ChatsScreen> {
+            composable<MainNavigation.ChatsScreen>(
+                enterTransition = {
+                    when (initialState.destination.route) {
+                        MainNavigation.FriendsScreen::class.qualifiedName -> {
+
+                            slideInHorizontally(
+                                initialOffsetX = { it },
+                                animationSpec = tween(300)
+                            )
+                        }
+
+                        else -> fadeIn()
+                    }
+                },
+                popExitTransition = {
+
+                    when (targetState.destination.route) {
+                        MainNavigation.FriendsScreen::class.qualifiedName -> {
+                            slideOutHorizontally(
+                                targetOffsetX = { it },
+                                animationSpec = tween(300)
+                            )
+                        }
+
+                        else -> fadeOut()
+                    }
+                }
+            ) {
                 val chatRoomListViewModel: ChatRoomListViewModel = viewModel(
                     factory = ChatRoomListViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
@@ -174,7 +232,7 @@ fun MainContent(
 
             //채팅방 생성 화면
             composable<MainNavigation.ChatRoomCreateScreen> {
-                val chatRoomCreateViewModel:ChatRoomCreateViewModel = hiltViewModel()
+                val chatRoomCreateViewModel: ChatRoomCreateViewModel = hiltViewModel()
                 val friends by friendsViewModel.friendsState.collectAsStateWithLifecycle()
 
                 ChatRoomCreateScreen(
@@ -202,14 +260,14 @@ fun MainContent(
                 ),
                 enterTransition = {
                     slideInVertically(
-                        initialOffsetY = { fullHeight -> fullHeight },
+                        initialOffsetY = { it },
                         animationSpec = tween(300)
                     )
                 },
                 popExitTransition = {
                     // 화면이 닫힐 때 위에서 아래로 슬라이드
                     slideOutVertically(
-                        targetOffsetY = { fullHeight -> fullHeight },
+                        targetOffsetY = { it },
                         animationSpec = tween(300)
                     )
                 }

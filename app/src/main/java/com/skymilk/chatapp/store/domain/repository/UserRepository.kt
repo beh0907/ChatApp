@@ -12,6 +12,8 @@ interface UserRepository {
         imageUrl: String
     ): Result<Unit> // 프로필 정보 갱신
 
+    fun updateFcmToken(userId: String, token: String) // FCM 토큰 업데이트
+
     suspend fun getUser(userId: String): Result<User> // 특정 유저 정보 가져오기
 
     fun getFriends(userId: String): Flow<List<User>> // 나의 친구 목록 가져오기

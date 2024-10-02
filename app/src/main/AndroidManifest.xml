@@ -70,6 +70,26 @@
         <meta-data
             android:name="com.google.android.gms.credentials.PROVIDE_CLIENT_ID"
             android:value="true" />
+
+
+        <!--        카카오 계정 로그인 인증-->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="${KAKAO_SDK_NATIVE_KEY}"/>
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${KAKAO_SDK_NATIVE_KEY}" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

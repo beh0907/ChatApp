@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectionUserItem
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable

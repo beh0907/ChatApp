@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.auth
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.model.User
@@ -57,6 +58,26 @@ class AuthViewModel @Inject constructor(
     fun signInWithGoogle() {
         viewModelScope.launch {
             authUseCases.signInWithGoogle()
+                .catch { exception ->
+                    _authState.update {
+                        val message = exception.message ?: "Unknown error"
+                        //토스트 메시지 전달
+                        sendEvent(Event.Toast(message))
+
+                        AuthState.Error(message)
+                    }
+                }
+                .collectLatest { user ->
+                    checkSignInResult(user)
+                }
+        }
+    }
+
+    //카카오 로그인
+    //카카오 로그인 화면 전환 시 activity로 이동하기 때문에 acitivity가 필요하다
+    fun signInWithKakao(activity: Activity) {
+        viewModelScope.launch {
+            authUseCases.signInWithKakao(activity)
                 .catch { exception ->
                     _authState.update {
                         val message = exception.message ?: "Unknown error"

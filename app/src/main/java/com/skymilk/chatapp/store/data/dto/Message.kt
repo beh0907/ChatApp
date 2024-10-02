@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Message(
+//    @SerialName("token")
+//    val token: List<String>,
     @SerialName("topic")
     val topic: String,
     @SerialName("data")

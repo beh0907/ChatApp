@@ -6,6 +6,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
+import com.kakao.sdk.user.UserApiClient
 import com.skymilk.chatapp.BuildConfig
 import com.skymilk.chatapp.store.data.remote.FcmApi
 import com.skymilk.chatapp.utils.Constants
@@ -46,8 +47,12 @@ object AppModule {
     //파이어베이스 메시지 초기화
     @Provides
     @Singleton
-    fun provideFirebaseMessage() = FirebaseMessaging.getInstance()
+    fun provideFirebaseMessaging() = FirebaseMessaging.getInstance()
 
+    //카카오 로그인 인스턴스
+    @Provides
+    @Singleton
+    fun provideKakaoUserApiClient() = UserApiClient.instance
 
     // Retrofit 객체 생성
     @Singleton

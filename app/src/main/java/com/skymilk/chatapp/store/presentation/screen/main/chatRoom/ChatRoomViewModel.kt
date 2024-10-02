@@ -112,23 +112,23 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
-    fun sendMessage(sender: User, content: String) {
+    fun sendMessage(sender: User, content: String, participants: List<User>) {
         viewModelScope.launch {
             try {
-                chatUseCases.sendMessage(chatRoomId, sender, content)
+                chatUseCases.sendMessage(chatRoomId, sender, content, participants)
             } catch (e: Exception) {
                 //에러 처리
             }
         }
     }
 
-    fun sendImageMessage(sender: User, imageUri: Uri) {
+    fun sendImageMessage(sender: User, imageUri: Uri, participants: List<User>) {
         //이미지 업로드 결과
         uploadImage(sender.id, imageUri) { url ->
 
             viewModelScope.launch {
                 try {
-                    chatUseCases.sendImageMessage(chatRoomId, sender, url)
+                    chatUseCases.sendImageMessage(chatRoomId, sender, url, participants)
                 } catch (e: Exception) {
                     _uploadState.value =
                         ImageUploadState.Error("Failed to send image message: ${e.message}")

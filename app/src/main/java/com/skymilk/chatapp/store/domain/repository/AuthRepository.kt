@@ -1,11 +1,14 @@
 package com.skymilk.chatapp.store.domain.repository
 
+import android.app.Activity
 import com.skymilk.chatapp.store.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
 
     fun signInWithGoogle(): Flow<User>
+
+    fun signInWithKakao(activity: Activity): Flow<User>
 
     fun signInWithEmailAndPassword(email: String, password: String): Flow<User>
 

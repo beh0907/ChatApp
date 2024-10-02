@@ -9,6 +9,7 @@ import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
 import com.skymilk.chatapp.store.domain.usecase.auth.GetCurrentUser
 import com.skymilk.chatapp.store.domain.usecase.auth.SignInWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.auth.SignInWithGoogle
+import com.skymilk.chatapp.store.domain.usecase.auth.SignInWithKakao
 import com.skymilk.chatapp.store.domain.usecase.auth.SignOut
 import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
@@ -33,6 +34,7 @@ import com.skymilk.chatapp.store.domain.usecase.user.GetIsFriend
 import com.skymilk.chatapp.store.domain.usecase.user.GetUser
 import com.skymilk.chatapp.store.domain.usecase.user.SearchUser
 import com.skymilk.chatapp.store.domain.usecase.user.SetFriend
+import com.skymilk.chatapp.store.domain.usecase.user.UpdateFcmToken
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import dagger.Module
@@ -50,6 +52,7 @@ object UseCaseModule {
     fun provideAuthUseCase(authRepository: AuthRepository): AuthUseCases =
         AuthUseCases(
             SignInWithGoogle(authRepository),
+            SignInWithKakao(authRepository),
             SignInWithEmailAndPassword(authRepository),
             SignUpWithEmailAndPassword(authRepository),
             SignOut(authRepository),
@@ -74,6 +77,7 @@ object UseCaseModule {
     fun provideUserUseCase(userRepository: UserRepository): UserUseCases =
         UserUseCases(
             UpdateProfile(userRepository),
+            UpdateFcmToken(userRepository),
             GetUser(userRepository),
             GetFriends(userRepository),
             GetIsFriend(userRepository),

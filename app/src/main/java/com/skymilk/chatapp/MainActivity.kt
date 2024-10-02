@@ -1,7 +1,11 @@
 package com.skymilk.chatapp
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -11,9 +15,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.firebase.messaging.FirebaseMessaging
 import com.skymilk.chatapp.store.presentation.navigation.AppNavigation
 import com.skymilk.chatapp.ui.theme.ChatAppTheme
 import com.skymilk.chatapp.utils.Event
@@ -21,9 +28,17 @@ import com.skymilk.chatapp.utils.EventBus.events
 import com.skymilk.chatapp.utils.PermissionUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +61,21 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+//    fun getKeyHash() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            val packageInfo = applicationContext.packageManager.getPackageInfo(applicationContext.packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+//            for (signature in packageInfo.signingInfo!!.apkContentsSigners) {
+//                try {
+//                    val md = MessageDigest.getInstance("SHA")
+//                    md.update(signature.toByteArray())
+//                    Log.d("getKeyHash", "key hash: ${Base64.encodeToString(md.digest(), Base64.NO_WRAP)}")
+//                } catch (e: NoSuchAlgorithmException) {
+//                    Log.w("getKeyHash", "Unable to get MessageDigest. signature=$signature", e)
+//                }
+//            }
+//        }
+//    }
 
     @Composable
     private fun SetObserveMessage() {

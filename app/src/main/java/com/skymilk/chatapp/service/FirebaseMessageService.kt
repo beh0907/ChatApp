@@ -14,7 +14,9 @@ import com.google.firebase.messaging.RemoteMessage
 import com.skymilk.chatapp.MainActivity
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
+import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -27,13 +29,21 @@ class FirebaseMessageService : FirebaseMessagingService() {
     @Inject
     lateinit var settingUseCases: SettingUseCases
 
+    @Inject
+    lateinit var userUseCases: UserUseCases
+
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+
+        // 현재 로그인된 사용자가 있는 경우에만 토큰 업데이트
+        firebaseAuth.currentUser?.let { user ->
+            userUseCases.updateFcmToken(user.uid, token)
+        }
+    }
+
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-
-        //받은 메시지는 알림 출력
-//        message.notification?.let {
-//            showNotification(it.title, it.body, message.data)
-//        }
 
         val title = message.notification?.title ?: message.data["title"]
         val body = message.notification?.body ?: message.data["body"]

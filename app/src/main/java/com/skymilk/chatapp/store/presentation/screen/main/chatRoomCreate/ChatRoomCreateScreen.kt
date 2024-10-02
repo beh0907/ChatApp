@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectedUserList
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 

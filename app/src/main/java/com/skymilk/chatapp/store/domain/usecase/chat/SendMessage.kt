@@ -7,8 +7,18 @@ import javax.inject.Inject
 class SendMessage @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-    suspend operator fun invoke(chatRoomId: String, sender: User, content: String): Result<Unit> {
-        return chatRepository.sendMessage(chatRoomId, sender, content)
+    suspend operator fun invoke(
+        chatRoomId: String,
+        sender: User,
+        content: String,
+        participants: List<User>
+    ): Result<Unit> {
+        return chatRepository.sendMessage(
+            chatRoomId,
+            sender,
+            content,
+            participants
+        )
     }
 
 }

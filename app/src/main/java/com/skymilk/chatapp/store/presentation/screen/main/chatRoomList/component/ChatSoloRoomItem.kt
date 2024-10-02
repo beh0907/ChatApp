@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

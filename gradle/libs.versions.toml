@@ -30,6 +30,7 @@ tedimagepicker = "1.6.1"
 tedpermissionCoroutine = "3.4.2"
 transformations = "2.0.3"
 loggingInterceptor = "4.12.0"
+v2User = "2.20.6"
 
 
 [libraries]
@@ -77,6 +78,7 @@ tedpermission-coroutine = { module = "io.github.ParkSangGwon:tedpermission-corou
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kakao-sdk-user = { module = "com.kakao.sdk:v2-user", version.ref = "v2User" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -168,7 +168,8 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun sendMessage(
         chatRoomId: String,
         sender: User,
-        content: String
+        content: String,
+        participants:List<User>
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val messagesRef = firebaseDatabase.getReference("messages").child(chatRoomId)
@@ -198,7 +199,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .await()
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
-            sendFcmMessage(chatRoomId, sender, content)
+            sendFcmMessage(chatRoomId, sender, content, participants)
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -210,7 +211,8 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun sendImageMessage(
         chatRoomId: String,
         sender:User,
-        content: String
+        content: String,
+        participants:List<User>
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val chatMessage = ChatMessage(
@@ -241,7 +243,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .await()
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
-            sendFcmMessage(chatRoomId, sender, "이미지")
+            sendFcmMessage(chatRoomId, sender, "이미지", participants)
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -295,10 +297,15 @@ class ChatRepositoryImpl @Inject constructor(
     private suspend fun sendFcmMessage(
         chatRoomId: String,
         sender: User,
-        body: String
+        body: String,
+        participants: List<User>
     ) {
+
+//        val tokens = participants.map { it.fcmToken }
+
         val fcmMessage = FcmMessage(
             message = Message(
+//                token = tokens,
                 topic = "${Constants.FCM_TOPIC_PREFIX}$chatRoomId",
                 data = mapOf(
                     "chatRoomId" to chatRoomId,

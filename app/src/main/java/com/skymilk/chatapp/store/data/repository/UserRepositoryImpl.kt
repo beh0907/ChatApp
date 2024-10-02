@@ -11,10 +11,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.utils.FirebaseUtil
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -61,6 +63,23 @@ class UserRepositoryImpl @Inject constructor(
             handleUserError(e)
         }
     }
+
+    override fun updateFcmToken(userId: String, token: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val userRef = firebaseFireStore.collection("users").document(userId)
+
+                val updates = hashMapOf<String, Any>(
+                    "fcmToken" to token
+                )
+
+                userRef.update(updates).await()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
     override suspend fun getUser(userId: String): Result<User> = withContext(Dispatchers.IO) {
         try {

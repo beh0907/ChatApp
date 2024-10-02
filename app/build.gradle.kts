@@ -31,6 +31,7 @@ android {
             useSupportLibrary = true
         }
 
+
         buildConfigField(
             "String",
             "GOOGLE_AUTH_WEB_CLIENT_ID",
@@ -48,6 +49,14 @@ android {
             "FIREBASE_ADMIN_KEY",
             properties.getProperty("firebase.admin.key")
         )
+
+        buildConfigField(
+            "String",
+            "KAKAO_SDK_NATIVE_KEY",
+            properties.getProperty("kakao.sdk.native.key")
+        )
+
+        manifestPlaceholders["KAKAO_SDK_NATIVE_KEY"] = properties.getProperty("kakao.sdk.native.key")
     }
 
     buildTypes {
@@ -106,14 +115,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //serialization
-    implementation (libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.json)
 
     //ConstraintLayout
-    implementation (libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.constraintlayout.compose)
 
     //Ted
     implementation(libs.tedpermission.coroutine) // permissions
-    implementation (libs.tedimagepicker) // ImagePicker
+    implementation(libs.tedimagepicker) // ImagePicker
 
     // Coil Image
     implementation(libs.coil)
@@ -150,7 +159,10 @@ dependencies {
     implementation(libs.firebase.messaging)
 
     //google oauth2
-    implementation (libs.google.auth.library.oauth2.http)
+    implementation(libs.google.auth.library.oauth2.http)
+
+    //Kakao Login
+    implementation(libs.kakao.sdk.user)
 
     //Dagger Hilt
     implementation(libs.hilt.android)
@@ -165,8 +177,8 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
-    implementation (libs.logging.interceptor)
+    implementation(libs.logging.interceptor)
 
     //Datastore
-    implementation (libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences)
 }

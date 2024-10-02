@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.auth.signIn
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
@@ -35,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -88,7 +88,10 @@ fun SignInScreen(
         ) {
             SignInSection(viewModel::signInWithEmailAndPassword)
             Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
-            SocialSection(viewModel::signInWithGoogle)
+            SocialSection(
+                onSignInWithGoogle = viewModel::signInWithGoogle,
+                onSignInWithKaKao = viewModel::signInWithKakao
+            )
         }
 
         CreateSection(onNavigateToSignUp)
@@ -142,7 +145,12 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
 
 //소셜 로그인 OR 회원가입 영역
 @Composable
-private fun SocialSection(onSignInWithGoogleClick: () -> Unit) {
+private fun SocialSection(
+    onSignInWithGoogle: () -> Unit,
+    onSignInWithKaKao: (Activity) -> Unit,
+) {
+    val context = LocalContext.current
+
     Column(horizontalAlignment = CenterHorizontally) {
         Text(
             text = "다른 방식으로 로그인 하시겠습니까?",
@@ -154,20 +162,20 @@ private fun SocialSection(onSignInWithGoogleClick: () -> Unit) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             SignInSocialMedia(
                 modifier = Modifier.weight(weight = 1f),
-                icon = R.drawable.google,
+                icon = R.drawable.ic_google,
                 text = "google"
             ) {
-                onSignInWithGoogleClick()
+                onSignInWithGoogle()
             }
 
             Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
 
             SignInSocialMedia(
                 modifier = Modifier.weight(weight = 1f),
-                icon = R.drawable.facebook,
-                text = "face book"
+                icon = R.drawable.ic_kakao,
+                text = "카카오"
             ) {
-
+                onSignInWithKaKao(context as Activity)
             }
         }
     }
