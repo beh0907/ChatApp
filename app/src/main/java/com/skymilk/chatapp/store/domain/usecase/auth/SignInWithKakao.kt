@@ -1,6 +1,6 @@
 package com.skymilk.chatapp.store.domain.usecase.auth
 
-import android.app.Activity
+import com.kakao.sdk.auth.model.OAuthToken
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
@@ -9,8 +9,8 @@ import javax.inject.Inject
 class SignInWithKakao @Inject constructor(
     private val authRepository: AuthRepository
 ) {
-    operator fun invoke(activity: Activity): Flow<User> {
-        return authRepository.signInWithKakao(activity)
+    operator fun invoke(kakaoToken: OAuthToken): Flow<User> {
+        return authRepository.signInWithKakao(kakaoToken.idToken!!, kakaoToken.accessToken)
     }
 
 }

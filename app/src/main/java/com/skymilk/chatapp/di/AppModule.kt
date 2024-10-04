@@ -49,11 +49,6 @@ object AppModule {
     @Singleton
     fun provideFirebaseMessaging() = FirebaseMessaging.getInstance()
 
-    //카카오 로그인 인스턴스
-    @Provides
-    @Singleton
-    fun provideKakaoUserApiClient() = UserApiClient.instance
-
     // Retrofit 객체 생성
     @Singleton
     @Provides

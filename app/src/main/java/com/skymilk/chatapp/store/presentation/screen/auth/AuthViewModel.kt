@@ -3,6 +3,8 @@ package com.skymilk.chatapp.store.presentation.screen.auth
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.kakao.sdk.auth.model.OAuthToken
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
 import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation
@@ -55,9 +57,15 @@ class AuthViewModel @Inject constructor(
     }
 
     //구글 로그인
-    fun signInWithGoogle() {
+    fun signInWithGoogle(googleIdTokenCredential: GoogleIdTokenCredential?) {
         viewModelScope.launch {
-            authUseCases.signInWithGoogle()
+            if (googleIdTokenCredential == null) {
+                //토스트 메시지 전달
+                sendEvent(Event.Toast("구글 로그인에 실패하였습니다."))
+                return@launch
+            }
+
+            authUseCases.signInWithGoogle(googleIdTokenCredential)
                 .catch { exception ->
                     _authState.update {
                         val message = exception.message ?: "Unknown error"
@@ -75,9 +83,15 @@ class AuthViewModel @Inject constructor(
 
     //카카오 로그인
     //카카오 로그인 화면 전환 시 activity로 이동하기 때문에 acitivity가 필요하다
-    fun signInWithKakao(activity: Activity) {
+    fun signInWithKakao(kakaoToken: OAuthToken?) {
         viewModelScope.launch {
-            authUseCases.signInWithKakao(activity)
+            if (kakaoToken == null) {
+                //토스트 메시지 전달
+                sendEvent(Event.Toast("카카오 로그인에 실패하였습니다."))
+                return@launch
+            }
+
+            authUseCases.signInWithKakao(kakaoToken)
                 .catch { exception ->
                     _authState.update {
                         val message = exception.message ?: "Unknown error"

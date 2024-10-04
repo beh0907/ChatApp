@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -44,12 +45,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.user.UserApiClient
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.ui.theme.dimens
+import com.skymilk.chatapp.utils.CredentialUtil
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
@@ -146,10 +152,11 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
 //소셜 로그인 OR 회원가입 영역
 @Composable
 private fun SocialSection(
-    onSignInWithGoogle: () -> Unit,
-    onSignInWithKaKao: (Activity) -> Unit,
+    onSignInWithGoogle: (GoogleIdTokenCredential?) -> Unit,
+    onSignInWithKaKao: (OAuthToken?) -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Column(horizontalAlignment = CenterHorizontally) {
         Text(
@@ -163,9 +170,13 @@ private fun SocialSection(
             SignInSocialMedia(
                 modifier = Modifier.weight(weight = 1f),
                 icon = R.drawable.ic_google,
-                text = "google"
+                text = "google 로그인",
+                backgroundColor = Color.White,
             ) {
-                onSignInWithGoogle()
+                scope.launch {
+                    val googleIdTokenCredential = CredentialUtil.getGoogleIdTokenCredential(context)
+                    onSignInWithGoogle(googleIdTokenCredential)
+                }
             }
 
             Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
@@ -173,9 +184,13 @@ private fun SocialSection(
             SignInSocialMedia(
                 modifier = Modifier.weight(weight = 1f),
                 icon = R.drawable.ic_kakao,
-                text = "카카오"
+                text = "카카오 로그인",
+                backgroundColor = Color(0xFFFEE500),
             ) {
-                onSignInWithKaKao(context as Activity)
+                scope.launch {
+                    val kakaoToken = CredentialUtil.getKakaoToken(context as Activity, UserApiClient.instance)
+                    onSignInWithKaKao(kakaoToken)
+                }
             }
         }
     }

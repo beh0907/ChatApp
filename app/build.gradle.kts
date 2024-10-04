@@ -1,4 +1,3 @@
-import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -9,11 +8,17 @@ plugins {
     kotlin("kapt")
     id("kotlin-parcelize")
     kotlin("plugin.serialization") version "1.9.22"
+    alias(libs.plugins.compose.compiler)
 }
 
-// local.properties 사용을 위함
-val properties = Properties()
-properties.load(FileInputStream(rootProject.file("local.properties")))
+//kotlin 2.0.0으로 버전업 하면서 사용불가
+//val properties = Properties()
+//properties.load(FileInputStream(rootProject.file("local.properties")))
+
+// local.properties 사용
+val localProperties = rootProject.file("local.properties").inputStream().use {
+    Properties().apply { load(it) }
+}
 
 android {
     namespace = "com.skymilk.chatapp"
@@ -35,28 +40,29 @@ android {
         buildConfigField(
             "String",
             "GOOGLE_AUTH_WEB_CLIENT_ID",
-            properties.getProperty("google.auth.web.client.id")
+            localProperties.getProperty("google.auth.web.client.id")
         )
 
         buildConfigField(
             "String",
             "FIREBASE_DATABASE_URL",
-            properties.getProperty("firebase.database.url")
+            localProperties.getProperty("firebase.database.url")
         )
 
         buildConfigField(
             "String",
             "FIREBASE_ADMIN_KEY",
-            properties.getProperty("firebase.admin.key")
+            localProperties.getProperty("firebase.admin.key")
         )
 
         buildConfigField(
             "String",
             "KAKAO_SDK_NATIVE_KEY",
-            properties.getProperty("kakao.sdk.native.key")
+            localProperties.getProperty("kakao.sdk.native.key")
         )
 
-        manifestPlaceholders["KAKAO_SDK_NATIVE_KEY"] = properties.getProperty("kakao.sdk.native.key")
+        manifestPlaceholders["KAKAO_SDK_NATIVE_KEY"] =
+            localProperties.getProperty("kakao.sdk.native.key")
     }
 
     buildTypes {
@@ -80,8 +86,11 @@ android {
         buildConfig = true
         dataBinding = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+    composeCompiler {
+        enableStrongSkippingMode = true
+        includeSourceInformation = true
+        // composeCompiler 블록내의 설정들은 하단 Reference를 참고해보세요
+        // Compose compiler -> Compose compiler options dsl
     }
     packaging {
         resources {
