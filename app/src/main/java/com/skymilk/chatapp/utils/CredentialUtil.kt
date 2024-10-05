@@ -52,10 +52,6 @@ object CredentialUtil {
                     continuation.resume(null)
                 }
             }
-            Log.d(
-                "getKakaoToken",
-                "카톡 설치 여부 : ${kakaoUserApiClient.isKakaoTalkLoginAvailable(activity)}"
-            )
 
             if (kakaoUserApiClient.isKakaoTalkLoginAvailable(activity)) {
                 kakaoUserApiClient.loginWithKakaoTalk(activity) { token, error ->

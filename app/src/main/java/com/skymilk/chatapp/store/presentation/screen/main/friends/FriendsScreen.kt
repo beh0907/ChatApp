@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
@@ -53,6 +54,11 @@ fun FriendsScreen(
 
             is FriendsState.Success -> {
                 val friends = (friendsState as FriendsState.Success).friends
+
+                if (friends.isEmpty()) {
+                    EmptyScreen("등록된 친구가 없습니다.")
+                    return
+                }
 
                 FriendsList(friends, onUserItemClick = { user ->
                     onNavigateToProfile(user)

@@ -42,12 +42,7 @@ fun SelectionUserItem(
             modifier = Modifier
                 .size(50.dp)
                 .clip(RoundedCornerShape(4.dp)),
-            model = ImageRequest.Builder(
-                LocalContext.current
-            )
-                .data(user.profileImageUrl)
-                .crossfade(true)
-                .build(),
+            model = user.profileImageUrl,
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

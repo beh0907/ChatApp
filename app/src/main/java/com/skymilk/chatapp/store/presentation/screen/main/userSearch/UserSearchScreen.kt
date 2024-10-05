@@ -18,7 +18,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
@@ -63,6 +63,11 @@ fun UserSearchScreen(
 
             is UserSearchState.Success -> {
                 val users = (userSearchState as UserSearchState.Success).users
+
+                if (users.isEmpty()) {
+                    EmptyScreen("검색 결과가 없습니다.")
+                    return
+                }
 
                 UserSearchList(
                     currentUser = currentUser,
@@ -122,7 +127,7 @@ private fun UserSearchSection(
         singleLine = true,
         placeholder = {
             Text(
-                text ="아이디 혹은 이름을 검색해주세요.",
+                text = "아이디 혹은 이름을 검색해주세요.",
                 fontFamily = LeeSeoYunFont,
                 color = Color.Gray,
             )

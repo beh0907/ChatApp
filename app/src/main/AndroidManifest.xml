@@ -73,9 +73,6 @@
 
 
         <!--        카카오 계정 로그인 인증-->
-        <meta-data
-            android:name="com.kakao.sdk.AppKey"
-            android:value="${KAKAO_SDK_NATIVE_KEY}"/>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -87,7 +84,7 @@
 
                 <data
                     android:host="oauth"
-                    android:scheme="kakao${KAKAO_SDK_NATIVE_KEY}" />
+                    android:scheme="@string/KAKAO_SDK_OAUTH_SCHEME" />
             </intent-filter>
         </activity>
     </application>

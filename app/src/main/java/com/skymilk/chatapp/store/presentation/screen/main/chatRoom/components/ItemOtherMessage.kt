@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -26,12 +27,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
@@ -40,6 +42,7 @@ import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.utils.DateUtil
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun ItemOtherMessage(
     chatMessage: ChatMessage,
@@ -61,10 +64,11 @@ fun ItemOtherMessage(
             verticalAlignment = Alignment.Bottom
         ) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(sender.profileImageUrl)
-                    .crossfade(true)
-                    .build(),
+                model = if (sender.profileImageUrl.isNullOrBlank()) {
+                    painterResource(id = R.drawable.bg_default_profile)
+                } else {
+                    sender.profileImageUrl
+                },
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(40.dp)
@@ -149,6 +153,7 @@ fun ItemOtherMessage(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun ItemOtherMessageShimmer() {
     BoxWithConstraints(

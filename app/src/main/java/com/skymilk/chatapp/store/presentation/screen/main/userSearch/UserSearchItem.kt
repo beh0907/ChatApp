@@ -17,10 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -44,12 +44,11 @@ fun UserSearchItem(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(4.dp)),
-            model = ImageRequest.Builder(
-                LocalContext.current
-            )
-                .data(user.profileImageUrl)
-                .crossfade(true)
-                .build(),
+            model = if (user.profileImageUrl.isNullOrBlank()) {
+                painterResource(id = R.drawable.bg_default_profile)
+            } else {
+                user.profileImageUrl
+            },
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

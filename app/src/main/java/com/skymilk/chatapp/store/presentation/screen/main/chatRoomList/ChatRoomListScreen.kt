@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomListShimmer
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -59,6 +60,11 @@ fun ChatListScreen(
             is ChatRoomsState.Success -> {
                 //로딩이 완료 됐을 때 표시
                 val chatRooms = (chatListState as ChatRoomsState.Success).chatRooms
+
+                if (chatRooms.isEmpty()) {
+                    EmptyScreen("등록된 채팅방이 없습니다.")
+                    return
+                }
 
                 ChatRoomList(chatRooms, currentUser, onNavigateToChatRoom)
             }

@@ -91,6 +91,7 @@ fun AppNavigation(isDeepLink: Boolean) {
         composable<Navigations.Main> {
             val currentUser = (authState as? AuthState.Authenticated)?.user
             if (currentUser != null) {
+
                 MainContent(
                     currentUser = currentUser,
                     onSignOut = {

@@ -45,9 +45,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -182,7 +184,11 @@ fun UserProfileSection(
                         onNavigateToImageViewer(it)
                     }
                 },
-            model = user.profileImageUrl ?: "https://via.placeholder.com/150",
+            model = if (user.profileImageUrl.isNullOrBlank()) {
+                painterResource(id = R.drawable.bg_default_profile)
+            } else {
+                user.profileImageUrl
+            },
             contentScale = ContentScale.Crop,
             contentDescription = null
         )

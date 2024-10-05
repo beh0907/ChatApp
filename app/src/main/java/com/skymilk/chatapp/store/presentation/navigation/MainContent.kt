@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -58,6 +59,7 @@ fun MainContent(
     onSignOut: () -> Unit,
     parentNavController: NavHostController
 ) {
+
     //하단 탭 메뉴
     val bottomNavigationItems = remember {
         listOf(

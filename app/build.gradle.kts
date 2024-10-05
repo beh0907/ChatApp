@@ -61,8 +61,7 @@ android {
             localProperties.getProperty("kakao.sdk.native.key")
         )
 
-        manifestPlaceholders["KAKAO_SDK_NATIVE_KEY"] =
-            localProperties.getProperty("kakao.sdk.native.key")
+        resValue("string", "KAKAO_SDK_OAUTH_SCHEME", localProperties.getProperty("kakao.sdk.oauth.scheme"))
     }
 
     buildTypes {
