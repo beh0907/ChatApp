@@ -6,5 +6,5 @@ sealed class UserSearchState {
     data object Initial : UserSearchState()
     data object Loading : UserSearchState()
     data class Success(val users: List<User>) : UserSearchState()
-    data class Error(val message: String?) : UserSearchState()
+    data class Error(val message: String) : UserSearchState()
 }

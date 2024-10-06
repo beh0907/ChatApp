@@ -24,7 +24,10 @@ import com.skymilk.chatapp.store.domain.usecase.setting.DeleteAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSettingAsync
 import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmsSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.GetUserSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.GetUserSettingAsync
 import com.skymilk.chatapp.store.domain.usecase.setting.SaveAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.setting.SaveUserSetting
 import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveProfileImage
@@ -95,12 +98,16 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideSettingUseCase(settingRepository: SettingRepository): SettingUseCases =
+    fun provideSettingUseCases(settingRepository: SettingRepository): SettingUseCases =
         SettingUseCases(
             GetAlarmSetting(settingRepository),
             GetAlarmSettingAsync(settingRepository),
             GetAlarmsSetting(settingRepository),
             SaveAlarmSetting(settingRepository),
-            DeleteAlarmSetting(settingRepository)
+            DeleteAlarmSetting(settingRepository),
+
+            GetUserSetting(settingRepository),
+            GetUserSettingAsync(settingRepository),
+            SaveUserSetting(settingRepository),
         )
 }

@@ -6,10 +6,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Message(
-//    @SerialName("token")
-//    val token: List<String>,
-    @SerialName("topic")
-    val topic: String,
+    @SerialName("token")
+    val token: String = "",
+//    @SerialName("topic")
+//    val topic: String,
     @SerialName("data")
     val data: Map<String, String>,
     @SerialName("android")

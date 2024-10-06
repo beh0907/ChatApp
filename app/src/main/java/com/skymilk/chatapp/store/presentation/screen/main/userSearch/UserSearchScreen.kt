@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
+import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 
 @Composable
@@ -77,7 +78,11 @@ fun UserSearchScreen(
 
             }
 
-            is UserSearchState.Error -> {}
+            is UserSearchState.Error -> {
+                val message = (userSearchState as UserSearchState.Error).message
+
+                ErrorScreen(message = message)
+            }
         }
     }
 }

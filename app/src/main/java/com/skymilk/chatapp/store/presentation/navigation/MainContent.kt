@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,7 +13,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,6 +49,8 @@ import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.setting.SettingScreen
+import com.skymilk.chatapp.store.presentation.screen.main.setting.SettingViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.userSearch.UserSearchScreen
 import com.skymilk.chatapp.store.presentation.screen.main.userSearch.UserSearchViewModel
 import dagger.hilt.android.EntryPointAccessors
@@ -75,12 +78,12 @@ fun MainContent(
                 title = "채팅",
                 route = MainNavigation.ChatsScreen
             ),
-//            BottomNavigationItem(
-//                icon = Icons.Outlined.Person,
-//                selectedIcon = Icons.Filled.Person,
-//                title = "프로필",
-//                route = MainNavigation.ProfileScreen.route
-//            )
+            BottomNavigationItem(
+                icon = Icons.Outlined.Settings,
+                selectedIcon = Icons.Filled.Settings,
+                title = "설정",
+                route = MainNavigation.SettingScreen
+            )
         )
     }
 
@@ -135,34 +138,7 @@ fun MainContent(
             startDestination = MainNavigation.FriendsScreen
         ) {
             //친구 목록 화면
-            composable<MainNavigation.FriendsScreen>(
-                popEnterTransition = {
-                    when (initialState.destination.route) {
-                        MainNavigation.ChatsScreen::class.qualifiedName -> {
-                            slideInHorizontally(
-                                initialOffsetX = { -it },
-                                animationSpec = tween(300)
-                            )
-                        }
-
-                        else -> fadeIn()
-                    }
-
-
-                },
-                exitTransition = {
-                    when (targetState.destination.route) {
-                        MainNavigation.ChatsScreen::class.qualifiedName -> {
-                            slideOutHorizontally(
-                                targetOffsetX = { -it },
-                                animationSpec = tween(300)
-                            )
-                        }
-
-                        else -> fadeOut()
-                    }
-                }
-            ) {
+            composable<MainNavigation.FriendsScreen> {
 
                 FriendsScreen(
                     currentUser = currentUser,
@@ -182,34 +158,7 @@ fun MainContent(
             }
 
             //채팅방 목록 화면
-            composable<MainNavigation.ChatsScreen>(
-                enterTransition = {
-                    when (initialState.destination.route) {
-                        MainNavigation.FriendsScreen::class.qualifiedName -> {
-
-                            slideInHorizontally(
-                                initialOffsetX = { it },
-                                animationSpec = tween(300)
-                            )
-                        }
-
-                        else -> fadeIn()
-                    }
-                },
-                popExitTransition = {
-
-                    when (targetState.destination.route) {
-                        MainNavigation.FriendsScreen::class.qualifiedName -> {
-                            slideOutHorizontally(
-                                targetOffsetX = { it },
-                                animationSpec = tween(300)
-                            )
-                        }
-
-                        else -> fadeOut()
-                    }
-                }
-            ) {
+            composable<MainNavigation.ChatsScreen>{
                 val chatRoomListViewModel: ChatRoomListViewModel = viewModel(
                     factory = ChatRoomListViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
@@ -228,6 +177,20 @@ fun MainContent(
                     },
                     onNavigateToChatRoomCreate = {
                         navController.navigate(MainNavigation.ChatRoomCreateScreen)
+                    }
+                )
+            }
+
+            composable<MainNavigation.SettingScreen> {
+                val settingViewModel: SettingViewModel = hiltViewModel()
+
+                SettingScreen(
+                    currentUser = currentUser,
+                    viewModel = settingViewModel,
+                    onNavigateToProfile = { user: User ->
+                        navController.navigate(
+                            MainNavigation.ProfileScreen(user = user)
+                        )
                     }
                 )
             }

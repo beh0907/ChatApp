@@ -12,6 +12,9 @@ sealed class MainNavigation {
     @Serializable
     data object ChatsScreen : MainNavigation() // 채팅 목록 탭
 
+    @Serializable
+    data object SettingScreen : MainNavigation() // 설정 화면
+
     //하단 바가 없는 화면
     @Serializable
     data class ChatRoomScreen(val chatRoomId: String) : MainNavigation() // 채팅방 화면

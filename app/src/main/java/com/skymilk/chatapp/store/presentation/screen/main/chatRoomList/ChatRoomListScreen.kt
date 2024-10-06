@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
+import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomListShimmer
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -52,6 +53,8 @@ fun ChatListScreen(
         )
 
         when (chatListState) {
+            is ChatRoomsState.Initial -> {}
+
             is ChatRoomsState.Loading -> {
                 // 로딩 중 UI 표시
                 ChatRoomListShimmer()
@@ -69,7 +72,12 @@ fun ChatListScreen(
                 ChatRoomList(chatRooms, currentUser, onNavigateToChatRoom)
             }
 
-            else -> Unit
+            is ChatRoomsState.Error -> {
+                // 에러 발생 시 표시
+                val message = (chatListState as ChatRoomsState.Error).message
+
+                ErrorScreen(message = message, retry = viewModel::loadChatRooms)
+            }
         }
     }
 }

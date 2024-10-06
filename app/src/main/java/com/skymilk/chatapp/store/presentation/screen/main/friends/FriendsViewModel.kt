@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.friends
 
+import android.R.id.message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -44,13 +45,17 @@ class FriendsViewModel @AssistedInject constructor(
         loadFriends()
     }
 
-    private fun loadFriends() {
+    fun loadFriends() {
         viewModelScope.launch {
             userUseCases.getFriends(userId)
                 .onStart {
                     _friendsState.value = FriendsState.Loading
                 }.catch { exception ->
-                    sendEvent(Event.Toast(exception.message ?: "Unknown error"))
+//                    val message = exception.message ?: "친구 목록을 불러오지 못하였습니다."
+                    val message = "친구 목록을 불러오지 못하였습니다."
+
+                    sendEvent(Event.Toast(message))
+                    _friendsState.value = FriendsState.Error(message)
                 }.collectLatest { friends ->
                     _friendsState.value = FriendsState.Success(friends)
                 }

@@ -21,11 +21,13 @@ import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
-import com.skymilk.chatapp.utils.Constants
 import com.skymilk.chatapp.utils.FirebaseUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
@@ -169,7 +171,7 @@ class ChatRepositoryImpl @Inject constructor(
         chatRoomId: String,
         sender: User,
         content: String,
-        participants:List<User>
+        participants: List<User>
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val messagesRef = firebaseDatabase.getReference("messages").child(chatRoomId)
@@ -210,9 +212,9 @@ class ChatRepositoryImpl @Inject constructor(
     // 이미지 메시지 전달 (Realtime Database)
     override suspend fun sendImageMessage(
         chatRoomId: String,
-        sender:User,
+        sender: User,
         content: String,
-        participants:List<User>
+        participants: List<User>
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val chatMessage = ChatMessage(
@@ -294,35 +296,72 @@ class ChatRepositoryImpl @Inject constructor(
         }
 
     //FCM 메시지 전송
+//    private suspend fun sendFcmMessage(
+//        chatRoomId: String,
+//        sender: User,
+//        body: String,
+//        participants: List<User>
+//    ) {
+//        val fcmMessage = FcmMessage(
+//            message = Message(
+////                token = tokens,
+//                topic = "${Constants.FCM_TOPIC_PREFIX}$chatRoomId",
+//                data = mapOf(
+//                    "chatRoomId" to chatRoomId,
+//                    "senderId" to sender.id,
+//
+//                    //notification에 담기면 백그라운드일 경우 자동 처리하는 문제가 생김
+//                    //data에 담아야 백그라운드에서 onMessageReceived를 통할 수 있다
+//                    "title" to sender.username,
+//                    "body" to body
+//                ),
+//                android = FcmAndroidSetting(directBootOk = true)
+//            )
+//        )
+//
+//        val token = "Bearer ${FirebaseUtil.getAccessToken(context)}"
+//
+//        //메시지와 토큰 전달
+//        fcmApi.postNotification(token, fcmMessage)
+//    }
+
     private suspend fun sendFcmMessage(
         chatRoomId: String,
         sender: User,
         body: String,
         participants: List<User>
-    ) {
+    ) = coroutineScope {
+        // DB에서 참가자들의 FCM 토큰을 가져옵니다.
+        val tokens = participants.map { it.fcmToken }
 
-//        val tokens = participants.map { it.fcmToken }
+        // 토큰이 없는 경우 처리
+        if (tokens.isEmpty()) {
+            Log.w("FCM", "No valid FCM tokens found for participants")
+            return@coroutineScope
+        }
 
-        val fcmMessage = FcmMessage(
-            message = Message(
-//                token = tokens,
-                topic = "${Constants.FCM_TOPIC_PREFIX}$chatRoomId",
-                data = mapOf(
-                    "chatRoomId" to chatRoomId,
-                    "senderId" to sender.id,
-
-                    //notification에 담기면 백그라운드일 경우 자동 처리하는 문제가 생김
-                    //data에 담아야 백그라운드에서 onMessageReceived를 통할 수 있다
-                    "title" to sender.username,
-                    "body" to body
-                ),
-                android = FcmAndroidSetting(directBootOk = true)
-            )
+        val baseMessage = Message(
+            data = mapOf(
+                "chatRoomId" to chatRoomId,
+                "senderId" to sender.id,
+                "title" to sender.username,
+                "body" to body
+            ),
+            android = FcmAndroidSetting(directBootOk = true)
         )
 
-        val token = "Bearer ${FirebaseUtil.getAccessToken(context)}"
+        val accessToken = "Bearer ${FirebaseUtil.getAccessToken(context)}"
 
-        //메시지와 토큰 전달
-        fcmApi.postNotification(token, fcmMessage)
+        // 각 토큰에 대해 비동기적으로 메시지를 전송합니다.
+        tokens.map { deviceToken ->
+            async {
+                val fcmMessage = FcmMessage(
+                    message = baseMessage.copy(token = deviceToken)
+                )
+
+                //토큰 전달
+                fcmApi.postNotification(accessToken, fcmMessage)
+            }
+        }.awaitAll()
     }
 }

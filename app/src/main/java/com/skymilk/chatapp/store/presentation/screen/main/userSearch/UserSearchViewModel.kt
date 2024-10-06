@@ -29,9 +29,10 @@ class UserSearchViewModel @Inject constructor(
                 }
 
                 result.isFailure -> {
-                    sendEvent(Event.Toast("유저 검색에 실패하였습니다."))
+                    val message = "유저 검색에 실패하였습니다."
 
-                    _userSearchState.value = UserSearchState.Error(result.exceptionOrNull()?.message)
+                    sendEvent(Event.Toast(message))
+                    _userSearchState.value = UserSearchState.Error(message)
                 }
             }
         }

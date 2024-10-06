@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
+import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
 import com.skymilk.chatapp.utils.Event
 import com.skymilk.chatapp.utils.sendEvent
 import dagger.assisted.Assisted
@@ -45,14 +46,17 @@ class ChatRoomListViewModel @AssistedInject constructor(
         loadChatRooms()
     }
 
-    private fun loadChatRooms() {
+    fun loadChatRooms() {
         viewModelScope.launch {
             chatUseCases.getChatRooms(userId)
                 .onStart {
                     _chatRoomsState.value = ChatRoomsState.Loading // 로딩 상태 설정
                 }
                 .catch { exception ->
-                    sendEvent(Event.Toast(exception.message ?: "Unknown error"))
+                    val message = "채팅방 목록을 불러오지 못하였습니다."
+
+                    sendEvent(Event.Toast(message))
+                    _chatRoomsState.value = ChatRoomsState.Error(message)
                 }
                 .collect { chatRooms ->
                     _chatRoomsState.value = ChatRoomsState.Success(chatRooms) // 성공 상태 설정

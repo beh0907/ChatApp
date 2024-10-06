@@ -16,7 +16,6 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -63,6 +62,9 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
         //내가 보낸 메시지라면 알림X
         if (firebaseAuth.currentUser?.uid == senderId) return
+
+        //유저가 알림 설정을 하지 않았다면
+        if (!settingUseCases.getUserSetting()) return
 
         //알림이 해제된 채팅방이라면 알림X
         if (settingUseCases.getAlarmSetting(chatRoomId)) return

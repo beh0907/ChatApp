@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
@@ -83,7 +84,7 @@ fun ChatRoomCreateScreen(
 
         when(friendsState) {
             is FriendsState.Success -> {
-                //유저 목록 섹션
+                                //유저 목록 섹션
                 SelectionUserList(
                     users = friendsState.friends,
                     selectedUsers = selectedUsers,
@@ -97,10 +98,7 @@ fun ChatRoomCreateScreen(
                     }
                 )
             }
-
-            else -> {
-
-            }
+            else -> {}
         }
 
 
