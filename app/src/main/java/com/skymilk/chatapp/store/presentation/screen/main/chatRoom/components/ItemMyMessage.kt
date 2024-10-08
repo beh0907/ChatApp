@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
 import com.skymilk.chatapp.utils.DateUtil
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun ItemMyMessage(
     chatMessage: ChatMessage,
@@ -113,7 +115,7 @@ fun ItemMyMessageShimmer() {
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        val maxWidth = maxWidth * 0.6f
+        maxWidth * 0.6f
 
         Row(
             modifier = Modifier.fillMaxWidth(),

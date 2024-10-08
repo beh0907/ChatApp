@@ -3,14 +3,14 @@ package com.skymilk.chatapp.store.presentation.navigation.routes
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Navigations {
+sealed interface Navigations {
 
     @Serializable
-    data object Start : Navigations()
+    data object Start : Navigations
 
     @Serializable
-    data object Auth : Navigations()
+    data object Auth : Navigations
 
     @Serializable
-    data object Main : Navigations()
+    data object Main : Navigations
 }

@@ -33,7 +33,7 @@ import com.skymilk.chatapp.utils.FileSizeUtil
 
 @Composable
 fun ItemMyUploadImage(
-    uploadState: ImageUploadState.Uploading
+    uploadState: ImageUploadState.Progress
 ) {
     BoxWithConstraints(
         modifier = Modifier

@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -46,6 +45,8 @@ import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomConfirmDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
+import com.skymilk.chatapp.store.presentation.common.EmptyScreen
+import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
@@ -91,6 +92,8 @@ fun ChatRoomScreen(
 
                 //채팅 목록 영역
                 when (chatMessagesState) {
+                    is ChatMessagesState.Initial -> {}
+
                     is ChatMessagesState.Loading -> {
                         // 로딩 중 UI 표시
                         ChatMessageListShimmer(
@@ -102,8 +105,12 @@ fun ChatRoomScreen(
 
                     is ChatMessagesState.Success -> {
                         //로딩이 완료 됐을 때 표시
-                        val chatMessages =
-                            (chatMessagesState as ChatMessagesState.Success).chatMessages
+                        val chatMessages = (chatMessagesState as ChatMessagesState.Success).chatMessages
+
+                        if (chatMessages.isEmpty()) {
+                            EmptyScreen("채팅을 입력해주세요.")
+                            return
+                        }
 
                         ChatMessageList(
                             modifier = Modifier
@@ -118,7 +125,12 @@ fun ChatRoomScreen(
                         )
                     }
 
-                    else -> Unit
+                    is ChatMessagesState.Error -> {
+                        ErrorScreen(
+                            message = "메시지를 불러오지 못했습니다.",
+                            retry = viewModel::loadChatMessages
+                        )
+                    }
                 }
 
 

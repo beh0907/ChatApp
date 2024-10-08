@@ -1,12 +1,10 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
+import android.util.Log
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,8 +12,10 @@ import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +36,7 @@ import androidx.navigation.toRoute
 import com.skymilk.chatapp.di.ViewModelFactoryModule
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
+import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.ChatRoomCreateScreen
@@ -158,7 +159,7 @@ fun MainContent(
             }
 
             //채팅방 목록 화면
-            composable<MainNavigation.ChatsScreen>{
+            composable<MainNavigation.ChatsScreen> {
                 val chatRoomListViewModel: ChatRoomListViewModel = viewModel(
                     factory = ChatRoomListViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
@@ -181,6 +182,7 @@ fun MainContent(
                 )
             }
 
+            //설정 화면
             composable<MainNavigation.SettingScreen> {
                 val settingViewModel: SettingViewModel = hiltViewModel()
 
@@ -224,10 +226,18 @@ fun MainContent(
                     typeOf<User>() to CustomNavType.UserType
                 ),
                 enterTransition = {
-                    slideInVertically(
-                        initialOffsetY = { it },
-                        animationSpec = tween(300)
-                    )
+                    when (initialState.destination.route) {
+                        MainNavigation.ProfileEditScreen::class.qualifiedName-> {
+                            EnterTransition.None
+                        }
+
+                        else -> {
+                            slideInVertically(
+                                initialOffsetY = { it },
+                                animationSpec = tween(300)
+                            )
+                        }
+                    }
                 },
                 popExitTransition = {
                     // 화면이 닫힐 때 위에서 아래로 슬라이드

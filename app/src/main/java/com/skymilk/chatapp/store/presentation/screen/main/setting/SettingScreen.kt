@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.setting
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -82,13 +83,14 @@ fun SettingSection(
     toggleAlarmSetting: (Boolean) -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
         //설정 상태
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { toggleAlarmSetting(!settingState.isAlarmEnabled) }
+                .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -98,7 +100,9 @@ fun SettingSection(
             )
 
             Text(
-                modifier = Modifier.weight(1f).padding(start = 10.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp),
                 text = "알림",
                 fontFamily = LeeSeoYunFont,
                 style = MaterialTheme.typography.titleLarge,

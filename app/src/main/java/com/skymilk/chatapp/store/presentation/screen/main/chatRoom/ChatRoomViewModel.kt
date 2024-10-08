@@ -95,7 +95,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //채팅 메시지 목록 불러오기
-    private fun loadChatMessages() {
+    fun loadChatMessages() {
         viewModelScope.launch {
             chatUseCases.getMessages(chatRoomId)
                 .onStart {
@@ -150,7 +150,7 @@ class ChatRoomViewModel @AssistedInject constructor(
                             ImageUploadState.Success(progress.downloadUrl)
                         }
 
-                        else -> ImageUploadState.Uploading(
+                        else -> ImageUploadState.Progress(
                             progress = progress.progress,
                             bytesTransferred = progress.bytesTransferred,
                             totalBytes = progress.totalBytes,

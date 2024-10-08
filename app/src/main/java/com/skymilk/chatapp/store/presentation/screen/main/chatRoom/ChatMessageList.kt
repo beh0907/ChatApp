@@ -103,7 +103,7 @@ fun ChatMessageList(
         ) {
             //내가 전송중인 이미지 정보
             //이미지가 전송중일때만 정보를 표시
-            if (uploadState is ImageUploadState.Uploading) {
+            if (uploadState is ImageUploadState.Progress) {
                 item {
                     ItemMyUploadImage(uploadState)
                 }
