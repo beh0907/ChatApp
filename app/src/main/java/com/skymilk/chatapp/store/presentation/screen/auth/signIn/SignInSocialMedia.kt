@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.ui.theme.LightBlueWhite
 import com.skymilk.chatapp.ui.theme.dimens
 
@@ -54,7 +53,7 @@ fun SignInSocialMedia(
             textAlign = TextAlign.Center,
             text = text,
             style = MaterialTheme.typography.labelLarge.copy(color = Color.Black.copy(alpha = 0.85f)),
-            fontFamily = LeeSeoYunFont
+            fontFamily = CookieRunFont
         )
     }
 }

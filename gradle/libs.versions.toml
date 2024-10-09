@@ -57,12 +57,13 @@ androidx-material3-window-size = { group = "androidx.compose.material3", name = 
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credential" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credential" }
+coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
+coil-transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformations" }
 easycrop = { module = "io.github.mr0xf00:easycrop", version.ref = "easycrop" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "googleAuthLibraryOauth2Http" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
-coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-coil-transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformations" }
 image-viewer = { module = "com.jvziyaoyao.scale:image-viewer", version.ref = "imageViewer" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

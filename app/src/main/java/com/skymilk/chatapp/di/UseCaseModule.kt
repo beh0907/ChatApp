@@ -14,6 +14,7 @@ import com.skymilk.chatapp.store.domain.usecase.auth.SignOut
 import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chat.CreateChatRoom
+import com.skymilk.chatapp.store.domain.usecase.chat.ExitChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRooms
 import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
@@ -72,7 +73,8 @@ object UseCaseModule {
             GetMessages(chatRepository),
             SendMessage(chatRepository),
             SendImageMessage(chatRepository),
-            CreateChatRoom(chatRepository)
+            CreateChatRoom(chatRepository),
+            ExitChatRoom(chatRepository),
         )
 
     @Provides

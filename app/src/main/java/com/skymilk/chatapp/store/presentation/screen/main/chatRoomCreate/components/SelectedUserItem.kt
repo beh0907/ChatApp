@@ -1,7 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Icon
@@ -12,14 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun SelectedUserItem(
@@ -33,7 +36,7 @@ fun SelectedUserItem(
         AsyncImage(
             modifier = Modifier
                 .size(60.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(CircleShape)
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
@@ -42,7 +45,11 @@ fun SelectedUserItem(
             model = if (user.profileImageUrl.isNullOrBlank()) {
                 painterResource(id = R.drawable.bg_default_profile)
             } else {
-                user.profileImageUrl
+//                user.profileImageUrl
+                ImageRequest.Builder(LocalContext.current)
+                    .data(user.profileImageUrl)
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build()
             },
             contentScale = ContentScale.Crop,
             contentDescription = null
@@ -68,7 +75,7 @@ fun SelectedUserItem(
 
         Text(
             text = user.username,
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.constrainAs(username) {
                 top.linkTo(image.bottom, margin = 4.dp)

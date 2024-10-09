@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
+import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.ChatMessage
@@ -39,12 +40,12 @@ import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.utils.DateUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ItemOtherMessage(
+fun OtherMessageItem(
     chatMessage: ChatMessage,
     sender: User,
     onNavigateToProfile: (User) -> Unit,
@@ -67,7 +68,11 @@ fun ItemOtherMessage(
                 model = if (sender.profileImageUrl.isNullOrBlank()) {
                     painterResource(id = R.drawable.bg_default_profile)
                 } else {
-                    sender.profileImageUrl
+//                    sender.profileImageUrl
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(sender.profileImageUrl)
+                        .decoderFactory(SvgDecoder.Factory())
+                        .build()
                 },
                 contentDescription = "Profile Image",
                 modifier = Modifier
@@ -87,7 +92,7 @@ fun ItemOtherMessage(
                     text = sender.username,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = LeeSeoYunFont
+                    fontFamily = CookieRunFont
                 )
 
                 Row {
@@ -105,7 +110,7 @@ fun ItemOtherMessage(
                                     color = Black,
                                     text = chatMessage.content,
                                     modifier = Modifier.padding(8.dp),
-                                    fontFamily = LeeSeoYunFont
+                                    fontFamily = CookieRunFont
                                 )
                             }
 
@@ -145,7 +150,7 @@ fun ItemOtherMessage(
                         text = DateUtil.getTime(chatMessage.timestamp),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.align(Alignment.Bottom),
-                        fontFamily = LeeSeoYunFont
+                        fontFamily = CookieRunFont
                     )
                 }
             }
@@ -155,7 +160,7 @@ fun ItemOtherMessage(
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ItemOtherMessageShimmer() {
+fun OtherMessageItemShimmer() {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()

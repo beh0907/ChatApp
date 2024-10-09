@@ -28,16 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun ChatRoomCreateScreen(
@@ -132,9 +132,10 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "대화상대 초대",
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
         )
 
         IconButton(
@@ -168,7 +169,7 @@ private fun FriendSearchSection(
         placeholder = {
             Text(
                 text = "이름을 검색해주세요.",
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 color = Color.Gray,
             )
         },
@@ -190,7 +191,7 @@ private fun FriendSearchSection(
             unfocusedContainerColor = Color.Transparent
         ),
         textStyle = TextStyle(
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             color = MaterialTheme.colorScheme.onSurface

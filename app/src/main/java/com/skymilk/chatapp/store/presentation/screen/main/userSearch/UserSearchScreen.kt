@@ -25,13 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun UserSearchScreen(
@@ -88,7 +89,7 @@ fun UserSearchScreen(
 }
 
 @Composable
-private fun TopSection(
+fun TopSection(
     modifier: Modifier = Modifier,
     onNavigateToBack: () -> Unit,
 ) {
@@ -106,9 +107,10 @@ private fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "유저 검색",
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -133,7 +135,7 @@ private fun UserSearchSection(
         placeholder = {
             Text(
                 text = "아이디 혹은 이름을 검색해주세요.",
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 color = Color.Gray,
             )
         },
@@ -153,7 +155,7 @@ private fun UserSearchSection(
             unfocusedContainerColor = Color.Transparent
         ),
         textStyle = TextStyle(
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             color = MaterialTheme.colorScheme.onSurface

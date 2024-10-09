@@ -41,10 +41,13 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.ImageCropper
@@ -55,7 +58,7 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -191,9 +194,10 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "프로필 편집",
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleLarge,
-            color = Color.White
+            color = Color.White,
+            fontWeight = FontWeight.Bold
         )
 
         TextButton(onClick = {
@@ -201,7 +205,7 @@ fun TopSection(
         }) {
             Text(
                 text = "완료",
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -259,7 +263,11 @@ private fun EditProfileSection(
                 model = if (profileImageUrl.isNullOrBlank()) {
                     painterResource(id = R.drawable.bg_default_profile)
                 } else {
-                    profileImageUrl
+//                    profileImageUrl
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(profileImageUrl)
+                        .decoderFactory(SvgDecoder.Factory())
+                        .build()
                 },
                 contentScale = ContentScale.Crop,
                 contentDescription = null
@@ -273,7 +281,7 @@ private fun EditProfileSection(
                 .align(Alignment.BottomCenter),
             textAlign = TextAlign.Center,
             text = "편집",
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             color = Color.White,
 
             )
@@ -301,7 +309,7 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleLarge,
             text = editName,
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             textAlign = TextAlign.Center,
             color = Color.White
         )
@@ -315,7 +323,7 @@ private fun EditProfileSection(
 
     }
 
-    Spacer(modifier = Modifier.height(5.dp))
+    Spacer(modifier = Modifier.height(10.dp))
 
     HorizontalDivider(
         modifier = Modifier
@@ -345,7 +353,7 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleMedium,
             text = editStatusMessage,
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             textAlign = TextAlign.Center,
             color = Color.White
         )
@@ -357,7 +365,7 @@ private fun EditProfileSection(
             tint = Color.White
         )
     }
-    Spacer(modifier = Modifier.height(5.dp))
+    Spacer(modifier = Modifier.height(10.dp))
 }
 
 @Composable

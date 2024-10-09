@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun FriendsList(
@@ -21,7 +21,7 @@ fun FriendsList(
             Text(
                 modifier = Modifier.padding(top = 10.dp, start = 15.dp),
                 text = "친구 ${friends.size}",
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 fontSize = 14.sp
             )
         }

@@ -30,12 +30,12 @@ import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.utils.DateUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ItemMyMessage(
+fun MyMessageItem(
     chatMessage: ChatMessage,
     onNavigateToImageViewer: (String) -> Unit
 ) {
@@ -57,7 +57,7 @@ fun ItemMyMessage(
                 text = DateUtil.getTime(chatMessage.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
-                fontFamily = LeeSeoYunFont
+                fontFamily = CookieRunFont
             )
 
             Surface(
@@ -73,7 +73,7 @@ fun ItemMyMessage(
                             color = Black,
                             text = chatMessage.content,
                             modifier = Modifier.padding(8.dp),
-                            fontFamily = LeeSeoYunFont
+                            fontFamily = CookieRunFont
                         )
                     }
 
@@ -108,8 +108,9 @@ fun ItemMyMessage(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ItemMyMessageShimmer() {
+fun MyMessageItemShimmer() {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()

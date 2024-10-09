@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +25,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
 
@@ -50,7 +49,7 @@ fun ChatSoloRoomItem(
         AsyncImage(
             modifier = Modifier
                 .size(60.dp)
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(CircleShape),
             model = ImageRequest.Builder(
                 LocalContext.current
             )
@@ -80,7 +79,7 @@ fun ChatSoloRoomItem(
                             MaterialTheme.colorScheme.secondary
                         ),
                     text = " 나 ",
-                    fontFamily = LeeSeoYunFont,
+                    fontFamily = CookieRunFont,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.surface
                 )
@@ -89,7 +88,7 @@ fun ChatSoloRoomItem(
 
                 Text(
                     text = currentUser.username,
-                    fontFamily = LeeSeoYunFont,
+                    fontFamily = CookieRunFont,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1
@@ -102,7 +101,7 @@ fun ChatSoloRoomItem(
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 maxLines = 1
@@ -116,7 +115,7 @@ fun ChatSoloRoomItem(
             //시간 정보
             Text(
                 text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

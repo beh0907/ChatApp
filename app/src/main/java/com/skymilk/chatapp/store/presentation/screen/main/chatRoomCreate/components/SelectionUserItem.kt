@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,12 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -41,7 +39,7 @@ fun SelectionUserItem(
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(CircleShape),
             model = user.profileImageUrl,
             contentScale = ContentScale.Crop,
             contentDescription = null,
@@ -54,8 +52,8 @@ fun SelectionUserItem(
                 .weight(1f),
             text = user.username,
             color = MaterialTheme.colorScheme.onSurface,
-            fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-            fontFamily = LeeSeoYunFont
+            style = MaterialTheme.typography.bodyLarge,
+            fontFamily = CookieRunFont
         )
 
         Checkbox(

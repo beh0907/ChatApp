@@ -112,6 +112,7 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
+    //텍스트 메시지 전송
     fun sendMessage(sender: User, content: String, participants: List<User>) {
         viewModelScope.launch {
             try {
@@ -122,6 +123,7 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
+    //이미지 메시지 전송
     fun sendImageMessage(sender: User, imageUri: Uri, participants: List<User>) {
         //이미지 업로드 결과
         uploadImage(sender.id, imageUri) { url ->
@@ -170,14 +172,31 @@ class ChatRoomViewModel @AssistedInject constructor(
             when (alarmState.value) {
                 true -> {
                     settingUseCases.deleteAlarmSetting(chatRoomId)
-
                     sendEvent(Event.Toast("채팅방 알람이 설정되었습니다"))
                 }
 
                 false -> {
                     settingUseCases.saveAlarmSetting(chatRoomId)
-
                     sendEvent(Event.Toast("채팅방 알람이 해제되었습니다"))
+                }
+            }
+        }
+    }
+
+    //채팅방 나가기
+    fun exitChatRoom(user: User, onNavigateToBack: () -> Unit) {
+        viewModelScope.launch {
+            val result = chatUseCases.exitChatRoom(chatRoomId, user)
+
+            when {
+                result.isSuccess -> {
+                    onNavigateToBack()
+                    sendEvent(Event.Toast("채팅방에서 퇴장하였습니다."))
+                    unsubscribeForNotification()
+                }
+
+                result.isFailure -> {
+                    sendEvent(Event.Toast("채팅방을 나가지 못하였습니다."))
                 }
             }
         }
@@ -190,8 +209,6 @@ class ChatRoomViewModel @AssistedInject constructor(
                 .subscribeToTopic("${Constants.FCM_TOPIC_PREFIX}${chatRoomId}")
                 .await()
         }
-
-
     }
 
     //fcm 알림 토픽 제거

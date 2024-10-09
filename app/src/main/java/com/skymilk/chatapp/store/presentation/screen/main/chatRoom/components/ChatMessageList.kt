@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,14 +31,8 @@ import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemFullDate
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemMyMessage
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemMyMessageShimmer
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemMyUploadImage
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemOtherMessage
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ItemOtherMessageShimmer
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.utils.DateUtil
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -105,7 +99,7 @@ fun ChatMessageList(
             //이미지가 전송중일때만 정보를 표시
             if (uploadState is ImageUploadState.Progress) {
                 item {
-                    ItemMyUploadImage(uploadState)
+                    MyUploadImageItem(uploadState)
                 }
 
                 if (chatMessages.isNotEmpty())
@@ -123,7 +117,7 @@ fun ChatMessageList(
 
                 if (chatMessage.senderId == currentUser.id) {
                     //내가 작성한 메시지
-                    ItemMyMessage(
+                    MyMessageItem(
                         chatMessage = chatMessage,
                         onNavigateToImageViewer = onNavigateToImageViewer
                     )
@@ -134,7 +128,7 @@ fun ChatMessageList(
                         .find { it.id == chatMessage.senderId }!!
 
                     //다른 사람이 작성한 메시지
-                    ItemOtherMessage(
+                    OtherMessageItem(
                         chatMessage = chatMessage,
                         sender = sender,
                         onNavigateToProfile = onNavigateToProfile,
@@ -151,7 +145,7 @@ fun ChatMessageList(
                     )
                 ) {
                     //중앙 날짜 정보
-                    ItemFullDate(DateUtil.getFullDate(chatMessage.timestamp))
+                    FullDateItem(DateUtil.getFullDate(chatMessage.timestamp))
                 }
             }
         }
@@ -178,7 +172,7 @@ fun ChatMessageList(
             ) {
                 Text(
                     text = showNewMessage,
-                    fontFamily = LeeSeoYunFont,
+                    fontFamily = CookieRunFont,
                     color = MaterialTheme.colorScheme.surface
                 )
 
@@ -203,8 +197,8 @@ fun ChatMessageListShimmer(
             // 랜덤으로 아이템 선택
             val isMyMessage = Random.nextBoolean()
 
-            if (isMyMessage) ItemMyMessageShimmer() // 사용자 메시지 로딩 아이템
-            else ItemOtherMessageShimmer() // 상대방 메시지 로딩 아이템
+            if (isMyMessage) MyMessageItemShimmer() // 사용자 메시지 로딩 아이템
+            else OtherMessageItemShimmer() // 상대방 메시지 로딩 아이템
 
         }
     }

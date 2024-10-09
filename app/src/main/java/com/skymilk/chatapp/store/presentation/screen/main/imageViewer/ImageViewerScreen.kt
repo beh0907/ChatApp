@@ -15,7 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView
 import com.jvziyaoyao.scale.zoomable.zoomable.rememberZoomableState
 
@@ -26,7 +29,12 @@ fun ImageViewerScreen(
     onNavigateToBack: () -> Unit,
 ) {
 
-    val painter = rememberAsyncImagePainter(imageUrl)
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl)
+            .decoderFactory(SvgDecoder.Factory())
+            .build()
+    )
     val state = rememberZoomableState(contentSize = painter.intrinsicSize)
 
     Box(
@@ -52,8 +60,9 @@ fun ImageViewerScreen(
 }
 
 @Composable
-private fun TopSection(
-    modifier: Modifier = Modifier, onNavigateToBack: () -> Unit
+fun TopSection(
+    modifier: Modifier = Modifier,
+    onNavigateToBack: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth()

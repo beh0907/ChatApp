@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +32,7 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
 
@@ -57,7 +57,7 @@ fun ChatRoomItem(
         AsyncImage(
             modifier = Modifier
                 .size(60.dp)
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(CircleShape),
             model = ImageRequest.Builder(
                 LocalContext.current
             )
@@ -84,7 +84,7 @@ fun ChatRoomItem(
                             style = SpanStyle(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                fontFamily = LeeSeoYunFont
+                                fontFamily = CookieRunFont
                             )
                         ) {
                             append("${participant.username} ")
@@ -98,7 +98,7 @@ fun ChatRoomItem(
                     style = SpanStyle(
                         color = Color.Gray,
                         fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                        fontFamily = LeeSeoYunFont,
+                        fontFamily = CookieRunFont,
                         fontWeight = FontWeight.Medium
                     )
                 ) {
@@ -111,7 +111,7 @@ fun ChatRoomItem(
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 maxLines = 1
@@ -125,7 +125,7 @@ fun ChatRoomItem(
             //시간 정보
             Text(
                 text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -145,7 +145,7 @@ fun ChatRoomItemShimmer() {
             modifier = Modifier
                 .size(60.dp)
                 .shimmerEffect()
-                .clip(RoundedCornerShape(4.dp))
+                .clip(CircleShape)
         )
 
         // 채팅방 정보

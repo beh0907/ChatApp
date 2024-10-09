@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.R
@@ -32,7 +33,7 @@ import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomListShimmer
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -94,9 +95,10 @@ fun TopSection(onNavigateToChatRoomCreate: () -> Unit) {
         Text(
             modifier = Modifier.weight(1f),
             text = "채팅",
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
         )
 
         IconButton(onClick = { onNavigateToChatRoomCreate() }) {

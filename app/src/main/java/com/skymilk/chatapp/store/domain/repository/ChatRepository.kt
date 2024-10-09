@@ -23,4 +23,6 @@ interface ChatRepository {
     suspend fun createChatRoom(name: String, participants: List<String>): Result<ChatRoom>
 
     suspend fun getUsersForParticipants(participants: List<String>): List<User>
+
+    suspend fun exitChatRoom(chatRoomId: String, user: User): Result<Unit>
 }

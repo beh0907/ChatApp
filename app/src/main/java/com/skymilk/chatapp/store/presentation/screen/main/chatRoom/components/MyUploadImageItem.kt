@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,12 +28,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.utils.DateUtil
 import com.skymilk.chatapp.utils.FileSizeUtil
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ItemMyUploadImage(
+fun MyUploadImageItem(
     uploadState: ImageUploadState.Progress
 ) {
     BoxWithConstraints(
@@ -51,7 +53,7 @@ fun ItemMyUploadImage(
                 text = DateUtil.getTime(),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
-                fontFamily = LeeSeoYunFont
+                fontFamily = CookieRunFont
             )
 
             Surface(

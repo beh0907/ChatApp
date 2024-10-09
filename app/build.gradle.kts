@@ -134,6 +134,7 @@ dependencies {
 
     // Coil Image
     implementation(libs.coil)
+    implementation(libs.coil.svg)
     implementation(libs.coil.transformations)
 
     //Image Cropper
@@ -144,7 +145,6 @@ dependencies {
 
     //lottie
     implementation(libs.lottie.compose)
-
 
     // Material Icon Extended
     implementation(libs.androidx.material.icons.extended)

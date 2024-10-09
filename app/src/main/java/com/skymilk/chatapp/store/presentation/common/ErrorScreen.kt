@@ -1,14 +1,11 @@
 package com.skymilk.chatapp.store.presentation.common
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,10 +23,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun ErrorScreen(message: String, icon: Int = R.drawable.ic_error, retry: (() -> Unit)? = null) {
@@ -69,7 +65,7 @@ fun ErrorContent(alphaAnim: Float, message: String, icon: Int, retry: (() -> Uni
                 .padding(20.dp)
                 .alpha(alphaAnim),
             text = message,
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.bodyMedium,
             color = if (isSystemInDarkTheme()) LightGray else DarkGray,
         )
@@ -79,7 +75,7 @@ fun ErrorContent(alphaAnim: Float, message: String, icon: Int, retry: (() -> Uni
             TextButton(
                 onClick = retry
             ) {
-                Text(text = "다시 시도", fontFamily = LeeSeoYunFont)
+                Text(text = "다시 시도", fontFamily = CookieRunFont)
             }
         }
     }

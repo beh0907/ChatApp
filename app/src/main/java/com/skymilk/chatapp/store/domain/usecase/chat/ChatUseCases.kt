@@ -7,5 +7,6 @@ data class ChatUseCases(
     val getMessages: GetMessages,
     val sendMessage: SendMessage,
     val sendImageMessage: SendImageMessage,
-    val createChatRoom: CreateChatRoom
+    val createChatRoom: CreateChatRoom,
+    val exitChatRoom: ExitChatRoom
 )

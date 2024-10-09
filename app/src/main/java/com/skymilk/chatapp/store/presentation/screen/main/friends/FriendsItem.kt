@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.friends
 
+import android.R.attr.maxLines
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,21 +11,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -44,11 +48,15 @@ fun FriendsItem(
         AsyncImage(
             modifier = Modifier
                 .size(60.dp)
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(CircleShape),
             model = if (user.profileImageUrl.isNullOrBlank()) {
                 painterResource(id = R.drawable.bg_default_profile)
             } else {
-                user.profileImageUrl
+//                user.profileImageUrl
+                ImageRequest.Builder(LocalContext.current)
+                    .data(user.profileImageUrl)
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build()
             },
             contentScale = ContentScale.Crop,
             contentDescription = null,
@@ -66,18 +74,17 @@ fun FriendsItem(
             Text(
                 text = user.username,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                fontFamily = LeeSeoYunFont
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = CookieRunFont
             )
 
             //유저 상태 메시지가 있다면
             if (user.statusMessage.isNotBlank()) {
-                //유저 이름
                 Text(
                     text = user.statusMessage,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                    fontFamily = LeeSeoYunFont,
+                    fontFamily = CookieRunFont,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -97,8 +104,8 @@ fun FriendsItemShimmer() {
         Box(
             modifier = Modifier
                 .size(60.dp)
+                .clip(CircleShape)
                 .shimmerEffect()
-                .clip(RoundedCornerShape(4.dp))
         )
 
         // 유저 정보

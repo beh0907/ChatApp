@@ -38,7 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun CustomProgressDialog(message: String) {
@@ -60,7 +60,7 @@ fun CustomProgressDialog(message: String) {
                 Text(
                     text = message,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = LeeSeoYunFont
+                    fontFamily = CookieRunFont
                 )
             }
         }
@@ -75,7 +75,7 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
             Text(
                 text = message,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontFamily = LeeSeoYunFont
+                fontFamily = CookieRunFont
             )
         },
         confirmButton = {
@@ -85,7 +85,7 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
                 Text(
                     "확인",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = LeeSeoYunFont
+                    fontFamily = CookieRunFont
                 )
             }
         },
@@ -101,7 +101,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
             Text(
                 text = message,
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                fontFamily = LeeSeoYunFont
+                fontFamily = CookieRunFont
             )
         },
         confirmButton = {
@@ -111,7 +111,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
                 Text(
                     "확인",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = LeeSeoYunFont
+                    fontFamily = CookieRunFont
                 )
             }
         },
@@ -122,7 +122,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
                 Text(
                     "취소",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = LeeSeoYunFont
+                    fontFamily = CookieRunFont
                 )
             }
         },
@@ -174,7 +174,7 @@ fun CustomFullScreenEditDialog(
                         Text(
                             text = "프로필 편집",
                             style = MaterialTheme.typography.titleLarge,
-                            fontFamily = LeeSeoYunFont,
+                            fontFamily = CookieRunFont,
                             color = Color.White
                         )
                     }
@@ -185,7 +185,7 @@ fun CustomFullScreenEditDialog(
                     ) {
                         Text(
                             text = "확인",
-                            fontFamily = LeeSeoYunFont,
+                            fontFamily = CookieRunFont,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -206,7 +206,7 @@ fun CustomFullScreenEditDialog(
                             if (it.length <= maxLength) inputText = it
                         },
                         textStyle = TextStyle(
-                            fontFamily = LeeSeoYunFont,
+                            fontFamily = CookieRunFont,
                             fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
                             color = Color.White
                         ),
@@ -216,8 +216,8 @@ fun CustomFullScreenEditDialog(
                         placeholder = {
                             Text(
                                 "텍스트를 입력하세요",
-                                fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                fontFamily = LeeSeoYunFont,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontFamily = CookieRunFont,
                                 color = Color.White
                             )
                         },
@@ -233,7 +233,7 @@ fun CustomFullScreenEditDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
 
-                    Text("${inputText.length} / $maxLength", fontFamily = LeeSeoYunFont, color = Color.White)
+                    Text("${inputText.length} / $maxLength", fontFamily = CookieRunFont, color = Color.White)
                 }
             }
         }

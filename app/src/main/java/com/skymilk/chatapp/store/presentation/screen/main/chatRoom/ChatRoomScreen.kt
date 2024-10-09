@@ -1,20 +1,33 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
@@ -30,11 +43,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -43,13 +58,16 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.store.presentation.common.CustomConfirmDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
-import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageList
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ChatMessageListShimmer
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 
 @Composable
@@ -66,7 +84,15 @@ fun ChatRoomScreen(
     val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
     val alarmState by viewModel.alarmState.collectAsStateWithLifecycle()
 
-    Column(
+    var visibleExitDialog by remember { mutableStateOf(false) }
+    var visibleDrawer by remember { mutableStateOf(false) }
+
+    // 드로어가 오픈되어 있을경우 백버튼을 누르면 드로어만 닫는다
+    BackHandler(enabled = visibleDrawer) {
+        visibleDrawer = false
+    }
+
+    Box(
         modifier = modifier.fillMaxSize()
     ) {
         //채팅방 정보 체크
@@ -81,70 +107,85 @@ fun ChatRoomScreen(
                 //채팅방 로드 성공
                 val chatRoom = (chatRoomState as ChatRoomState.Success).chatRoom
 
-                //제목 영역
-                TopSection(
-                    chatRoom = chatRoom,
-                    currentUser = currentUser,
-                    alarmState = alarmState,
-                    onNavigateToBack = onNavigateToBack,
-                    toggleAlarmState = viewModel::toggleAlarmState
-                )
+                Column(
+                    modifier = modifier.fillMaxSize()
+                ) {
+                    //제목 영역
+                    TopSection(
+                        chatRoom = chatRoom,
+                        currentUser = currentUser,
+                        onNavigateToBack = onNavigateToBack,
+                        onOpenDrawer = { visibleDrawer = true }
+                    )
 
-                //채팅 목록 영역
-                when (chatMessagesState) {
-                    is ChatMessagesState.Initial -> {}
+                    //채팅 목록 영역
+                    when (chatMessagesState) {
+                        is ChatMessagesState.Initial -> {}
 
-                    is ChatMessagesState.Loading -> {
-                        // 로딩 중 UI 표시
-                        ChatMessageListShimmer(
-                            modifier = Modifier
-                                .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
-                                .fillMaxWidth()
-                        )
-                    }
-
-                    is ChatMessagesState.Success -> {
-                        //로딩이 완료 됐을 때 표시
-                        val chatMessages = (chatMessagesState as ChatMessagesState.Success).chatMessages
-
-                        if (chatMessages.isEmpty()) {
-                            EmptyScreen("채팅을 입력해주세요.")
-                            return
+                        is ChatMessagesState.Loading -> {
+                            // 로딩 중 UI 표시
+                            ChatMessageListShimmer(
+                                modifier = Modifier
+                                    .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
+                                    .fillMaxWidth()
+                            )
                         }
 
-                        ChatMessageList(
-                            modifier = Modifier
-                                .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
-                                .fillMaxWidth(),
-                            chatRoom = chatRoom,
-                            chatMessages = chatMessages,
-                            currentUser = currentUser,
-                            uploadState = uploadState,
-                            onNavigateToProfile = onNavigateToProfile,
-                            onNavigateToImageViewer = onNavigateToImageViewer
-                        )
+                        is ChatMessagesState.Success -> {
+                            //로딩이 완료 됐을 때 표시
+                            val chatMessages =
+                                (chatMessagesState as ChatMessagesState.Success).chatMessages
+
+                            //채팅 메시지 목록
+                            ChatMessageList(
+                                modifier = Modifier
+                                    .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
+                                    .fillMaxWidth(),
+                                chatRoom = chatRoom,
+                                chatMessages = chatMessages,
+                                currentUser = currentUser,
+                                uploadState = uploadState,
+                                onNavigateToProfile = onNavigateToProfile,
+                                onNavigateToImageViewer = onNavigateToImageViewer
+                            )
+                        }
+
+                        is ChatMessagesState.Error -> {
+                            ErrorScreen(
+                                message = "메시지를 불러오지 못했습니다.",
+                                retry = viewModel::loadChatMessages
+                            )
+                        }
                     }
 
-                    is ChatMessagesState.Error -> {
-                        ErrorScreen(
-                            message = "메시지를 불러오지 못했습니다.",
-                            retry = viewModel::loadChatMessages
-                        )
-                    }
+
+                    //채팅 입력 영역
+                    BottomSection(
+                        modifier = Modifier.imePadding(),
+                        onSendMessage = { sender, content ->
+                            viewModel.sendMessage(sender, content, chatRoom.participants)
+                        },
+                        onSendImageMessage = { sender, uri ->
+                            viewModel.sendImageMessage(sender, uri, chatRoom.participants)
+                        },
+                        user = currentUser,
+                    )
                 }
 
-
-                //채팅 입력 영역
-                BottomSection(
-                    modifier = Modifier.imePadding(),
-                    onSendMessage = { sender, content ->
-                        viewModel.sendMessage(sender, content, chatRoom.participants)
-                    },
-                    onSendImageMessage = { sender, uri ->
-                        viewModel.sendImageMessage(sender, uri, chatRoom.participants)
-                    },
-                    user = currentUser,
+                //우측 드로어 메뉴
+                CustomRightSideDrawer(
+                    drawerVisibility = visibleDrawer,
+                    currentUser = currentUser,
+                    chatRoom = chatRoom,
+                    alarmState = alarmState,
+                    onVisibleExitDialog = { visibleExitDialog = true },
+                    onToggleAlarmState = viewModel::toggleAlarmState,
+                    onNavigateToProfile = onNavigateToProfile,
+                    onCloseDrawer = {
+                        visibleDrawer = false
+                    }
                 )
+
             }
 
             is ChatRoomState.Error -> {
@@ -152,8 +193,15 @@ fun ChatRoomScreen(
                 CustomConfirmDialog("채팅방을 불러오지 못했습니다.", onNavigateToBack)
             }
         }
-    }
 
+        if (visibleExitDialog)
+            CustomAlertDialog(
+                message = "채팅방을 나가시겠습니까?",
+                onConfirm = {
+                    viewModel.exitChatRoom(currentUser, onNavigateToBack)
+                },
+                onDismiss = { visibleExitDialog = false })
+    }
 }
 
 
@@ -162,14 +210,13 @@ fun ChatRoomScreen(
 fun TopSection(
     chatRoom: ChatRoomWithUsers,
     currentUser: User,
-    alarmState: Boolean,
     onNavigateToBack: () -> Unit,
-    toggleAlarmState: () -> Unit
+    onOpenDrawer: () -> Unit
 ) {
     val title = when (chatRoom.participants.size) {
         1 -> chatRoom.participants.first().username
         2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: ""
-        else -> "그룹채팅"
+        else -> "그룹채팅 ${chatRoom.participants.size}"
     }
 
     Row(
@@ -186,26 +233,25 @@ fun TopSection(
             )
         }
 
+        //타이틀
         Text(
             modifier = Modifier.weight(1f),
             text = title,
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
         )
 
-
-        //혼자 있는 방은 알람 자체가 발생하지 않기 때문에 설정하지 않는다
-        if (chatRoom.participants.size != 1) {
-            IconButton(onClick = {
-                toggleAlarmState()
-            }) {
-                Icon(
-                    imageVector = if (alarmState) Icons.Outlined.NotificationsOff else Icons.Outlined.Notifications,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
+        //드로어 메뉴 오픈
+        IconButton(onClick = {
+            onOpenDrawer()
+        }) {
+            Icon(
+                imageVector = Icons.Outlined.Menu,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
@@ -290,7 +336,7 @@ fun BottomSection(
                     text = "채팅을 입력해주세요.",
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.Gray,
-                    fontFamily = LeeSeoYunFont
+                    fontFamily = CookieRunFont
                 )
             },
             colors = TextFieldDefaults.colors(
@@ -300,7 +346,7 @@ fun BottomSection(
                 unfocusedContainerColor = Color.Transparent
             ),
             textStyle = TextStyle(
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 color = MaterialTheme.colorScheme.onSurface
@@ -333,6 +379,104 @@ fun BottomSection(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface
                 )
+            }
+        }
+    }
+}
+
+
+//우 -> 좌 방향 커스텀 드로어
+//기본은 좌 -> 우이기 때문에 별도 구현
+@Composable
+fun BoxScope.CustomRightSideDrawer(
+    drawerVisibility: Boolean,
+    currentUser: User,
+    chatRoom: ChatRoomWithUsers,
+    alarmState: Boolean,
+    onVisibleExitDialog: () -> Unit,
+    onToggleAlarmState: () -> Unit,
+    onNavigateToProfile: (User) -> Unit,
+    onCloseDrawer: () -> Unit,
+) {
+    // 드로어 뒷배경
+    AnimatedVisibility(
+        visible = drawerVisibility,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(
+                    //리플 효과 제거
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { onCloseDrawer() }
+        )
+    }
+
+    // 드로어 레이아웃
+    AnimatedVisibility(
+        visible = drawerVisibility,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it }),
+        modifier = Modifier.align(Alignment.CenterEnd)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(0.75f)
+                .clip(RoundedCornerShape(topStart = 30.dp, bottomStart = 30.dp))
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Column {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    text = "채팅방 정보",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = CookieRunFont,
+                    fontWeight = FontWeight.Bold
+                )
+
+                ParticipantList(
+                    modifier = Modifier.weight(1f),
+                    currentUser = currentUser,
+                    participants = chatRoom.participants,
+                    onUserItemClick = onNavigateToProfile
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { onVisibleExitDialog() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+
+                    //혼자 있는 방은 알람 자체가 발생하지 않기 때문에 설정하지 않는다
+                    if (chatRoom.participants.size != 1) {
+                        IconButton(onClick = {
+                            onToggleAlarmState()
+                        }) {
+                            Icon(
+                                imageVector = if (alarmState) Icons.Outlined.NotificationsOff else Icons.Filled.Notifications,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
             }
         }
     }

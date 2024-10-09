@@ -17,12 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsItem
-import com.skymilk.chatapp.ui.theme.LeeSeoYunFont
+import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
 fun SettingScreen(
@@ -67,9 +68,10 @@ fun TopSection() {
         Text(
             modifier = Modifier.weight(1f),
             text = "설정",
-            fontFamily = LeeSeoYunFont,
+            fontFamily = CookieRunFont,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
         )
     }
 
@@ -104,7 +106,7 @@ fun SettingSection(
                     .weight(1f)
                     .padding(start = 10.dp),
                 text = "알림",
-                fontFamily = LeeSeoYunFont,
+                fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
