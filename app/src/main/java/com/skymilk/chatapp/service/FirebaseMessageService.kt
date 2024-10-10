@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -44,8 +45,11 @@ class FirebaseMessageService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        //메시지 상태 정보
         val title = message.notification?.title ?: message.data["title"]
         val body = message.notification?.body ?: message.data["body"]
+
+        //알림 출력
         showNotification(title, body, message.data)
     }
 

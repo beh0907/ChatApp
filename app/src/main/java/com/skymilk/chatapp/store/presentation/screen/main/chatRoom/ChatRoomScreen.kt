@@ -3,12 +3,22 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.splineBasedDecay
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +41,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +49,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +59,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -67,8 +86,10 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
+import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.CookieRunFont
 import gun0912.tedimagepicker.builder.TedImagePicker
+import kotlin.math.roundToInt
 
 @Composable
 fun ChatRoomScreen(
@@ -387,6 +408,7 @@ fun BottomSection(
 
 //우 -> 좌 방향 커스텀 드로어
 //기본은 좌 -> 우이기 때문에 별도 구현
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BoxScope.CustomRightSideDrawer(
     drawerVisibility: Boolean,
@@ -398,6 +420,42 @@ fun BoxScope.CustomRightSideDrawer(
     onNavigateToProfile: (User) -> Unit,
     onCloseDrawer: () -> Unit,
 ) {
+    val ratio = 0.8f
+    val density = LocalDensity.current
+    val drawerWidth = with(density) { (LocalConfiguration.current.screenWidthDp * ratio).dp.toPx() }
+
+    val anchors = remember {
+        DraggableAnchors {
+            DrawerValue.Closed at drawerWidth
+            DrawerValue.Open at 0f
+        }
+    }
+
+    val draggableState = remember {
+        AnchoredDraggableState(
+            initialValue = if (drawerVisibility) DrawerValue.Open else DrawerValue.Closed,
+            anchors = anchors,
+            positionalThreshold = { distance: Float -> distance * 0.5f },
+            velocityThreshold = { with(density) { 100.dp.toPx() } },
+            snapAnimationSpec = SpringSpec(stiffness = Spring.StiffnessMediumLow),
+            decayAnimationSpec = splineBasedDecay(density),
+            confirmValueChange = { true }
+        )
+    }
+
+    //드로어 상태 애니메이션 표현
+    LaunchedEffect(drawerVisibility) {
+        val value = if (drawerVisibility) DrawerValue.Open else DrawerValue.Closed
+        draggableState.animateTo(value)
+    }
+
+    //드래그로 닫힌다면 onCloseDrawer 호출
+    LaunchedEffect(draggableState.currentValue) {
+        if (draggableState.currentValue == DrawerValue.Closed) {
+            onCloseDrawer()
+        }
+    }
+
     // 드로어 뒷배경
     AnimatedVisibility(
         visible = drawerVisibility,
@@ -424,11 +482,22 @@ fun BoxScope.CustomRightSideDrawer(
         modifier = Modifier.align(Alignment.CenterEnd)
     ) {
         Box(
-            modifier = Modifier
+            modifier = Modifier.offset {
+                IntOffset(
+                    x = draggableState
+                        .offset
+                        .roundToInt(),
+                    y = 0
+                )
+            }
                 .fillMaxHeight()
-                .fillMaxWidth(0.75f)
+                .fillMaxWidth(ratio)
                 .clip(RoundedCornerShape(topStart = 30.dp, bottomStart = 30.dp))
                 .background(MaterialTheme.colorScheme.surface)
+                .anchoredDraggable(
+                    state = draggableState,
+                    orientation = Orientation.Horizontal
+                )
         ) {
             Column {
                 Text(

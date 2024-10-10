@@ -31,6 +31,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -49,26 +51,26 @@ class ChatRepositoryImpl @Inject constructor(
         val listener = firebaseFireStore.collection("chatRooms").document(chatRoomId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    close()
+                    close(e)
                     return@addSnapshotListener
                 }
-
                 if (snapshot != null && snapshot.exists()) {
                     val chatRoom = snapshot.toObject<ChatRoom>()!!
                     launch {
-                        val chatRoomWithUsers = ChatRoomWithUsers(
-                            id = chatRoom.id,
-                            name = chatRoom.name,
-                            participants = getUsersForParticipants(chatRoom.participants),
-                            lastMessage = chatRoom.lastMessage,
-                            lastMessageTimestamp = chatRoom.lastMessageTimestamp,
-                            createdTimestamp = chatRoom.createdTimestamp
-                        )
-                        trySend(chatRoomWithUsers)
+                        getUsersForParticipants(chatRoom.participants).collect { users ->
+                            val chatRoomWithUsers = ChatRoomWithUsers(
+                                id = chatRoom.id,
+                                name = chatRoom.name,
+                                participants = users,
+                                lastMessage = chatRoom.lastMessage,
+                                lastMessageTimestamp = chatRoom.lastMessageTimestamp,
+                                createdTimestamp = chatRoom.createdTimestamp
+                            )
+                            trySend(chatRoomWithUsers)
+                        }
                     }
                 }
             }
-
         awaitClose { listener.remove() }
     }
 
@@ -91,18 +93,23 @@ class ChatRepositoryImpl @Inject constructor(
                     }.orEmpty()
 
                     // participants를 기반으로 User 정보를 가져오기
-                    val chatRoomWithUsersList = chatRooms.fastMap { chatRoom ->
-                        ChatRoomWithUsers(
-                            id = chatRoom.id,
-                            name = chatRoom.name,
-                            participants = getUsersForParticipants(chatRoom.participants),
-                            lastMessage = chatRoom.lastMessage,
-                            lastMessageTimestamp = chatRoom.lastMessageTimestamp,
-                            createdTimestamp = chatRoom.createdTimestamp
-                        )
+                    val chatRoomWithUsersList = chatRooms.map { chatRoom ->
+                        getUsersForParticipants(chatRoom.participants).map { users ->
+                            ChatRoomWithUsers(
+                                id = chatRoom.id,
+                                name = chatRoom.name,
+                                participants = users,
+                                lastMessage = chatRoom.lastMessage,
+                                lastMessageTimestamp = chatRoom.lastMessageTimestamp,
+                                createdTimestamp = chatRoom.createdTimestamp
+                            )
+                        }
                     }
 
-                    trySend(chatRoomWithUsersList)
+                    //채팅방 정보들 결합 후 리턴
+                    combine(chatRoomWithUsersList) { it.toList() }.collect {
+                        trySend(it)
+                    }
                 }
             }
 
@@ -278,35 +285,46 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     // 참가자 아이디를 사용하여 User 정보를 가져오는 함수
-    override suspend fun getUsersForParticipants(participants: List<String>): List<User> =
-        withContext(Dispatchers.IO) {
-            if (participants.isNotEmpty()) {
-                // 사용자 정보를 한 번에 가져오기
-                val usersRef = firebaseFireStore.collection("users")
-                val userDocuments = usersRef
-                    .whereIn(FieldPath.documentId(), participants)
-                    .get()
-                    .await()
+    fun getUsersForParticipants(participants: List<String>): Flow<List<User>> = callbackFlow {
+        if (participants.isNotEmpty()) {
+            val usersRef = firebaseFireStore.collection("users")
+            val listener = usersRef
+                .whereIn(FieldPath.documentId(), participants)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
 
-                userDocuments.documents.mapNotNull { doc ->
-                    doc.toObject(User::class.java)
+                    val users = snapshot?.documents?.mapNotNull { doc ->
+                        doc.toObject(User::class.java)
+                    } ?: emptyList()
+
+                    trySend(users)
                 }
-            } else {
-                emptyList()
-            }
+
+            awaitClose { listener.remove() }
+        } else {
+            trySend(emptyList())
+            close()
         }
+    }
 
     //채팅방 나가기
     override suspend fun exitChatRoom(
         chatRoomId: String,
         user: User
-    ): Result<Unit> = runCatching {
-        val query = firebaseFireStore.collection("chatRooms").document(chatRoomId)
-        query.update("participants", FieldValue.arrayRemove(user.id)).await()
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val query = firebaseFireStore.collection("chatRooms").document(chatRoomId)
 
-        return Result.success(Unit)
-    }.onFailure {
-        return Result.failure(it)
+            //채팅방 참여자 중에 유저 아이디를 하나 제거한다
+            query.update("participants", FieldValue.arrayRemove(user.id)).await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     //FCM 메시지 전송

@@ -74,6 +74,7 @@ fun ChatMessageList(
                         MessageType.TEXT -> newMessage.content
                         MessageType.IMAGE -> "이미지"
                         MessageType.VIDEO -> "비디오"
+                        MessageType.SYSTEM -> "시스템 메시지"
                     }
                 }
             }

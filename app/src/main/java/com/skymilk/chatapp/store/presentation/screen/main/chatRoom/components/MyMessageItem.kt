@@ -102,6 +102,9 @@ fun MyMessageItem(
 
                     MessageType.VIDEO -> {
                     }
+
+                    MessageType.SYSTEM -> {
+                    }
                 }
             }
         }

@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -12,10 +11,8 @@ import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +33,6 @@ import androidx.navigation.toRoute
 import com.skymilk.chatapp.di.ViewModelFactoryModule
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
-import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.ChatRoomCreateScreen
@@ -227,7 +223,7 @@ fun MainContent(
                 ),
                 enterTransition = {
                     when (initialState.destination.route) {
-                        MainNavigation.ProfileEditScreen::class.qualifiedName-> {
+                        MainNavigation.ProfileEditScreen::class.qualifiedName -> {
                             EnterTransition.None
                         }
 

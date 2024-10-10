@@ -8,6 +8,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.utils.FirebaseUtil
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.Locale
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -60,7 +60,7 @@ class UserRepositoryImpl @Inject constructor(
 
             Result.success(Unit)
         } catch (e: Exception) {
-            handleUserError(e)
+            handleError(e)
         }
     }
 
@@ -92,7 +92,7 @@ class UserRepositoryImpl @Inject constructor(
                 Result.failure(Exception("사용자를 찾을 수 없습니다"))
             }
         } catch (e: Exception) {
-            handleUserError(e)
+            handleError(e)
         }
     }
 
@@ -101,7 +101,9 @@ class UserRepositoryImpl @Inject constructor(
         val query = firebaseFireStore.collection("friends").document(userId)
         val usersCollection = firebaseFireStore.collection("users")
 
-        val listener = query.addSnapshotListener { snapshot, error ->
+        var userListener: ListenerRegistration? = null
+
+        val friendListener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.d("getFriends error", error.message.toString())
                 close()
@@ -112,16 +114,23 @@ class UserRepositoryImpl @Inject constructor(
                 val friendIds = snapshot.get("friendList") as? List<String> ?: emptyList()
 
                 if (friendIds.isNotEmpty()) {
-                    usersCollection.whereIn(FieldPath.documentId(), friendIds).get()
-                        .addOnSuccessListener { querySnapshot ->
-                            val userList = querySnapshot.documents.mapNotNull { doc ->
-                                doc.toObject(User::class.java)
+                    // 기존 userListener가 있다면 제거
+                    userListener?.remove()
+
+                    // 새로운 userListener 설정
+                    userListener = usersCollection.whereIn(FieldPath.documentId(), friendIds)
+                        .addSnapshotListener { usersSnapshot, usersError ->
+                            if (usersError != null) {
+                                Log.d("getFriends users error", usersError.message.toString())
+                                close()
+                                return@addSnapshotListener
                             }
+
+                            val userList = usersSnapshot?.documents?.mapNotNull { doc ->
+                                doc.toObject(User::class.java)
+                            } ?: emptyList()
+
                             trySend(userList)
-                        }
-                        .addOnFailureListener { e ->
-                            Log.d("getFriends users error", e.message.toString())
-                            close(e)
                         }
                 } else {
                     trySend(emptyList())
@@ -132,7 +141,8 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         awaitClose {
-            listener.remove()
+            friendListener.remove()
+            userListener?.remove()
         }
     }
 
@@ -146,6 +156,7 @@ class UserRepositoryImpl @Inject constructor(
             }
 
             if (snapshot != null && snapshot.exists()) {
+
                 val friendList = snapshot.get("friendList") as? List<String> ?: emptyList()
                 trySend(otherUserId in friendList)
             } else {
@@ -217,7 +228,7 @@ class UserRepositoryImpl @Inject constructor(
 
 
     //오류 체크
-    private fun <T> handleUserError(e: Exception): Result<T> {
+    private fun <T> handleError(e: Exception): Result<T> {
         e.printStackTrace()
         val errorMessage = when (e) {
             is FirebaseAuthException -> FirebaseUtil.getErrorMessage(e)
