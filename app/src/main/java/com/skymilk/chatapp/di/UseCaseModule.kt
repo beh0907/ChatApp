@@ -2,6 +2,7 @@ package com.skymilk.chatapp.di
 
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
+import com.skymilk.chatapp.store.domain.repository.NavigationRepository
 import com.skymilk.chatapp.store.domain.repository.SettingRepository
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import com.skymilk.chatapp.store.domain.repository.UserRepository
@@ -21,6 +22,9 @@ import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
 import com.skymilk.chatapp.store.domain.usecase.chat.GetOrCreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
 import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
+import com.skymilk.chatapp.store.domain.usecase.navigation.GetCurrentDestination
+import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
+import com.skymilk.chatapp.store.domain.usecase.navigation.SaveCurrentDestination
 import com.skymilk.chatapp.store.domain.usecase.setting.DeleteAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSettingAsync
@@ -111,5 +115,13 @@ object UseCaseModule {
             GetUserSetting(settingRepository),
             GetUserSettingAsync(settingRepository),
             SaveUserSetting(settingRepository),
+        )
+
+    @Provides
+    @Singleton
+    fun provideNavigationUseCases(navigationRepository: NavigationRepository): NavigationUseCases =
+        NavigationUseCases(
+            GetCurrentDestination(navigationRepository),
+            SaveCurrentDestination(navigationRepository),
         )
 }

@@ -14,8 +14,10 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.skymilk.chatapp.MainActivity
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
+import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.random.Random
@@ -28,6 +30,9 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
     @Inject
     lateinit var settingUseCases: SettingUseCases
+
+    @Inject
+    lateinit var navigationUseCases: NavigationUseCases
 
     @Inject
     lateinit var userUseCases: UserUseCases
@@ -61,6 +66,8 @@ class FirebaseMessageService : FirebaseMessagingService() {
         val senderId = messageData["senderId"] ?: return
         val chatRoomId = messageData["chatRoomId"] ?: return
 
+        val navigationState = navigationUseCases.getCurrentDestination()
+
         //로그인 상태가 아니라면 알림X
         if (firebaseAuth.currentUser == null) return
 
@@ -72,6 +79,10 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
         //알림이 해제된 채팅방이라면 알림X
         if (settingUseCases.getAlarmSetting(chatRoomId)) return
+
+        //현재 참여하고 있는 채팅방이라면 알림X
+        if (navigationState.destination == MainNavigation.ChatRoomScreen.javaClass.toString()
+            && navigationState.params["chatRoomId"] == chatRoomId) return
 
         val notificationManager = getSystemService<NotificationManager>()!!
 

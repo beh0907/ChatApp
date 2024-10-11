@@ -2,11 +2,13 @@ package com.skymilk.chatapp.di
 
 import com.skymilk.chatapp.store.data.repository.AuthRepositoryImpl
 import com.skymilk.chatapp.store.data.repository.ChatRepositoryImpl
+import com.skymilk.chatapp.store.data.repository.NavigationRepositoryImpl
 import com.skymilk.chatapp.store.data.repository.SettingRepositoryImpl
 import com.skymilk.chatapp.store.data.repository.StorageRepositoryImpl
 import com.skymilk.chatapp.store.data.repository.UserRepositoryImpl
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
+import com.skymilk.chatapp.store.domain.repository.NavigationRepository
 import com.skymilk.chatapp.store.domain.repository.SettingRepository
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import com.skymilk.chatapp.store.domain.repository.UserRepository
@@ -41,4 +43,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingRepository(impl: SettingRepositoryImpl): SettingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNavigationRepository(impl: NavigationRepositoryImpl): NavigationRepository
 }

@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -59,7 +61,6 @@ fun MainContent(
     onSignOut: () -> Unit,
     parentNavController: NavHostController
 ) {
-
     //하단 탭 메뉴
     val bottomNavigationItems = remember {
         listOf(
@@ -111,6 +112,9 @@ fun MainContent(
             currentUser.id
         )
     )
+
+    //네비게이션 화면 상태 저장 viewmodel
+    val navigationViewmodel: NavigationViewModel = hiltViewModel()
 
     Scaffold(
         bottomBar = {
@@ -303,6 +307,21 @@ fun MainContent(
                         args.chatRoomId
                     )
                 )
+
+                //채팅방에 진입할 때 채팅방 화면 정보와 파라미터 전달
+                DisposableEffect(Unit) {
+                    args.javaClass.toString()
+                    // 현재 화면 정보 저장
+                    navigationViewmodel.updateCurrentDestination(
+                        MainNavigation.ChatRoomScreen.javaClass.toString(),
+                        mapOf("chatRoomId" to args.chatRoomId)
+                    )
+
+                    //메인화면 종료 시 데이터 초기화
+                    onDispose {
+                        navigationViewmodel.updateCurrentDestination("", null)
+                    }
+                }
 
                 ChatRoomScreen(
                     viewModel = chatRoomViewModel,
