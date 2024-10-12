@@ -113,7 +113,7 @@ fun ChatRoomItem(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
                 fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.primary,
                 maxLines = 1
             )
         }

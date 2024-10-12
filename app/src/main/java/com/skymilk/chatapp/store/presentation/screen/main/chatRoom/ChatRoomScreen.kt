@@ -18,13 +18,13 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,6 +42,7 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +51,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +59,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -67,7 +66,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -86,7 +84,6 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
-import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.ui.theme.CookieRunFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlin.math.roundToInt
@@ -98,7 +95,8 @@ fun ChatRoomScreen(
     currentUser: User,
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImageViewer: (String) -> Unit
+    onNavigateToImageViewer: (String) -> Unit,
+    onNavigateToInviteFriends: (String ,List<String>) -> Unit,
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
@@ -132,12 +130,10 @@ fun ChatRoomScreen(
                     modifier = modifier.fillMaxSize()
                 ) {
                     //제목 영역
-                    TopSection(
-                        chatRoom = chatRoom,
+                    TopSection(chatRoom = chatRoom,
                         currentUser = currentUser,
                         onNavigateToBack = onNavigateToBack,
-                        onOpenDrawer = { visibleDrawer = true }
-                    )
+                        onOpenDrawer = { visibleDrawer = true })
 
                     //채팅 목록 영역
                     when (chatMessagesState) {
@@ -173,8 +169,7 @@ fun ChatRoomScreen(
 
                         is ChatMessagesState.Error -> {
                             ErrorScreen(
-                                message = "메시지를 불러오지 못했습니다.",
-                                retry = viewModel::loadChatMessages
+                                message = "메시지를 불러오지 못했습니다.", retry = viewModel::loadChatMessages
                             )
                         }
                     }
@@ -194,18 +189,20 @@ fun ChatRoomScreen(
                 }
 
                 //우측 드로어 메뉴
-                CustomRightSideDrawer(
-                    drawerVisibility = visibleDrawer,
+                CustomRightSideDrawer(drawerVisibility = visibleDrawer,
                     currentUser = currentUser,
                     chatRoom = chatRoom,
                     alarmState = alarmState,
                     onVisibleExitDialog = { visibleExitDialog = true },
                     onToggleAlarmState = viewModel::toggleAlarmState,
                     onNavigateToProfile = onNavigateToProfile,
+                    onNavigateToInviteFriends = {
+                        //채팅방 아이디, 현재 참여자 목록
+                        onNavigateToInviteFriends(chatRoom.id, chatRoom.participants.map { it.id })
+                    },
                     onCloseDrawer = {
                         visibleDrawer = false
-                    }
-                )
+                    })
 
             }
 
@@ -215,13 +212,9 @@ fun ChatRoomScreen(
             }
         }
 
-        if (visibleExitDialog)
-            CustomAlertDialog(
-                message = "채팅방을 나가시겠습니까?",
-                onConfirm = {
-                    viewModel.exitChatRoom(currentUser, onNavigateToBack)
-                },
-                onDismiss = { visibleExitDialog = false })
+        if (visibleExitDialog) CustomAlertDialog(message = "채팅방을 나가시겠습니까?", onConfirm = {
+            viewModel.exitChatRoom(currentUser, onNavigateToBack)
+        }, onDismiss = { visibleExitDialog = false })
     }
 }
 
@@ -241,8 +234,7 @@ fun TopSection(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
             onNavigateToBack()
@@ -333,8 +325,7 @@ fun BottomSection(
                         .start { uri ->
                             onSendImageMessage(user, uri)
                         }
-                },
-            contentAlignment = Alignment.BottomCenter
+                }, contentAlignment = Alignment.BottomCenter
         ) {
             Icon(
                 modifier = Modifier
@@ -389,8 +380,7 @@ fun BottomSection(
 
                         //키보드 숨기기
                         keyboardController?.hide()
-                    },
-                contentAlignment = Alignment.BottomCenter
+                    }, contentAlignment = Alignment.BottomCenter
             ) {
                 Icon(
                     modifier = Modifier
@@ -418,6 +408,7 @@ fun BoxScope.CustomRightSideDrawer(
     onVisibleExitDialog: () -> Unit,
     onToggleAlarmState: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
+    onNavigateToInviteFriends: () -> Unit,
     onCloseDrawer: () -> Unit,
 ) {
     val ratio = 0.8f
@@ -432,15 +423,13 @@ fun BoxScope.CustomRightSideDrawer(
     }
 
     val draggableState = remember {
-        AnchoredDraggableState(
-            initialValue = if (drawerVisibility) DrawerValue.Open else DrawerValue.Closed,
+        AnchoredDraggableState(initialValue = if (drawerVisibility) DrawerValue.Open else DrawerValue.Closed,
             anchors = anchors,
             positionalThreshold = { distance: Float -> distance * 0.5f },
             velocityThreshold = { with(density) { 100.dp.toPx() } },
             snapAnimationSpec = SpringSpec(stiffness = Spring.StiffnessMediumLow),
             decayAnimationSpec = splineBasedDecay(density),
-            confirmValueChange = { true }
-        )
+            confirmValueChange = { true })
     }
 
     //드로어 상태 애니메이션 표현
@@ -458,47 +447,36 @@ fun BoxScope.CustomRightSideDrawer(
 
     // 드로어 뒷배경
     AnimatedVisibility(
-        visible = drawerVisibility,
-        enter = fadeIn(),
-        exit = fadeOut()
+        visible = drawerVisibility, enter = fadeIn(), exit = fadeOut()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(
-                    //리플 효과 제거
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) { onCloseDrawer() }
-        )
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable(
+                //리플 효과 제거
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }) { onCloseDrawer() })
     }
 
     // 드로어 레이아웃
-    AnimatedVisibility(
-        visible = drawerVisibility,
+    AnimatedVisibility(visible = drawerVisibility,
         enter = slideInHorizontally(initialOffsetX = { it }),
         exit = slideOutHorizontally(targetOffsetX = { it }),
         modifier = Modifier.align(Alignment.CenterEnd)
     ) {
-        Box(
-            modifier = Modifier.offset {
+        Box(modifier = Modifier
+            .offset {
                 IntOffset(
-                    x = draggableState
-                        .offset
-                        .roundToInt(),
-                    y = 0
+                    x = draggableState.offset.roundToInt(), y = 0
                 )
             }
-                .fillMaxHeight()
-                .fillMaxWidth(ratio)
-                .clip(RoundedCornerShape(topStart = 30.dp, bottomStart = 30.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .anchoredDraggable(
-                    state = draggableState,
-                    orientation = Orientation.Horizontal
-                )
-        ) {
+            .fillMaxHeight()
+            .fillMaxWidth(ratio)
+            .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .anchoredDraggable(
+                state = draggableState, orientation = Orientation.Horizontal
+            )) {
             Column {
                 Text(
                     modifier = Modifier
@@ -510,17 +488,23 @@ fun BoxScope.CustomRightSideDrawer(
                     fontWeight = FontWeight.Bold
                 )
 
+                HorizontalDivider(modifier = Modifier.padding(bottom = 10.dp))
+
+                //채팅방 참여자 목록
                 ParticipantList(
                     modifier = Modifier.weight(1f),
                     currentUser = currentUser,
                     participants = chatRoom.participants,
-                    onUserItemClick = onNavigateToProfile
+                    onUserItemClick = onNavigateToProfile,
+                    onNavigateToInviteFriends = onNavigateToInviteFriends
                 )
+
+                HorizontalDivider()
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
+                        .padding(5.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {

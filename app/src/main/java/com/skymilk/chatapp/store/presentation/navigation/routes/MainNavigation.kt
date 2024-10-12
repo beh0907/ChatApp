@@ -20,7 +20,10 @@ sealed interface MainNavigation {
     data class ChatRoomScreen(val chatRoomId: String) : MainNavigation // 채팅방 화면
 
     @Serializable
-    data object ChatRoomCreateScreen : MainNavigation // 채팅방 생성 화면
+    data class ChatRoomInviteScreen(
+        val existingChatRoomId: String? = null,
+        val existingParticipants: List<String> = emptyList()
+    ) : MainNavigation // 채팅방 대화상대 초대 화면
 
     @Serializable
     data class ProfileScreen(val user: User) : MainNavigation // 프로필 화면

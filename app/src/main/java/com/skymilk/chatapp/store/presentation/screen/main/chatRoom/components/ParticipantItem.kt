@@ -67,7 +67,7 @@ fun ParticipantItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(
-                        MaterialTheme.colorScheme.secondary
+                        MaterialTheme.colorScheme.primary
                     ),
                 text = " 나 ",
                 fontFamily = CookieRunFont,

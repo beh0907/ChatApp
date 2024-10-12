@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -34,17 +34,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectedUserList
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components.SelectionUserList
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectedUserList
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
 import com.skymilk.chatapp.ui.theme.CookieRunFont
 
 @Composable
-fun ChatRoomCreateScreen(
+fun ChatRoomInviteScreen(
     modifier: Modifier = Modifier,
     friendsState: FriendsState,
-    viewModel: ChatRoomCreateViewModel = hiltViewModel(),
+    viewModel: ChatRoomInviteViewModel = hiltViewModel(),
     currentUser: User,
+    existingChatRoomId: String?,
+    existingParticipants: List<String>,
     onNavigateToChatRoom: (String) -> Unit,
     onNavigateToBack: () -> Unit
 ) {
@@ -62,10 +64,14 @@ fun ChatRoomCreateScreen(
     Column(modifier = modifier.fillMaxSize()) {
         //상단 타이틀 섹션
         TopSection(
-            currentUser = currentUser,
             selectedUsers = selectedUsers,
             onNavigateToBack = onNavigateToBack,
-            onCreateChatRoom = viewModel::getChatRoomId
+            onCreateChatRoom = {
+                if (existingChatRoomId != null)
+                    viewModel.addParticipantsToChatRoom(currentUser, existingChatRoomId, selectedUsers)
+                else
+                    viewModel.getChatRoomId(currentUser, selectedUsers)
+            }
         )
 
         //선택된 유저 목록
@@ -82,25 +88,31 @@ fun ChatRoomCreateScreen(
             onSearchQueryChange = { searchQuery = it }
         )
 
-        when(friendsState) {
+        when (friendsState) {
             is FriendsState.Success -> {
-                                //유저 목록 섹션
+                //기존 채팅방일 경우 해당 참가자들은 제외하여 표시한다
+                val availableUsers =
+                    if (existingChatRoomId != null) friendsState.friends.filter { it.id !in existingParticipants }
+                    else friendsState.friends
+
+
+                //유저 목록 섹션
                 SelectionUserList(
-                    users = friendsState.friends,
+                    users = availableUsers,
                     selectedUsers = selectedUsers,
                     searchQuery = searchQuery,
                     onUserSelect = { user ->
                         selectedUsers = if (user in selectedUsers) {
                             selectedUsers - user
                         } else {
-                            listOf(user) + selectedUsers
+                            selectedUsers + user
                         }
                     }
                 )
             }
+
             else -> {}
         }
-
 
 
     }
@@ -109,10 +121,9 @@ fun ChatRoomCreateScreen(
 //상단 타이틀
 @Composable
 fun TopSection(
-    currentUser: User,
     selectedUsers: List<User>,
     onNavigateToBack: () -> Unit,
-    onCreateChatRoom: (List<String>) -> Unit
+    onCreateChatRoom: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -140,9 +151,7 @@ fun TopSection(
 
         IconButton(
             enabled = selectedUsers.isNotEmpty(),
-            onClick = {
-                onCreateChatRoom(selectedUsers.map { it.id } + currentUser.id)
-            }
+            onClick = { onCreateChatRoom() }
         ) {
             Icon(Icons.Default.Check, contentDescription = "Confirm")
         }
@@ -152,7 +161,7 @@ fun TopSection(
 @Composable
 private fun FriendSearchSection(
     modifier: Modifier = Modifier,
-    searchQuery : String,
+    searchQuery: String,
     onSearchQueryChange: (String) -> Unit
 ) {
 

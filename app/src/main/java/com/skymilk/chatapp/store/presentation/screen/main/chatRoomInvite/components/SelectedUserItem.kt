@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -85,26 +85,4 @@ fun SelectedUserItem(
             }
         )
     }
-
-//    Column(
-//        modifier = Modifier.padding(8.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        AsyncImage(
-//            modifier = Modifier
-//                .size(50.dp)
-//                .clip(RoundedCornerShape(10.dp)),
-//            model = user.profileImageUrl ?: "https://via.placeholder.com/150",
-//            contentScale = ContentScale.Crop,
-//            contentDescription = null
-//        )
-//
-//        Spacer(modifier = Modifier.height(4.dp))
-//
-//        Text(
-//            text = user.username,
-//            fontFamily = LeeSeoYunFont,
-//            style = MaterialTheme.typography.titleMedium,
-//        )
-//    }
 }

@@ -70,6 +70,7 @@ fun ChatMessageList(
                 } else {
                     // 스크롤이 최하단에 있지 않으면 알림 표시
                     showNewMessageNotification = true
+
                     showNewMessage = when (newMessage.type) {
                         MessageType.TEXT -> newMessage.content
                         MessageType.IMAGE -> "이미지"
@@ -113,30 +114,39 @@ fun ChatMessageList(
                 count = chatMessages.size,
                 key = { index -> chatMessages[index].id }
             ) { index ->
-
                 val chatMessage = chatMessages[index]
 
-                if (chatMessage.senderId == currentUser.id) {
-                    //내가 작성한 메시지
-                    MyMessageItem(
-                        chatMessage = chatMessage,
-                        onNavigateToImageViewer = onNavigateToImageViewer
-                    )
+                when(chatMessage.type) {
+                    //시스템 메시지는 별도 표시
+                    MessageType.SYSTEM -> {
+                        SystemMessageItem(
+                            content = chatMessage.content
+                        )
+                    }
 
-                } else {
-                    // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
-                    val sender = chatRoom.participants
-                        .find { it.id == chatMessage.senderId }!!
+                    //채팅 메시지 표시
+                    else -> {
+                        //내가 작성한 메시지
+                        if (chatMessage.senderId == currentUser.id) {
+                            MyMessageItem(
+                                chatMessage = chatMessage,
+                                onNavigateToImageViewer = onNavigateToImageViewer
+                            )
 
-                    //다른 사람이 작성한 메시지
-                    OtherMessageItem(
-                        chatMessage = chatMessage,
-                        sender = sender,
-                        onNavigateToProfile = onNavigateToProfile,
-                        onNavigateToImageViewer = onNavigateToImageViewer
-                    )
+                        } else {
+                            // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
+                            val sender = chatRoom.participants.find { it.id == chatMessage.senderId }!!
+
+                            //다른 사람이 작성한 메시지
+                            OtherMessageItem(
+                                chatMessage = chatMessage,
+                                sender = sender,
+                                onNavigateToProfile = onNavigateToProfile,
+                                onNavigateToImageViewer = onNavigateToImageViewer
+                            )
+                        }
+                    }
                 }
-
 
                 //첫번째 메시지거나 이전 메시지와 날짜가 다르다면
                 // 날짜 정보 표시

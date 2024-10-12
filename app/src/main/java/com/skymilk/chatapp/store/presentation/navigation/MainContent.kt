@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -37,8 +36,8 @@ import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.ChatRoomCreateScreen
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.ChatRoomCreateViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.ChatRoomInviteScreen
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.ChatRoomInviteViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatListScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomListViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
@@ -176,8 +175,8 @@ fun MainContent(
                             launchSingleTop = true
                         }
                     },
-                    onNavigateToChatRoomCreate = {
-                        navController.navigate(MainNavigation.ChatRoomCreateScreen)
+                    onNavigateToChatRoomInvite = {
+                        navController.navigate(MainNavigation.ChatRoomInviteScreen)
                     }
                 )
             }
@@ -198,14 +197,19 @@ fun MainContent(
             }
 
             //채팅방 생성 화면
-            composable<MainNavigation.ChatRoomCreateScreen> {
-                val chatRoomCreateViewModel: ChatRoomCreateViewModel = hiltViewModel()
+            composable<MainNavigation.ChatRoomInviteScreen> {
+                val chatRoomInviteViewModel: ChatRoomInviteViewModel = hiltViewModel()
                 val friends by friendsViewModel.friendsState.collectAsStateWithLifecycle()
 
-                ChatRoomCreateScreen(
-                    viewModel = chatRoomCreateViewModel,
+                //특정 채팅방에서 유저를 추가할 땐 채팅방과 현재 참여자 정보를 가지고 있다
+                val args = it.toRoute<MainNavigation.ChatRoomInviteScreen>()
+
+                ChatRoomInviteScreen(
+                    viewModel = chatRoomInviteViewModel,
                     friendsState = friends,
                     currentUser = currentUser,
+                    existingChatRoomId = args.existingChatRoomId,
+                    existingParticipants = args.existingParticipants,
                     onNavigateToChatRoom = { chatRoomId ->
                         navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
@@ -214,9 +218,7 @@ fun MainContent(
                             launchSingleTop = true
                         }
                     },
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    }
+                    onNavigateToBack = { navController.popBackStack() }
                 )
             }
 
@@ -254,9 +256,7 @@ fun MainContent(
                     viewModel = profileViewModel,
                     user = if (currentUser.id == argsUser.id) currentUser else argsUser, //프로필 갱신 시 실시간 반영처리를 위해 currentUser를 넣는다
                     loginUserId = currentUser.id,
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    },
+                    onNavigateToBack = { navController.popBackStack() },
                     onNavigateToProfileEdit = {
                         navController.navigate(MainNavigation.ProfileEditScreen) {
                             launchSingleTop = true
@@ -284,9 +284,7 @@ fun MainContent(
                 ProfileEditScreen(
                     viewModel = profileEditViewModel,
                     user = currentUser,
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    }
+                    onNavigateToBack = { navController.popBackStack() }
                 )
             }
 
@@ -326,9 +324,7 @@ fun MainContent(
                 ChatRoomScreen(
                     viewModel = chatRoomViewModel,
                     currentUser = currentUser,
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    },
+                    onNavigateToBack = { navController.popBackStack() },
                     onNavigateToProfile = { user: User ->
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)
@@ -336,6 +332,14 @@ fun MainContent(
                     },
                     onNavigateToImageViewer = { imageUrl ->
                         navController.navigate(MainNavigation.ImageViewerScreen(imageUrl = imageUrl))
+                    },
+                    onNavigateToInviteFriends = { chatRoomId, participants ->
+                        navController.navigate(
+                            MainNavigation.ChatRoomInviteScreen(
+                                existingChatRoomId = chatRoomId,
+                                existingParticipants = participants
+                            )
+                        )
                     }
                 )
             }
@@ -346,9 +350,7 @@ fun MainContent(
 
                 ImageViewerScreen(
                     imageUrl = args.imageUrl,
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    }
+                    onNavigateToBack = { navController.popBackStack() }
                 )
             }
 
@@ -364,9 +366,7 @@ fun MainContent(
                             MainNavigation.ProfileScreen(user = user)
                         )
                     },
-                    onNavigateToBack = {
-                        navController.popBackStack()
-                    }
+                    onNavigateToBack = { navController.popBackStack() }
                 )
             }
         }

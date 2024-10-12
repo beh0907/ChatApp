@@ -142,8 +142,7 @@ fun OtherMessageItem(
                             MessageType.VIDEO -> {
                             }
 
-                            MessageType.SYSTEM -> {
-                            }
+                            MessageType.SYSTEM -> {}
                         }
                     }
 

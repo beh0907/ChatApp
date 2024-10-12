@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

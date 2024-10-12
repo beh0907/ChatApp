@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
@@ -113,10 +114,10 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //텍스트 메시지 전송
-    fun sendMessage(sender: User, content: String, participants: List<User>) {
+    fun sendMessage(sender: User, content: String, participants: List<User>, type: MessageType = MessageType.TEXT) {
         viewModelScope.launch {
             try {
-                chatUseCases.sendMessage(chatRoomId, sender, content, participants)
+                chatUseCases.sendMessage(chatRoomId, sender, content, participants, type)
             } catch (e: Exception) {
                 //에러 처리
             }
@@ -190,9 +191,18 @@ class ChatRoomViewModel @AssistedInject constructor(
 
             when {
                 result.isSuccess -> {
-                    onNavigateToBack()
-                    sendEvent(Event.Toast("채팅방에서 퇴장하였습니다."))
+                    //퇴장 시스템 메시지 전송
+                    //시스템 메시지는 알림을 표시하지 않기 위해 emptyList 전송
+                    sendMessage(user, "${user.username}님이 퇴장하셨습니다.", emptyList(), MessageType.SYSTEM)
+
+                    //알림 토픽 구독 제거
                     unsubscribeForNotification()
+
+                    //알림 메시지 출력
+                    sendEvent(Event.Toast("채팅방에서 퇴장하였습니다."))
+
+                    //화면 이동
+                    onNavigateToBack()
                 }
 
                 result.isFailure -> {

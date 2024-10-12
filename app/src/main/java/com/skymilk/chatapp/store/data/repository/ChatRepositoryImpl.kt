@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.data.repository
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.util.fastMap
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -117,7 +116,7 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     //채팅방 참가자가 일치한 채팅방 아이디 가져오기
-    override suspend fun getOrCreateChatRoom(participants: List<String>): Result<String?> =
+    override suspend fun getOrCreateChatRoom(participants: List<String>): Result<String> =
         withContext(Dispatchers.IO) {
             try {
                 // 참가자 목록을 정렬하여 일관성 있는 쿼리를 보장합니다.
@@ -154,10 +153,47 @@ class ChatRepositoryImpl @Inject constructor(
             }
         }
 
+    // 채팅방 생성 (Firestore)
+    override suspend fun createChatRoom(
+        name: String,
+        participants: List<String>
+    ): Result<ChatRoom> = withContext(Dispatchers.IO) {
+        val key = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
+
+        val chatRoom = ChatRoom(
+            id = key,
+            name = name,
+            participants = participants,
+            lastMessage = "",
+            lastMessageTimestamp = System.currentTimeMillis(),
+            createdTimestamp = System.currentTimeMillis()
+        )
+        try {
+            firebaseFireStore.collection("chatRooms").document(key).set(chatRoom).await()
+            Result.success(chatRoom)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    //기존 채팅방에 대화상대 유저 추가
+    override suspend fun addParticipants(chatRoomId: String, newParticipants: List<String>): Result<String> =
+        withContext(Dispatchers.IO) {
+            try {
+                val query = firebaseFireStore.collection("chatRooms").document(chatRoomId)
+
+                // FieldValue.arrayUnion()을 사용하여 새 참가자를 추가합니다.
+                query.update("participants", FieldValue.arrayUnion(*newParticipants.toTypedArray())).await()
+
+                Result.success(chatRoomId)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)
     override fun getMessages(chatRoomId: String): Flow<List<ChatMessage>> = callbackFlow {
-        val query = firebaseDatabase.getReference("messages")
-            .child(chatRoomId)
+        val query = firebaseDatabase.getReference("messages").child(chatRoomId)
 
         val listener = query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -179,7 +215,8 @@ class ChatRepositoryImpl @Inject constructor(
         chatRoomId: String,
         sender: User,
         content: String,
-        participants: List<User>
+        participants: List<User>,
+        type: MessageType
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val messagesRef = firebaseDatabase.getReference("messages").child(chatRoomId)
@@ -190,7 +227,7 @@ class ChatRepositoryImpl @Inject constructor(
                 senderId = sender.id,
                 content = content, // 메시지 내용
                 timestamp = System.currentTimeMillis(),
-                type = MessageType.TEXT
+                type = type
             )
 
             // 메시지를 Realtime Database에 저장
@@ -256,29 +293,6 @@ class ChatRepositoryImpl @Inject constructor(
             sendFcmMessage(chatRoomId, sender, "이미지", participants)
 
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    // 채팅방 생성 (Firestore)
-    override suspend fun createChatRoom(
-        name: String,
-        participants: List<String>
-    ): Result<ChatRoom> = withContext(Dispatchers.IO) {
-        val key = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
-
-        val chatRoom = ChatRoom(
-            id = key,
-            name = name,
-            participants = participants,
-            lastMessage = "",
-            lastMessageTimestamp = System.currentTimeMillis(),
-            createdTimestamp = System.currentTimeMillis()
-        )
-        try {
-            firebaseFireStore.collection("chatRooms").document(key).set(chatRoom).await()
-            Result.success(chatRoom)
         } catch (e: Exception) {
             Result.failure(e)
         }

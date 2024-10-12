@@ -76,7 +76,7 @@ fun ChatSoloRoomItem(
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(
-                            MaterialTheme.colorScheme.secondary
+                            MaterialTheme.colorScheme.primary
                         ),
                     text = " 나 ",
                     fontFamily = CookieRunFont,
@@ -103,7 +103,7 @@ fun ChatSoloRoomItem(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
                 fontFamily = CookieRunFont,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.primary,
                 maxLines = 1
             )
         }

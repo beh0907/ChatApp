@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.screen.main.chatRoomCreate.components
+package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

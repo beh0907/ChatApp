@@ -84,7 +84,7 @@ fun FriendsItem(
                     text = user.statusMessage,
                     fontFamily = CookieRunFont,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
