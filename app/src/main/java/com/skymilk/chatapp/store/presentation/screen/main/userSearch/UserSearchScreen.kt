@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Search
@@ -24,8 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -120,6 +124,7 @@ private fun UserSearchSection(
     modifier: Modifier = Modifier,
     searchUser: (String) -> Unit
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
     // 검색어 입력 칸
@@ -131,6 +136,11 @@ private fun UserSearchSection(
             .background(MaterialTheme.colorScheme.primaryContainer),
         value = searchQuery,
         onValueChange = { searchQuery = it },
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onDone = {
+            searchUser(searchQuery)
+            keyboardController?.hide()
+        }),
         singleLine = true,
         placeholder = {
             Text(

@@ -42,15 +42,13 @@ fun SelectedUserItem(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
-            model = if (user.profileImageUrl.isNullOrBlank()) {
-                painterResource(id = R.drawable.bg_default_profile)
-            } else {
-//                user.profileImageUrl
-                ImageRequest.Builder(LocalContext.current)
-                    .data(user.profileImageUrl)
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build()
-            },
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(
+                    if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                    else user.profileImageUrl
+                )
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
             contentScale = ContentScale.Crop,
             contentDescription = null
         )

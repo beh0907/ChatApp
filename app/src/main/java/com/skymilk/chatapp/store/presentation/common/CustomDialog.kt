@@ -106,7 +106,10 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
         },
         confirmButton = {
             TextButton(
-                onClick = { onConfirm() }
+                onClick = {
+                    onConfirm()
+                    onDismiss()
+                }
             ) {
                 Text(
                     "확인",

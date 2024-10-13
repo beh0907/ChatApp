@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -96,7 +95,7 @@ fun ChatRoomScreen(
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
     onNavigateToImageViewer: (String) -> Unit,
-    onNavigateToInviteFriends: (String ,List<String>) -> Unit,
+    onNavigateToInviteFriends: (String, List<String>) -> Unit,
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
@@ -212,9 +211,14 @@ fun ChatRoomScreen(
             }
         }
 
-        if (visibleExitDialog) CustomAlertDialog(message = "채팅방을 나가시겠습니까?", onConfirm = {
-            viewModel.exitChatRoom(currentUser, onNavigateToBack)
-        }, onDismiss = { visibleExitDialog = false })
+        if (visibleExitDialog)
+            CustomAlertDialog(
+                message = "채팅방을 나가시겠습니까?",
+                onConfirm = {
+                    viewModel.exitChatRoom(currentUser, onNavigateToBack)
+                },
+                onDismiss = { visibleExitDialog = false }
+            )
     }
 }
 
@@ -459,7 +463,8 @@ fun BoxScope.CustomRightSideDrawer(
     }
 
     // 드로어 레이아웃
-    AnimatedVisibility(visible = drawerVisibility,
+    AnimatedVisibility(
+        visible = drawerVisibility,
         enter = slideInHorizontally(initialOffsetX = { it }),
         exit = slideOutHorizontally(targetOffsetX = { it }),
         modifier = Modifier.align(Alignment.CenterEnd)

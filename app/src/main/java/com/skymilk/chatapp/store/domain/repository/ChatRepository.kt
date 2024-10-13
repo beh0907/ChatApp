@@ -15,7 +15,7 @@ interface ChatRepository {
 
     suspend fun getOrCreateChatRoom(participants: List<String>): Result<String>
 
-    suspend fun createChatRoom(name: String, participants: List<String>): Result<ChatRoom>
+    suspend fun createChatRoom(name: String, participants: List<String>): Result<String>
 
     suspend fun addParticipants(chatRoomId: String, newParticipants: List<String>): Result<String>
 

@@ -18,23 +18,24 @@ class ChatRoomInviteViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
 ) : ViewModel() {
 
-    //채팅방 이동 아이디
-    private val _chatRoomId = MutableStateFlow<String?>(null)
-    val chatRoomId = _chatRoomId.asStateFlow()
-
     //파라미터와 일치한 참여자가 있는 채팅방 찾기
-    fun getChatRoomId(currentUser: User, participants: List<User>) {
+    fun getChatRoomId(
+        currentUser: User,
+        participants: List<User>,
+        onNavigateToChatRoom: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            //유저 아이디가 일치한 채팅방의 아이디값을 가져온다
-            //없다면 내부에서 채팅방 생성
+            //새로운 채팅방을 만든다
+            //이미 중복된 참여자의 채팅방이 있더라도 새로 만든다
             val result =
-                chatUseCases.getOrCreateChatRoom(participants.map { it.id } + currentUser.id)
+                chatUseCases.createChatRoom("새로운 채팅방", participants.map { it.id } + currentUser.id)
 
             //결과 처리
             handleResult(
                 currentUser = currentUser,
                 participants = participants,
-                result = result
+                result = result,
+                onNavigateToChatRoom = onNavigateToChatRoom
             )
         }
     }
@@ -42,7 +43,8 @@ class ChatRoomInviteViewModel @Inject constructor(
     fun addParticipantsToChatRoom(
         currentUser: User,
         chatRoomId: String,
-        participants: List<User>
+        participants: List<User>,
+        onNavigateToChatRoom: (String) -> Unit
     ) {
         viewModelScope.launch {
             val result = chatUseCases.addParticipants(chatRoomId, participants.map { it.id })
@@ -51,7 +53,8 @@ class ChatRoomInviteViewModel @Inject constructor(
             handleResult(
                 currentUser = currentUser,
                 participants = participants,
-                result = result
+                result = result,
+                onNavigateToChatRoom = onNavigateToChatRoom
             )
         }
     }
@@ -59,7 +62,8 @@ class ChatRoomInviteViewModel @Inject constructor(
     private suspend fun handleResult(
         currentUser: User,
         participants: List<User>,
-        result: Result<String>
+        result: Result<String>,
+        onNavigateToChatRoom: (String) -> Unit
     ) {
         when {
             result.isSuccess -> {
@@ -74,13 +78,12 @@ class ChatRoomInviteViewModel @Inject constructor(
                     chatRoomId,
                     currentUser,
                     content,
-                    participants,
+                    emptyList(),
                     MessageType.SYSTEM
                 )
 
-                //채팅방 아이디 설정
-                //채팅방 아이디가 설정되면 채팅방으로 이동한다
-                _chatRoomId.value = chatRoomId
+                //채팅방으로 이동한다
+                onNavigateToChatRoom(chatRoomId)
             }
 
             result.isFailure -> {

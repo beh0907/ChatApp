@@ -38,7 +38,7 @@ fun SelectionUserList(
             SelectionUserItem(
                 user = user,
                 isSelected = user in selectedUsers,
-                onSelect = { onUserSelect(user) }
+                onUserSelect = onUserSelect
             )
         }
     }

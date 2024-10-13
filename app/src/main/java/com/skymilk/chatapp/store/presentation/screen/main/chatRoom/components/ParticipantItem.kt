@@ -47,15 +47,13 @@ fun ParticipantItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape),
-            model = if (participant.profileImageUrl.isNullOrBlank()) {
-                painterResource(id = R.drawable.bg_default_profile)
-            } else {
-//                user.profileImageUrl
-                ImageRequest.Builder(LocalContext.current)
-                    .data(participant.profileImageUrl)
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build()
-            },
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(
+                    if (participant.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                    else participant.profileImageUrl
+                )
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

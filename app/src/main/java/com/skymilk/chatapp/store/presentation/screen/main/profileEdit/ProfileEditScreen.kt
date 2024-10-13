@@ -260,15 +260,13 @@ private fun EditProfileSection(
             AsyncImage(
                 modifier = Modifier
                     .size(120.dp),
-                model = if (profileImageUrl.isNullOrBlank()) {
-                    painterResource(id = R.drawable.bg_default_profile)
-                } else {
-//                    profileImageUrl
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(profileImageUrl)
-                        .decoderFactory(SvgDecoder.Factory())
-                        .build()
-                },
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                        if (profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                        else profileImageUrl
+                    )
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build(),
                 contentScale = ContentScale.Crop,
                 contentDescription = null
             )

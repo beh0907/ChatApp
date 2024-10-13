@@ -24,14 +24,12 @@ import com.skymilk.chatapp.ui.theme.dimens
 fun SelectionUserItem(
     user: User,
     isSelected: Boolean,
-    onSelect: () -> Unit
+    onUserSelect: (User) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onSelect()
-            }
+            .clickable { onUserSelect(user) }
             .padding(horizontal = 10.dp, vertical = MaterialTheme.dimens.small1),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -58,7 +56,7 @@ fun SelectionUserItem(
 
         Checkbox(
             checked = isSelected,
-            onCheckedChange = { onSelect() }
+            onCheckedChange = { onUserSelect(user) }
         )
     }
 }

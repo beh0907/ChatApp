@@ -135,7 +135,8 @@ fun ChatMessageList(
 
                         } else {
                             // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
-                            val sender = chatRoom.participants.find { it.id == chatMessage.senderId }!!
+                            val sender = chatRoom.participants.find { it.id == chatMessage.senderId }
+                                ?: User()
 
                             //다른 사람이 작성한 메시지
                             OtherMessageItem(

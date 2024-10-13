@@ -142,7 +142,7 @@ class ChatRepositoryImpl @Inject constructor(
 
                     return@withContext when {
                         newChatRoom.isSuccess -> {
-                            Result.success(newChatRoom.getOrThrow().id)
+                            Result.success(newChatRoom.getOrThrow())
                         }
 
                         else -> Result.failure(Exception("채팅방을 생성할 수 없습니다"))
@@ -157,7 +157,7 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun createChatRoom(
         name: String,
         participants: List<String>
-    ): Result<ChatRoom> = withContext(Dispatchers.IO) {
+    ): Result<String> = withContext(Dispatchers.IO) {
         val key = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
 
         val chatRoom = ChatRoom(
@@ -170,7 +170,7 @@ class ChatRepositoryImpl @Inject constructor(
         )
         try {
             firebaseFireStore.collection("chatRooms").document(key).set(chatRoom).await()
-            Result.success(chatRoom)
+            Result.success(chatRoom.id)
         } catch (e: Exception) {
             Result.failure(e)
         }

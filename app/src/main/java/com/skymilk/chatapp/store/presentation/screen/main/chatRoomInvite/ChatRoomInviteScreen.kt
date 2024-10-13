@@ -53,14 +53,6 @@ fun ChatRoomInviteScreen(
     var selectedUsers by remember { mutableStateOf(listOf<User>()) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val chatRoomId by viewModel.chatRoomId.collectAsStateWithLifecycle()
-
-    LaunchedEffect(chatRoomId) {
-        chatRoomId?.let {
-            onNavigateToChatRoom(it)
-        }
-    }
-
     Column(modifier = modifier.fillMaxSize()) {
         //상단 타이틀 섹션
         TopSection(
@@ -68,9 +60,11 @@ fun ChatRoomInviteScreen(
             onNavigateToBack = onNavigateToBack,
             onCreateChatRoom = {
                 if (existingChatRoomId != null)
-                    viewModel.addParticipantsToChatRoom(currentUser, existingChatRoomId, selectedUsers)
+                    //이미 채팅방이 있다면 참여자만 추가한다
+                    viewModel.addParticipantsToChatRoom(currentUser, existingChatRoomId, selectedUsers, onNavigateToChatRoom)
                 else
-                    viewModel.getChatRoomId(currentUser, selectedUsers)
+                    //채팅방을 새로 생성한다
+                    viewModel.getChatRoomId(currentUser, selectedUsers, onNavigateToChatRoom)
             }
         )
 

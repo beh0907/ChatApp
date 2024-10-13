@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -27,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -65,22 +65,21 @@ fun OtherMessageItem(
             verticalAlignment = Alignment.Bottom
         ) {
             AsyncImage(
-                model = if (sender.profileImageUrl.isNullOrBlank()) {
-                    painterResource(id = R.drawable.bg_default_profile)
-                } else {
-//                    sender.profileImageUrl
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(sender.profileImageUrl)
-                        .decoderFactory(SvgDecoder.Factory())
-                        .build()
-                },
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                        if (sender.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                        else sender.profileImageUrl
+                    )
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build(),
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
                     .align(Alignment.Top)
                     .clickable {
-                        onNavigateToProfile(sender)
+                        if (sender.id.isNotBlank())
+                            onNavigateToProfile(sender)
                     },
                 contentScale = ContentScale.Crop
             )
@@ -89,7 +88,7 @@ fun OtherMessageItem(
 
             Column {
                 Text(
-                    text = sender.username,
+                    text = sender.username.ifBlank { "퇴장한 유저입니다." },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     fontFamily = CookieRunFont
@@ -139,10 +138,7 @@ fun OtherMessageItem(
                                 )
                             }
 
-                            MessageType.VIDEO -> {
-                            }
-
-                            MessageType.SYSTEM -> {}
+                            else -> Unit
                         }
                     }
 

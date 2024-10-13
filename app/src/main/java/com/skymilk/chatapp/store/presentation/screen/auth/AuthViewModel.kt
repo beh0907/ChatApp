@@ -1,12 +1,12 @@
 package com.skymilk.chatapp.store.presentation.screen.auth
 
-import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.auth.model.OAuthToken
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
+import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation
 import com.skymilk.chatapp.utils.Event
 import com.skymilk.chatapp.utils.ValidationUtil
@@ -22,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authUseCases: AuthUseCases
+    private val authUseCases: AuthUseCases,
+    private val userUseCases: UserUseCases
 ) : ViewModel() {
 
     //로그인 상태 정보
@@ -53,7 +54,6 @@ class AuthViewModel @Inject constructor(
                     }
                 }
         }
-
     }
 
     //구글 로그인

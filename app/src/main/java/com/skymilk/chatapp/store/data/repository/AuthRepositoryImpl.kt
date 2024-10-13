@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.data.repository
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.oAuthCredential
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,12 +10,12 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.model.toUser
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
-import com.skymilk.chatapp.utils.FirebaseUtil
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.math.abs
@@ -36,9 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
         val authUser = authResult.user?.toUser() ?: throw IllegalStateException("유저 정보가 없습니다.")
 
         //구글 회원가입이라면
-        if (isFirstTimeLogin(authResult)) {
-            saveUserToDatabase(authUser)
-        }
+        if (isFirstTimeLogin(authResult)) saveUserToDatabase(authUser)
 
         emitAll(getUserFlow(authUser.id))
     }
@@ -54,9 +51,7 @@ class AuthRepositoryImpl @Inject constructor(
         val authUser = authResult.user?.toUser() ?: throw IllegalStateException("유저 정보가 없습니다.")
 
         // 최초 로그인 시 데이터베이스에 유저 정보 저장
-        if (isFirstTimeLogin(authResult)) {
-            saveUserToDatabase(authUser)
-        }
+        if (isFirstTimeLogin(authResult)) saveUserToDatabase(authUser)
 
         emitAll(getUserFlow(authUser.id))
     }
@@ -92,9 +87,7 @@ class AuthRepositoryImpl @Inject constructor(
     override fun getCurrentUser(): Flow<User> = flow {
         val userId = firebaseAuth.currentUser?.uid
 
-        if (userId != null) {
-            emitAll(getUserFlow(userId))
-        }
+        if (userId != null) emitAll(getUserFlow(userId))
     }
 
     // Firebase Firestore에서 유저 정보를 Flow로 가져오는 함수
@@ -107,8 +100,27 @@ class AuthRepositoryImpl @Inject constructor(
                     return@addSnapshotListener
                 }
 
-                snapshot?.toObject(User::class.java)?.let { updatedUser ->
-                    trySend(updatedUser)
+                snapshot?.toObject(User::class.java)?.let { user ->
+                    //유저 정보 전달
+                    trySend(user)
+
+                    //FCM 토큰 업데이트
+                    launch {
+                        try {
+                            // FCM 토큰 가져오기 시도
+                            val fcmToken = firebaseMessaging.token.await()
+
+                            if (fcmToken != user.fcmToken) {
+                                firebaseFireStore.collection("users")
+                                    .document(userId)
+                                    .update("fcmToken", fcmToken)
+                                    .await()
+                            }
+                        } catch (e: Exception) {
+                            // 토큰 가져오기 실패 시 원래 유저 객체 사용 (fcmToken은 null 또는 빈 문자열)
+                            println("FCM 토큰 가져오기 실패: ${e.message}")
+                        }
+                    }
                 }
             }
         awaitClose { authListener?.remove() }
@@ -125,20 +137,10 @@ class AuthRepositoryImpl @Inject constructor(
 
     //회원 가입 시 유저 정보 DB 등록
     override suspend fun saveUserToDatabase(user: User) {
-        val updatedUser = try {
-            // FCM 토큰 가져오기 시도
-            val fcmToken = firebaseMessaging.token.await()
-            user.copy(fcmToken = fcmToken)
-        } catch (e: Exception) {
-            // 토큰 가져오기 실패 시 원래 유저 객체 사용 (fcmToken은 null 또는 빈 문자열)
-            println("FCM 토큰 가져오기 실패: ${e.message}")
-            user
-        }
-
         // 업데이트된 User 객체를 데이터베이스에 저장
         firebaseFireStore.collection("users")
-            .document(updatedUser.id)
-            .set(updatedUser)
+            .document(user.id)
+            .set(user)
             .await()
     }
 
@@ -147,15 +149,5 @@ class AuthRepositoryImpl @Inject constructor(
         val lastSignInTime = authResult.user?.metadata?.lastSignInTimestamp ?: return false
         val creationTime = authResult.user?.metadata?.creationTimestamp ?: return false
         return abs(lastSignInTime - creationTime) < 1000 // 1초 이내라면 회원가입으로 판단
-    }
-
-    //오류 체크
-    private fun handleAuthError(e: Exception): Result<User> {
-        e.printStackTrace()
-        val errorMessage = when (e) {
-            is FirebaseAuthException -> FirebaseUtil.getErrorMessage(e)
-            else -> e.message ?: "An unknown error occurred"
-        }
-        return Result.failure(Exception(errorMessage))
     }
 }

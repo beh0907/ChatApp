@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.friends
 
-import android.R.attr.maxLines
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -49,15 +47,13 @@ fun FriendsItem(
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape),
-            model = if (user.profileImageUrl.isNullOrBlank()) {
-                painterResource(id = R.drawable.bg_default_profile)
-            } else {
-//                user.profileImageUrl
-                ImageRequest.Builder(LocalContext.current)
-                    .data(user.profileImageUrl)
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build()
-            },
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(
+                    if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                    else user.profileImageUrl
+                )
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

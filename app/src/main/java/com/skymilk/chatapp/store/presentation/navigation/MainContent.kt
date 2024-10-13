@@ -188,7 +188,7 @@ fun MainContent(
                 SettingScreen(
                     currentUser = currentUser,
                     viewModel = settingViewModel,
-                    onNavigateToProfile = { user: User ->
+                    onNavigateToProfile = { user ->
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)
                         )
@@ -325,7 +325,7 @@ fun MainContent(
                     viewModel = chatRoomViewModel,
                     currentUser = currentUser,
                     onNavigateToBack = { navController.popBackStack() },
-                    onNavigateToProfile = { user: User ->
+                    onNavigateToProfile = { user ->
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)
                         )
