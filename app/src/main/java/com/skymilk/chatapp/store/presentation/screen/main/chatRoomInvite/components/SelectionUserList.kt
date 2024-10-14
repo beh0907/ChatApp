@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun SelectionUserList(
@@ -28,8 +28,8 @@ fun SelectionUserList(
         item {
             Text(
                 modifier = Modifier.padding(start = 15.dp),
-                text = "친구 ${filteredUsers.size}",
-                fontFamily = CookieRunFont,
+                text = "초대 가능한 친구 ${filteredUsers.size}",
+                fontFamily = SamsungOneFont,
                 fontSize = 14.sp
             )
         }

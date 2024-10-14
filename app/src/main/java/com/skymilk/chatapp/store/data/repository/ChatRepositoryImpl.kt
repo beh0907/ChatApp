@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.data.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.util.fastDistinctBy
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -87,6 +88,7 @@ class ChatRepositoryImpl @Inject constructor(
 
                 // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보를 비동기적으로 가져오기
                 launch {
+
                     val chatRooms = snapshots?.documents?.mapNotNull { doc ->
                         doc.toObject(ChatRoom::class.java)
                     }.orEmpty()
@@ -105,9 +107,14 @@ class ChatRepositoryImpl @Inject constructor(
                         }
                     }
 
-                    //채팅방 정보들 결합 후 리턴
-                    combine(chatRoomWithUsersList) { it.toList() }.collect {
-                        trySend(it)
+                    // 빈 목록일 경우 빈 리스트 반환
+                    if (chatRoomWithUsersList.isEmpty()) {
+                        trySend(emptyList())
+                    } else {
+                        // 채팅방 정보들 결합 후 리턴
+                        combine(chatRoomWithUsersList) { it.toList() }.collect {
+                            trySend(it)
+                        }
                     }
                 }
             }
@@ -177,13 +184,17 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     //기존 채팅방에 대화상대 유저 추가
-    override suspend fun addParticipants(chatRoomId: String, newParticipants: List<String>): Result<String> =
+    override suspend fun addParticipants(
+        chatRoomId: String,
+        newParticipants: List<String>
+    ): Result<String> =
         withContext(Dispatchers.IO) {
             try {
                 val query = firebaseFireStore.collection("chatRooms").document(chatRoomId)
 
                 // FieldValue.arrayUnion()을 사용하여 새 참가자를 추가합니다.
-                query.update("participants", FieldValue.arrayUnion(*newParticipants.toTypedArray())).await()
+                query.update("participants", FieldValue.arrayUnion(*newParticipants.toTypedArray()))
+                    .await()
 
                 Result.success(chatRoomId)
             } catch (e: Exception) {
@@ -229,21 +240,23 @@ class ChatRepositoryImpl @Inject constructor(
                 timestamp = System.currentTimeMillis(),
                 type = type
             )
-
             // 메시지를 Realtime Database에 저장
             newMessageRef.setValue(chatMessage).await()
 
-            // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
-            val chatRoomUpdates = mapOf(
-                "lastMessage" to content,  // 마지막 메시지 내용
-                "lastMessageTimestamp" to System.currentTimeMillis()  // 마지막 메시지 타임스탬프
-            )
+            //시스템 메시지가 아닐때만 마지막 메시지로 저장한다
+            if (type != MessageType.SYSTEM) {
+                // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
+                val chatRoomUpdates = mapOf(
+                    "lastMessage" to content,  // 마지막 메시지 내용
+                    "lastMessageTimestamp" to System.currentTimeMillis()  // 마지막 메시지 타임스탬프
+                )
 
-            // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
-            firebaseFireStore.collection("chatRooms")
-                .document(chatRoomId)
-                .update(chatRoomUpdates)
-                .await()
+                // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
+                firebaseFireStore.collection("chatRooms")
+                    .document(chatRoomId)
+                    .update(chatRoomUpdates)
+                    .await()
+            }
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
             sendFcmMessage(chatRoomId, sender, content, participants)
@@ -378,7 +391,8 @@ class ChatRepositoryImpl @Inject constructor(
         participants: List<User>
     ) = coroutineScope {
         // DB에서 참가자들의 FCM 토큰을 가져옵니다.
-        val tokens = participants.map { it.fcmToken }
+        // 한 계정에 복수의 로그인 이력이 있을 수 있으니 중복 제거
+        val tokens = participants.map { it.fcmToken }.fastDistinctBy { it }
 
         // 토큰이 없는 경우 처리
         if (tokens.isEmpty()) {

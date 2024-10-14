@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -40,7 +39,7 @@ import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.utils.DateUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
@@ -91,7 +90,7 @@ fun OtherMessageItem(
                     text = sender.username.ifBlank { "퇴장한 유저입니다." },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = CookieRunFont
+                    fontFamily = SamsungOneFont
                 )
 
                 Row {
@@ -109,7 +108,7 @@ fun OtherMessageItem(
                                     color = Black,
                                     text = chatMessage.content,
                                     modifier = Modifier.padding(8.dp),
-                                    fontFamily = CookieRunFont
+                                    fontFamily = SamsungOneFont
                                 )
                             }
 
@@ -148,7 +147,7 @@ fun OtherMessageItem(
                         text = DateUtil.getTime(chatMessage.timestamp),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.align(Alignment.Bottom),
-                        fontFamily = CookieRunFont
+                        fontFamily = SamsungOneFont
                     )
                 }
             }

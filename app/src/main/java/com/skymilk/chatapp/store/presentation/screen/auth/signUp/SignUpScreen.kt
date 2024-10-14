@@ -44,7 +44,7 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -172,7 +172,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignIn: () -> Unit) {
                 style = SpanStyle(
                     color = Color(0xff94a3b8),
                     fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = CookieRunFont,
+                    fontFamily = SamsungOneFont,
                     fontWeight = FontWeight.Normal
                 )
             ) {
@@ -183,7 +183,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignIn: () -> Unit) {
                 style = SpanStyle(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = CookieRunFont,
+                    fontFamily = SamsungOneFont,
                     fontWeight = FontWeight.Medium
                 )
             ) {

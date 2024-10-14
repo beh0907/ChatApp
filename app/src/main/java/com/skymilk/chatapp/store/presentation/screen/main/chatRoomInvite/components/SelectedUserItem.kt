@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -22,7 +21,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun SelectedUserItem(
@@ -73,7 +72,7 @@ fun SelectedUserItem(
 
         Text(
             text = user.username,
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.constrainAs(username) {
                 top.linkTo(image.bottom, margin = 4.dp)

@@ -22,7 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun FriendsScreen(
@@ -87,7 +87,7 @@ fun TopSection(onNavigateToUserSearch: () -> Unit) {
         Text(
             modifier = Modifier.weight(1f),
             text = "친구",
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold

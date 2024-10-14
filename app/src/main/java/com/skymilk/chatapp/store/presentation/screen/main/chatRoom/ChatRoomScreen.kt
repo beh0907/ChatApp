@@ -83,7 +83,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlin.math.roundToInt
 
@@ -254,7 +254,7 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = title,
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
@@ -352,7 +352,7 @@ fun BottomSection(
                     text = "채팅을 입력해주세요.",
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.Gray,
-                    fontFamily = CookieRunFont
+                    fontFamily = SamsungOneFont
                 )
             },
             colors = TextFieldDefaults.colors(
@@ -362,7 +362,7 @@ fun BottomSection(
                 unfocusedContainerColor = Color.Transparent
             ),
             textStyle = TextStyle(
-                fontFamily = CookieRunFont,
+                fontFamily = SamsungOneFont,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 color = MaterialTheme.colorScheme.onSurface
@@ -489,7 +489,7 @@ fun BoxScope.CustomRightSideDrawer(
                         .padding(10.dp),
                     text = "채팅방 정보",
                     style = MaterialTheme.typography.titleLarge,
-                    fontFamily = CookieRunFont,
+                    fontFamily = SamsungOneFont,
                     fontWeight = FontWeight.Bold
                 )
 

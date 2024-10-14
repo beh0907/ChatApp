@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -58,7 +57,7 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -194,7 +193,7 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "프로필 편집",
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = Color.White,
             fontWeight = FontWeight.Bold
@@ -205,7 +204,7 @@ fun TopSection(
         }) {
             Text(
                 text = "완료",
-                fontFamily = CookieRunFont,
+                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -279,10 +278,9 @@ private fun EditProfileSection(
                 .align(Alignment.BottomCenter),
             textAlign = TextAlign.Center,
             text = "편집",
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             color = Color.White,
-
-            )
+        )
     }
 
     Spacer(modifier = Modifier.height(17.dp))
@@ -307,7 +305,8 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleLarge,
             text = editName,
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             color = Color.White
         )
@@ -351,7 +350,7 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleMedium,
             text = editStatusMessage,
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             textAlign = TextAlign.Center,
             color = Color.White
         )
@@ -363,7 +362,7 @@ private fun EditProfileSection(
             tint = Color.White
         )
     }
-    Spacer(modifier = Modifier.height(10.dp))
+    Spacer(modifier = Modifier.height(11.dp))
 }
 
 @Composable

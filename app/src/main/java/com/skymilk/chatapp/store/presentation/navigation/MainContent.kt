@@ -176,7 +176,7 @@ fun MainContent(
                         }
                     },
                     onNavigateToChatRoomInvite = {
-                        navController.navigate(MainNavigation.ChatRoomInviteScreen)
+                        navController.navigate(MainNavigation.ChatRoomInviteScreen())
                     }
                 )
             }

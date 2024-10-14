@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,12 +31,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun ChatRoomInviteScreen(
@@ -137,7 +135,7 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "대화상대 초대",
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
@@ -172,7 +170,7 @@ private fun FriendSearchSection(
         placeholder = {
             Text(
                 text = "이름을 검색해주세요.",
-                fontFamily = CookieRunFont,
+                fontFamily = SamsungOneFont,
                 color = Color.Gray,
             )
         },
@@ -194,7 +192,7 @@ private fun FriendSearchSection(
             unfocusedContainerColor = Color.Transparent
         ),
         textStyle = TextStyle(
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             color = MaterialTheme.colorScheme.onSurface

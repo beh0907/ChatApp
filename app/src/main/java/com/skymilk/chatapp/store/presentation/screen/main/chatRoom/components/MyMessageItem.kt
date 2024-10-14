@@ -30,7 +30,7 @@ import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.utils.DateUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
@@ -57,7 +57,7 @@ fun MyMessageItem(
                 text = DateUtil.getTime(chatMessage.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
-                fontFamily = CookieRunFont
+                fontFamily = SamsungOneFont
             )
 
             Surface(
@@ -73,7 +73,7 @@ fun MyMessageItem(
                             color = Black,
                             text = chatMessage.content,
                             modifier = Modifier.padding(8.dp),
-                            fontFamily = CookieRunFont
+                            fontFamily = SamsungOneFont
                         )
                     }
 

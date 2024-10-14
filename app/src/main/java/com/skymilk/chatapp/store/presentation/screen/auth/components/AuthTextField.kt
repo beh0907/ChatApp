@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun AuthTextField(
@@ -40,7 +40,7 @@ fun AuthTextField(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = CookieRunFont
+                fontFamily = SamsungOneFont
             )
         },
         leadingIcon = {
@@ -52,7 +52,7 @@ fun AuthTextField(
             }
         },
         textStyle = TextStyle(
-            fontFamily = CookieRunFont,
+            fontFamily = SamsungOneFont,
             fontSize = 16.sp, // 텍스트 크기
         )
     )

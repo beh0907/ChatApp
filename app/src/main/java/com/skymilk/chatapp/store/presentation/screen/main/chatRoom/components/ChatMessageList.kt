@@ -32,7 +32,7 @@ import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.utils.DateUtil
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -184,7 +184,7 @@ fun ChatMessageList(
             ) {
                 Text(
                     text = showNewMessage,
-                    fontFamily = CookieRunFont,
+                    fontFamily = SamsungOneFont,
                     color = MaterialTheme.colorScheme.surface
                 )
 

@@ -32,7 +32,7 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
 
@@ -84,7 +84,8 @@ fun ChatRoomItem(
                             style = SpanStyle(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                fontFamily = CookieRunFont
+                                fontFamily = SamsungOneFont,
+                                fontWeight = FontWeight.Bold
                             )
                         ) {
                             append("${participant.username} ")
@@ -98,7 +99,7 @@ fun ChatRoomItem(
                     style = SpanStyle(
                         color = Color.Gray,
                         fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                        fontFamily = CookieRunFont,
+                        fontFamily = SamsungOneFont,
                         fontWeight = FontWeight.Medium
                     )
                 ) {
@@ -111,7 +112,7 @@ fun ChatRoomItem(
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
-                fontFamily = CookieRunFont,
+                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1
@@ -125,7 +126,7 @@ fun ChatRoomItem(
             //시간 정보
             Text(
                 text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                fontFamily = CookieRunFont,
+                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

@@ -38,7 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.skymilk.chatapp.ui.theme.CookieRunFont
+import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun CustomProgressDialog(message: String) {
@@ -60,7 +60,7 @@ fun CustomProgressDialog(message: String) {
                 Text(
                     text = message,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = CookieRunFont
+                    fontFamily = SamsungOneFont
                 )
             }
         }
@@ -75,7 +75,7 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
             Text(
                 text = message,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontFamily = CookieRunFont
+                fontFamily = SamsungOneFont
             )
         },
         confirmButton = {
@@ -85,7 +85,7 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
                 Text(
                     "확인",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = CookieRunFont
+                    fontFamily = SamsungOneFont
                 )
             }
         },
@@ -101,7 +101,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
             Text(
                 text = message,
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                fontFamily = CookieRunFont
+                fontFamily = SamsungOneFont
             )
         },
         confirmButton = {
@@ -114,7 +114,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
                 Text(
                     "확인",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = CookieRunFont
+                    fontFamily = SamsungOneFont
                 )
             }
         },
@@ -125,7 +125,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
                 Text(
                     "취소",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = CookieRunFont
+                    fontFamily = SamsungOneFont
                 )
             }
         },
@@ -177,7 +177,7 @@ fun CustomFullScreenEditDialog(
                         Text(
                             text = "프로필 편집",
                             style = MaterialTheme.typography.titleLarge,
-                            fontFamily = CookieRunFont,
+                            fontFamily = SamsungOneFont,
                             color = Color.White
                         )
                     }
@@ -188,7 +188,7 @@ fun CustomFullScreenEditDialog(
                     ) {
                         Text(
                             text = "확인",
-                            fontFamily = CookieRunFont,
+                            fontFamily = SamsungOneFont,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -209,7 +209,7 @@ fun CustomFullScreenEditDialog(
                             if (it.length <= maxLength) inputText = it
                         },
                         textStyle = TextStyle(
-                            fontFamily = CookieRunFont,
+                            fontFamily = SamsungOneFont,
                             fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
                             color = Color.White
                         ),
@@ -220,7 +220,7 @@ fun CustomFullScreenEditDialog(
                             Text(
                                 "텍스트를 입력하세요",
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontFamily = CookieRunFont,
+                                fontFamily = SamsungOneFont,
                                 color = Color.White
                             )
                         },
@@ -236,7 +236,7 @@ fun CustomFullScreenEditDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
 
-                    Text("${inputText.length} / $maxLength", fontFamily = CookieRunFont, color = Color.White)
+                    Text("${inputText.length} / $maxLength", fontFamily = SamsungOneFont, color = Color.White)
                 }
             }
         }
