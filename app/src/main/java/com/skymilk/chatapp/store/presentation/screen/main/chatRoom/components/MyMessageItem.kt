@@ -57,7 +57,6 @@ fun MyMessageItem(
                 text = DateUtil.getTime(chatMessage.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
-                fontFamily = SamsungOneFont
             )
 
             Surface(
@@ -72,8 +71,8 @@ fun MyMessageItem(
                         Text(
                             color = Black,
                             text = chatMessage.content,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(8.dp),
-                            fontFamily = SamsungOneFont
                         )
                     }
 
@@ -86,8 +85,7 @@ fun MyMessageItem(
                                 .clickable {
                                     onNavigateToImageViewer(chatMessage.content)
                                 },
-                            model = ImageRequest.Builder(context).data(chatMessage.content)
-                                .crossfade(true).build(),
+                            model = ImageRequest.Builder(context).data(chatMessage.content).build(),
                             contentDescription = null,
                             loading = {
                                 Box(

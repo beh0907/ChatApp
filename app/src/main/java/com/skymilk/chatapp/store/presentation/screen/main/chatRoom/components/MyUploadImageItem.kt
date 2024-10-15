@@ -28,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.utils.DateUtil
 import com.skymilk.chatapp.utils.FileSizeUtil
 
@@ -52,8 +51,7 @@ fun MyUploadImageItem(
             Text(
                 text = DateUtil.getTime(),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(end = 8.dp),
-                fontFamily = SamsungOneFont
+                modifier = Modifier.padding(end = 8.dp)
             )
 
             Surface(

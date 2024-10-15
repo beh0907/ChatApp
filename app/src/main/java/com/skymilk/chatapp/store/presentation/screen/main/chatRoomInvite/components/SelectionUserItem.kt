@@ -17,7 +17,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -50,8 +49,7 @@ fun SelectionUserItem(
                 .weight(1f),
             text = user.username,
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyLarge,
-            fontFamily = SamsungOneFont
+            style = MaterialTheme.typography.bodyLarge
         )
 
         Checkbox(

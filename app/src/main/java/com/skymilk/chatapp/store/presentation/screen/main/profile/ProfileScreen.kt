@@ -19,7 +19,6 @@ import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.DeviceUnknown
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.PersonRemoveAlt1
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,7 +48,6 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun ProfileScreen(
@@ -201,7 +199,6 @@ fun UserProfileSection(
         modifier = Modifier.padding(horizontal = 48.dp),
         text = user.username,
         style = MaterialTheme.typography.titleLarge,
-        fontFamily = SamsungOneFont,
         color = Color.White,
         fontWeight = FontWeight.Bold
     )
@@ -213,7 +210,6 @@ fun UserProfileSection(
         modifier = Modifier.padding(horizontal = 48.dp),
         text = user.statusMessage,
         style = MaterialTheme.typography.titleMedium,
-        fontFamily = SamsungOneFont,
         color = Color.White
     )
 
@@ -257,7 +253,6 @@ fun MyProfileEventSection(
                 text = "나와의 채팅",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = SamsungOneFont,
                 color = Color.White
             )
         }
@@ -285,7 +280,6 @@ fun MyProfileEventSection(
                 text = "프로필 편집",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = SamsungOneFont,
                 color = Color.White
             )
         }
@@ -313,7 +307,6 @@ fun MyProfileEventSection(
                 text = "로그아웃",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = SamsungOneFont,
                 color = Color.White
             )
         }
@@ -365,7 +358,6 @@ fun OtherProfileEventSection(
                 text = "1:1 채팅",
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                fontFamily = SamsungOneFont,
                 color = Color.White
             )
         }
@@ -397,7 +389,6 @@ fun OtherProfileEventSection(
                         text = if (isFriend) "친구 삭제" else "친구 추가",
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
-                        fontFamily = SamsungOneFont,
                         color = Color.White
                     )
                 }
@@ -410,30 +401,30 @@ fun OtherProfileEventSection(
         }
 
         //미구현
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                }
-                .padding(horizontal = 10.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.DeviceUnknown,
-                contentDescription = null,
-                tint = Color.White
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = "미구현",
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                fontFamily = SamsungOneFont,
-                color = Color.White
-            )
-        }
+//        Column(
+//            modifier = Modifier
+//                .fillMaxHeight()
+//                .clickable {
+//                }
+//                .padding(horizontal = 10.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Icon(
+//                imageVector = Icons.Rounded.DeviceUnknown,
+//                contentDescription = null,
+//                tint = Color.White
+//            )
+//
+//            Spacer(Modifier.height(10.dp))
+//
+//            Text(
+//                text = "미구현",
+//                style = MaterialTheme.typography.titleSmall,
+//                maxLines = 1,
+//                fontFamily = SamsungOneFont,
+//                color = Color.White
+//            )
+//        }
     }
 }

@@ -25,7 +25,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsItem
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun SettingScreen(
@@ -70,14 +69,13 @@ fun TopSection() {
         Text(
             modifier = Modifier.weight(1f),
             text = "설정",
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
 
         //사이즈 맞추기 용 임시 이미지
-        IconButton(enabled = false,onClick = { }) {
+        IconButton(enabled = false, onClick = { }) {
             Icon(
                 imageVector = Icons.Rounded.MapsUgc,
                 contentDescription = null,
@@ -117,7 +115,6 @@ fun SettingSection(
                     .weight(1f)
                     .padding(start = 10.dp),
                 text = "알림",
-                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )

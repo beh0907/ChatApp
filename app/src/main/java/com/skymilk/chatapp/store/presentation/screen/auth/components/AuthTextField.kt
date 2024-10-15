@@ -8,12 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.sp
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun AuthTextField(
@@ -38,9 +35,8 @@ fun AuthTextField(
         label = {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = SamsungOneFont
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         leadingIcon = {
@@ -51,9 +47,6 @@ fun AuthTextField(
                 )
             }
         },
-        textStyle = TextStyle(
-            fontFamily = SamsungOneFont,
-            fontSize = 16.sp, // 텍스트 크기
-        )
+        textStyle = MaterialTheme.typography.bodyMedium
     )
 }

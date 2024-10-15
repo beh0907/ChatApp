@@ -63,11 +63,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
@@ -83,7 +81,6 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlin.math.roundToInt
 
@@ -254,7 +251,6 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = title,
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
@@ -352,7 +348,6 @@ fun BottomSection(
                     text = "채팅을 입력해주세요.",
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.Gray,
-                    fontFamily = SamsungOneFont
                 )
             },
             colors = TextFieldDefaults.colors(
@@ -361,12 +356,7 @@ fun BottomSection(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent
             ),
-            textStyle = TextStyle(
-                fontFamily = SamsungOneFont,
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
         )
 
         //메시지 전송 버튼
@@ -489,7 +479,6 @@ fun BoxScope.CustomRightSideDrawer(
                         .padding(10.dp),
                     text = "채팅방 정보",
                     style = MaterialTheme.typography.titleLarge,
-                    fontFamily = SamsungOneFont,
                     fontWeight = FontWeight.Bold
                 )
 

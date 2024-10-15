@@ -16,5 +16,4 @@ object EventBus {
 sealed interface Event {
     data class Toast(val message: String) : Event
     data class SnackBar(val message: String) : Event
-    data class Dialog(val title: String, val text: String) : Event
 }

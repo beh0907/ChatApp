@@ -27,7 +27,6 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -46,7 +45,7 @@ fun FriendsItem(
         //이미지 정보
         AsyncImage(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
@@ -72,15 +71,15 @@ fun FriendsItem(
                 text = user.username,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
-                fontFamily = SamsungOneFont,
                 fontWeight = FontWeight.Bold
             )
+
+            Spacer(Modifier.height(5.dp))
 
             //유저 상태 메시지가 있다면
             if (user.statusMessage.isNotBlank()) {
                 Text(
                     text = user.statusMessage,
-                    fontFamily = SamsungOneFont,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
@@ -101,7 +100,7 @@ fun FriendsItemShimmer() {
         // 이미지 정보
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape)
                 .shimmerEffect()
         )

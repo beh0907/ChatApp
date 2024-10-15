@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.common
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,10 +36,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun CustomProgressDialog(message: String) {
@@ -59,8 +60,7 @@ fun CustomProgressDialog(message: String) {
 
                 Text(
                     text = message,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = SamsungOneFont
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         }
@@ -74,8 +74,7 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
         text = {
             Text(
                 text = message,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontFamily = SamsungOneFont
+                style = MaterialTheme.typography.titleMedium,
             )
         },
         confirmButton = {
@@ -84,8 +83,7 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
             ) {
                 Text(
                     "확인",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = SamsungOneFont
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
@@ -100,8 +98,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
         text = {
             Text(
                 text = message,
-                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                fontFamily = SamsungOneFont
+                style = MaterialTheme.typography.bodyLarge,
             )
         },
         confirmButton = {
@@ -113,8 +110,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
             ) {
                 Text(
                     "확인",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = SamsungOneFont
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
@@ -124,14 +120,14 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
             ) {
                 Text(
                     "취소",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = SamsungOneFont
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
         shape = RoundedCornerShape(24.dp)
     )
 }
+
 
 @Composable
 fun CustomFullScreenEditDialog(
@@ -177,7 +173,6 @@ fun CustomFullScreenEditDialog(
                         Text(
                             text = "프로필 편집",
                             style = MaterialTheme.typography.titleLarge,
-                            fontFamily = SamsungOneFont,
                             color = Color.White
                         )
                     }
@@ -188,7 +183,7 @@ fun CustomFullScreenEditDialog(
                     ) {
                         Text(
                             text = "확인",
-                            fontFamily = SamsungOneFont,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -209,7 +204,6 @@ fun CustomFullScreenEditDialog(
                             if (it.length <= maxLength) inputText = it
                         },
                         textStyle = TextStyle(
-                            fontFamily = SamsungOneFont,
                             fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
                             color = Color.White
                         ),
@@ -220,7 +214,6 @@ fun CustomFullScreenEditDialog(
                             Text(
                                 "텍스트를 입력하세요",
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontFamily = SamsungOneFont,
                                 color = Color.White
                             )
                         },
@@ -236,7 +229,11 @@ fun CustomFullScreenEditDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
 
-                    Text("${inputText.length} / $maxLength", fontFamily = SamsungOneFont, color = Color.White)
+                    Text(
+                        text = "${inputText.length} / $maxLength",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
                 }
             }
         }

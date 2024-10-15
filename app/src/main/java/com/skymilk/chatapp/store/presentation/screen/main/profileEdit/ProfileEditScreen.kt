@@ -57,7 +57,6 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -193,7 +192,6 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "프로필 편집",
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = Color.White,
             fontWeight = FontWeight.Bold
@@ -204,8 +202,8 @@ fun TopSection(
         }) {
             Text(
                 text = "완료",
-                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -278,7 +276,7 @@ private fun EditProfileSection(
                 .align(Alignment.BottomCenter),
             textAlign = TextAlign.Center,
             text = "편집",
-            fontFamily = SamsungOneFont,
+            style = MaterialTheme.typography.bodyMedium,
             color = Color.White,
         )
     }
@@ -305,7 +303,6 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleLarge,
             text = editName,
-            fontFamily = SamsungOneFont,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             color = Color.White
@@ -350,7 +347,6 @@ private fun EditProfileSection(
                 .padding(horizontal = 24.dp),
             style = MaterialTheme.typography.titleMedium,
             text = editStatusMessage,
-            fontFamily = SamsungOneFont,
             textAlign = TextAlign.Center,
             color = Color.White
         )

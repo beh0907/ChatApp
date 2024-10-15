@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun ParticipantList(
@@ -36,7 +35,6 @@ fun ParticipantList(
                 modifier = Modifier.padding(start = 15.dp),
                 text = "참여자 ${participants.size}",
                 style = MaterialTheme.typography.titleMedium,
-                fontFamily = SamsungOneFont
             )
         }
 
@@ -64,7 +62,6 @@ fun ParticipantList(
                 Text(
                     text = "대화상대 초대",
                     style = MaterialTheme.typography.titleMedium,
-                    fontFamily = SamsungOneFont,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

@@ -32,7 +32,6 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
 
@@ -56,7 +55,7 @@ fun ChatRoomItem(
         //이미지 정보
         AsyncImage(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape),
             model = ImageRequest.Builder(
                 LocalContext.current
@@ -84,7 +83,6 @@ fun ChatRoomItem(
                             style = SpanStyle(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                fontFamily = SamsungOneFont,
                                 fontWeight = FontWeight.Bold
                             )
                         ) {
@@ -99,7 +97,6 @@ fun ChatRoomItem(
                     style = SpanStyle(
                         color = Color.Gray,
                         fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                        fontFamily = SamsungOneFont,
                         fontWeight = FontWeight.Medium
                     )
                 ) {
@@ -112,7 +109,6 @@ fun ChatRoomItem(
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
-                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1
@@ -126,7 +122,6 @@ fun ChatRoomItem(
             //시간 정보
             Text(
                 text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -144,7 +139,7 @@ fun ChatRoomItemShimmer() {
         // 이미지 정보
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .shimmerEffect()
                 .clip(CircleShape)
         )

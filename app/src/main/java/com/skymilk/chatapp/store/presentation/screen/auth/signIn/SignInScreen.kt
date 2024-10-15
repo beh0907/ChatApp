@@ -52,7 +52,6 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.CredentialUtil
 import kotlinx.coroutines.launch
@@ -144,7 +143,7 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
         ),
         shape = RoundedCornerShape(size = 4.dp)
     ) {
-        Text(text = "로그인", style = MaterialTheme.typography.labelMedium)
+        Text(text = "로그인", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -170,7 +169,7 @@ private fun SocialSection(
             SignInSocialMedia(
                 modifier = Modifier.weight(weight = 1f),
                 icon = R.drawable.ic_google,
-                text = "google 로그인",
+                text = "Google 로그인",
                 backgroundColor = Color.White,
             ) {
                 scope.launch {
@@ -207,8 +206,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
             withStyle(
                 style = SpanStyle(
                     color = Color(0xff94a3b8),
-                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = SamsungOneFont,
+                    fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
                     fontWeight = FontWeight.Normal
                 )
             ) {
@@ -218,9 +216,8 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
             withStyle(
                 style = SpanStyle(
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = SamsungOneFont,
-                    fontWeight = FontWeight.Medium
+                    fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+                    fontWeight = FontWeight.Bold
                 )
             ) {
                 append(" ")

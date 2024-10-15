@@ -24,7 +24,6 @@ import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomListShimmer
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun ChatListScreen(
@@ -85,7 +84,6 @@ fun TopSection(onNavigateToChatRoomInvite: () -> Unit) {
         Text(
             modifier = Modifier.weight(1f),
             text = "채팅",
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold

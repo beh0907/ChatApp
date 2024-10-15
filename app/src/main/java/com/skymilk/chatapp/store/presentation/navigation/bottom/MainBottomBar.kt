@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.navigation
+package com.skymilk.chatapp.store.presentation.navigation.bottom
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -12,11 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEachIndexed
 import com.skymilk.chatapp.R
 
 @Composable
-fun MainBottomNavigation(
+fun MainBottomBar(
     items: List<BottomNavigationItem>,
     selected: Int,
     onItemClick: (Int) -> Unit

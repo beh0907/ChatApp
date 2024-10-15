@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun ErrorScreen(message: String, icon: Int = R.drawable.ic_error, retry: (() -> Unit)? = null) {
@@ -65,7 +64,6 @@ fun ErrorContent(alphaAnim: Float, message: String, icon: Int, retry: (() -> Uni
                 .padding(20.dp)
                 .alpha(alphaAnim),
             text = message,
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.bodyMedium,
             color = if (isSystemInDarkTheme()) LightGray else DarkGray,
         )
@@ -75,7 +73,7 @@ fun ErrorContent(alphaAnim: Float, message: String, icon: Int, retry: (() -> Uni
             TextButton(
                 onClick = retry
             ) {
-                Text(text = "다시 시도", fontFamily = SamsungOneFont)
+                Text(text = "다시 시도", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

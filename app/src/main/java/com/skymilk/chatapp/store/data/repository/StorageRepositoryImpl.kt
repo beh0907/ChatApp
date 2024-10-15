@@ -32,7 +32,7 @@ class StorageRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun <T> saveImage(path: String, imageData: T): Flow<UploadProgress> = callbackFlow {
+    private fun <T> saveImage(path: String, imageData: T): Flow<UploadProgress> = callbackFlow {
         val storageRef = storageReference.child(path)
 
         val uploadTask = when (imageData) {

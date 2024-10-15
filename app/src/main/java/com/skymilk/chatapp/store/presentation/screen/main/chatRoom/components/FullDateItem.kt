@@ -10,19 +10,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun FullDateItem(
     fullDate: String
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 20.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = fullDate,
-            fontFamily = SamsungOneFont,
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,

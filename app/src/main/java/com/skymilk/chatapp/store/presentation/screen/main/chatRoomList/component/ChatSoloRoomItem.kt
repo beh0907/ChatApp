@@ -20,12 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.utils.DateUtil
 
@@ -48,7 +48,7 @@ fun ChatSoloRoomItem(
         //이미지 정보
         AsyncImage(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape),
             model = ImageRequest.Builder(
                 LocalContext.current
@@ -79,7 +79,6 @@ fun ChatSoloRoomItem(
                             MaterialTheme.colorScheme.primary
                         ),
                     text = " 나 ",
-                    fontFamily = SamsungOneFont,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.surface
                 )
@@ -88,20 +87,18 @@ fun ChatSoloRoomItem(
 
                 Text(
                     text = currentUser.username,
-                    fontFamily = SamsungOneFont,
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1
                 )
             }
-
 
             Spacer(Modifier.height(5.dp))
 
             //채팅방 마지막 대화
             Text(
                 text = chatRoom.lastMessage.ifBlank { "메시지가 없습니다" },
-                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1
@@ -115,7 +112,6 @@ fun ChatSoloRoomItem(
             //시간 정보
             Text(
                 text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                fontFamily = SamsungOneFont,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

@@ -23,7 +23,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authUseCases: AuthUseCases,
-    private val userUseCases: UserUseCases
 ) : ViewModel() {
 
     //로그인 상태 정보

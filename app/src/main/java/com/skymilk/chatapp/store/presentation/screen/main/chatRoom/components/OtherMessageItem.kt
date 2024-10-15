@@ -89,12 +89,10 @@ fun OtherMessageItem(
                 Text(
                     text = sender.username.ifBlank { "퇴장한 유저입니다." },
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = SamsungOneFont
+                    fontWeight = FontWeight.Bold
                 )
 
                 Row {
-
                     Surface(
                         shape = RoundedCornerShape(12.dp),
                         shadowElevation = 4.dp,
@@ -107,8 +105,8 @@ fun OtherMessageItem(
                                 Text(
                                     color = Black,
                                     text = chatMessage.content,
-                                    modifier = Modifier.padding(8.dp),
-                                    fontFamily = SamsungOneFont
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(8.dp)
                                 )
                             }
 
@@ -146,8 +144,7 @@ fun OtherMessageItem(
                     Text(
                         text = DateUtil.getTime(chatMessage.timestamp),
                         style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.align(Alignment.Bottom),
-                        fontFamily = SamsungOneFont
+                        modifier = Modifier.align(Alignment.Bottom)
                     )
                 }
             }

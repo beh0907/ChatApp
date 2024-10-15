@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.LightBlueWhite
 import com.skymilk.chatapp.ui.theme.dimens
 
@@ -52,8 +51,8 @@ fun SignInSocialMedia(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             text = text,
-            style = MaterialTheme.typography.labelLarge.copy(color = Color.Black.copy(alpha = 0.85f)),
-            fontFamily = SamsungOneFont
+            style = MaterialTheme.typography.labelLarge,
+            color = Color.Black.copy(alpha = 0.85f)
         )
     }
 }

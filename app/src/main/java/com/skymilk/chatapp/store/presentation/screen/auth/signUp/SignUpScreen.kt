@@ -44,7 +44,6 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -155,7 +154,7 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
         ),
         shape = RoundedCornerShape(size = 4.dp)
     ) {
-        Text(text = "회원가입", style = MaterialTheme.typography.labelMedium)
+        Text(text = "회원가입", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -171,9 +170,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignIn: () -> Unit) {
             withStyle(
                 style = SpanStyle(
                     color = Color(0xff94a3b8),
-                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = SamsungOneFont,
-                    fontWeight = FontWeight.Normal
+                    fontStyle = MaterialTheme.typography.labelMedium.fontStyle
                 )
             ) {
                 append("이미 가입된 회원이신가요?")
@@ -182,9 +179,8 @@ private fun ColumnScope.CreateSection(onNavigateToSignIn: () -> Unit) {
             withStyle(
                 style = SpanStyle(
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                    fontFamily = SamsungOneFont,
-                    fontWeight = FontWeight.Medium
+                    fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+                    fontWeight = FontWeight.Bold
                 )
             ) {
                 append(" ")

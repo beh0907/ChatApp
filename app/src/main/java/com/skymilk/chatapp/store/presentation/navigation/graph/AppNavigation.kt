@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.navigation
+package com.skymilk.chatapp.store.presentation.navigation.graph
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -92,7 +92,7 @@ fun AppNavigation(isDeepLink: Boolean) {
             val currentUser = (authState as? AuthState.Authenticated)?.user
             if (currentUser != null) {
 
-                MainContent(
+                MainNavigation(
                     currentUser = currentUser,
                     onSignOut = {
                         navController.navigate(AuthNavigation.SignInScreen) {

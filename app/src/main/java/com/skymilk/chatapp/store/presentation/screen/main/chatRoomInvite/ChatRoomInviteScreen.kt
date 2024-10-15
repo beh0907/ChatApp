@@ -26,16 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun ChatRoomInviteScreen(
@@ -58,10 +55,15 @@ fun ChatRoomInviteScreen(
             onNavigateToBack = onNavigateToBack,
             onCreateChatRoom = {
                 if (existingChatRoomId != null)
-                    //이미 채팅방이 있다면 참여자만 추가한다
-                    viewModel.addParticipantsToChatRoom(currentUser, existingChatRoomId, selectedUsers, onNavigateToChatRoom)
+                //이미 채팅방이 있다면 참여자만 추가한다
+                    viewModel.addParticipantsToChatRoom(
+                        currentUser,
+                        existingChatRoomId,
+                        selectedUsers,
+                        onNavigateToChatRoom
+                    )
                 else
-                    //채팅방을 새로 생성한다
+                //채팅방을 새로 생성한다
                     viewModel.getChatRoomId(currentUser, selectedUsers, onNavigateToChatRoom)
             }
         )
@@ -135,7 +137,6 @@ fun TopSection(
         Text(
             modifier = Modifier.weight(1f),
             text = "대화상대 초대",
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
@@ -170,7 +171,7 @@ private fun FriendSearchSection(
         placeholder = {
             Text(
                 text = "이름을 검색해주세요.",
-                fontFamily = SamsungOneFont,
+                style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
             )
         },
@@ -191,11 +192,6 @@ private fun FriendSearchSection(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent
         ),
-        textStyle = TextStyle(
-            fontFamily = SamsungOneFont,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
     )
 }

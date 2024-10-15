@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun SystemMessageItem(
@@ -30,7 +29,6 @@ fun SystemMessageItem(
                 .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
                 .padding(vertical = 8.dp, horizontal = 20.dp),
             text = content,
-            fontFamily = SamsungOneFont,
             color = MaterialTheme.colorScheme.surface,
             style = MaterialTheme.typography.bodySmall
         )

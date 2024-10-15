@@ -32,7 +32,6 @@ import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.utils.DateUtil
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -104,19 +103,15 @@ fun ChatMessageList(
                     MyUploadImageItem(uploadState)
                 }
 
-                if (chatMessages.isNotEmpty())
-                    scope.launch { listState.scrollToItem(0) }
+                if (chatMessages.isNotEmpty()) scope.launch { listState.scrollToItem(0) }
 
             }
 
             //메시지 이력 목록
-            items(
-                count = chatMessages.size,
-                key = { index -> chatMessages[index].id }
-            ) { index ->
+            items(count = chatMessages.size, key = { index -> chatMessages[index].id }) { index ->
                 val chatMessage = chatMessages[index]
 
-                when(chatMessage.type) {
+                when (chatMessage.type) {
                     //시스템 메시지는 별도 표시
                     MessageType.SYSTEM -> {
                         SystemMessageItem(
@@ -135,8 +130,9 @@ fun ChatMessageList(
 
                         } else {
                             // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
-                            val sender = chatRoom.participants.find { it.id == chatMessage.senderId }
-                                ?: User()
+                            val sender =
+                                chatRoom.participants.find { it.id == chatMessage.senderId }
+                                    ?: User()
 
                             //다른 사람이 작성한 메시지
                             OtherMessageItem(
@@ -152,8 +148,7 @@ fun ChatMessageList(
                 //첫번째 메시지거나 이전 메시지와 날짜가 다르다면
                 // 날짜 정보 표시
                 if (index == chatMessages.size - 1 || !DateUtil.isToday(
-                        chatMessages[index + 1].timestamp,
-                        chatMessage.timestamp
+                        chatMessages[index + 1].timestamp, chatMessage.timestamp
                     )
                 ) {
                     //중앙 날짜 정보
@@ -165,26 +160,23 @@ fun ChatMessageList(
 
         // 새 메시지 알림
         if (showNewMessageNotification) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 10.dp)
-                    .clip(
-                        RoundedCornerShape(10.dp)
-                    )
-                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
-                    .clickable {
-                        scope.launch {
-                            listState.scrollToItem(0)
-                            showNewMessageNotification = false
-                        }
+            Row(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 10.dp)
+                .clip(
+                    RoundedCornerShape(10.dp)
+                )
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
+                .clickable {
+                    scope.launch {
+                        listState.scrollToItem(0)
+                        showNewMessageNotification = false
                     }
-                    .padding(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                }
+                .padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = showNewMessage,
-                    fontFamily = SamsungOneFont,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.surface
                 )
 

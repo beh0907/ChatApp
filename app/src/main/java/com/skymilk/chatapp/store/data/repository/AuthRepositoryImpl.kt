@@ -136,7 +136,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     //회원 가입 시 유저 정보 DB 등록
-    override suspend fun saveUserToDatabase(user: User) {
+    suspend fun saveUserToDatabase(user: User) {
         // 업데이트된 User 객체를 데이터베이스에 저장
         firebaseFireStore.collection("users")
             .document(user.id)

@@ -21,7 +21,6 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 
 @Composable
 fun SelectedUserItem(
@@ -34,7 +33,7 @@ fun SelectedUserItem(
 
         AsyncImage(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape)
                 .constrainAs(image) {
                     top.linkTo(parent.top)
@@ -72,7 +71,6 @@ fun SelectedUserItem(
 
         Text(
             text = user.username,
-            fontFamily = SamsungOneFont,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.constrainAs(username) {
                 top.linkTo(image.bottom, margin = 4.dp)

@@ -25,7 +25,6 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -44,7 +43,7 @@ fun UserSearchItem(
         //이미지 정보
         AsyncImage(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
@@ -70,7 +69,6 @@ fun UserSearchItem(
                 text = user.username,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
-                fontFamily = SamsungOneFont
             )
 
             //유저 상태 메시지가 있다면
@@ -81,7 +79,6 @@ fun UserSearchItem(
                     text = user.statusMessage,
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
-                    fontFamily = SamsungOneFont
                 )
             }
         }
@@ -98,7 +95,7 @@ fun UserSearchItemShimmer() {
         // 이미지 정보
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .shimmerEffect()
                 .clip(CircleShape)
         )

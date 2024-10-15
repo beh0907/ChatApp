@@ -16,6 +16,4 @@ interface AuthRepository {
     fun getCurrentUser(): Flow<User>
 
     suspend fun signOut()
-
-    suspend fun saveUserToDatabase(user: User)
 }

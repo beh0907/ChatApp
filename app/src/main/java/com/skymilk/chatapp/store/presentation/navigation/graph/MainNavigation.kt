@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.presentation.navigation
+package com.skymilk.chatapp.store.presentation.navigation.graph
 
 import android.app.Activity
 import androidx.compose.animation.EnterTransition
@@ -33,6 +33,10 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.skymilk.chatapp.di.ViewModelFactoryModule
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.navigation.bottom.BottomNavigationItem
+import com.skymilk.chatapp.store.presentation.navigation.CustomNavType
+import com.skymilk.chatapp.store.presentation.navigation.NavigationViewModel
+import com.skymilk.chatapp.store.presentation.navigation.bottom.MainBottomBar
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
@@ -55,7 +59,7 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlin.reflect.typeOf
 
 @Composable
-fun MainContent(
+fun MainNavigation(
     currentUser: User,
     onSignOut: () -> Unit,
     parentNavController: NavHostController
@@ -120,7 +124,7 @@ fun MainContent(
             //isBottomBarVisible 상태 정보 체크 처리
             if (!isBottomBarVisible) return@Scaffold
 
-            MainBottomNavigation(
+            MainBottomBar(
                 items = bottomNavigationItems,
                 selected = selectedItem,
                 onItemClick = { index ->
