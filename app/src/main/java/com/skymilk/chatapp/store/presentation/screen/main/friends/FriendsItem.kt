@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -27,6 +28,7 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -40,13 +42,13 @@ fun FriendsItem(
             .clickable {
                 onUserItemClick()
             }
-            .padding(MaterialTheme.dimens.small2),
+            .padding(MaterialTheme.dimens.small1),
     ) {
         //이미지 정보
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
-                .clip(CircleShape),
+                .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
                     if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
@@ -101,7 +103,7 @@ fun FriendsItemShimmer() {
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .clip(CircleShape)
+                .squircleClip()
                 .shimmerEffect()
         )
 

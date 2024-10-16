@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.store.presentation.utils
 
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.POST_NOTIFICATIONS

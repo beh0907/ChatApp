@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
+import android.R.attr.contentDescription
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -57,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
@@ -129,7 +131,8 @@ fun ChatRoomScreen(
                     TopSection(chatRoom = chatRoom,
                         currentUser = currentUser,
                         onNavigateToBack = onNavigateToBack,
-                        onOpenDrawer = { visibleDrawer = true })
+                        onOpenDrawer = { visibleDrawer = true }
+                    )
 
                     //채팅 목록 영역
                     when (chatMessagesState) {
@@ -235,7 +238,8 @@ fun TopSection(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
             onNavigateToBack()
@@ -346,7 +350,7 @@ fun BottomSection(
             placeholder = {
                 Text(
                     text = "채팅을 입력해주세요.",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     color = Color.Gray,
                 )
             },
@@ -374,11 +378,13 @@ fun BottomSection(
 
                         //키보드 숨기기
                         keyboardController?.hide()
-                    }, contentAlignment = Alignment.BottomCenter
+                    },
+                contentAlignment = Alignment.BottomCenter
             ) {
                 Icon(
                     modifier = Modifier
                         .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
+                        .rotate(-45f)
                         .size(24.dp),
                     imageVector = Icons.AutoMirrored.Rounded.Send,
                     contentDescription = null,

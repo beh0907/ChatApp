@@ -1,11 +1,9 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.store.data.utils
 
 import android.content.Context
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.auth.FirebaseAuthException
 import com.skymilk.chatapp.R
-import java.io.FileInputStream
-import java.util.Arrays
 
 
 object FirebaseUtil {

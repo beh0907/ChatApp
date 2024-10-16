@@ -1,8 +1,7 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.store.presentation.utils
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -14,7 +13,6 @@ import com.kakao.sdk.user.UserApiClient
 import com.skymilk.chatapp.BuildConfig
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 object CredentialUtil {
 

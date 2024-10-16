@@ -53,7 +53,7 @@ import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.dimens
-import com.skymilk.chatapp.utils.CredentialUtil
+import com.skymilk.chatapp.store.presentation.utils.CredentialUtil
 import kotlinx.coroutines.launch
 
 @Composable

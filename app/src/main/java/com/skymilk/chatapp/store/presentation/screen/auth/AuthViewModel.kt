@@ -6,11 +6,10 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.auth.model.OAuthToken
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
-import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation
-import com.skymilk.chatapp.utils.Event
-import com.skymilk.chatapp.utils.ValidationUtil
-import com.skymilk.chatapp.utils.sendEvent
+import com.skymilk.chatapp.store.presentation.utils.Event
+import com.skymilk.chatapp.store.presentation.utils.ValidationUtil
+import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

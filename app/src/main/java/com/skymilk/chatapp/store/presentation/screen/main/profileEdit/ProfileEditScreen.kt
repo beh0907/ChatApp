@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Edit
@@ -57,6 +56,7 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -225,7 +225,8 @@ private fun EditProfileSection(
     val scope = rememberCoroutineScope()
     Box(
         modifier = Modifier
-            .shadow(4.dp, RoundedCornerShape(30.dp))
+            .squircleClip()
+            .shadow(4.dp)
             .clickable {
                 //테드 이미지 픽커
                 TedImagePicker
@@ -273,6 +274,7 @@ private fun EditProfileSection(
             modifier = Modifier
                 .width(120.dp)
                 .background(Color(0x88888888))
+                .padding(vertical = 2.dp)
                 .align(Alignment.BottomCenter),
             textAlign = TextAlign.Center,
             text = "편집",
@@ -281,7 +283,7 @@ private fun EditProfileSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(17.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
     //유저 이름
     Box(
@@ -358,7 +360,8 @@ private fun EditProfileSection(
             tint = Color.White
         )
     }
-    Spacer(modifier = Modifier.height(11.dp))
+
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @Composable

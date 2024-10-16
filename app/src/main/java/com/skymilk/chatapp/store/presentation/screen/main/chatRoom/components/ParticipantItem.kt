@@ -23,6 +23,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -44,7 +45,7 @@ fun ParticipantItem(
         AsyncImage(
             modifier = Modifier
                 .size(40.dp)
-                .clip(CircleShape),
+                .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
                     if (participant.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile

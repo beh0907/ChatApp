@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.store.presentation.utils
 
 import android.util.Patterns
 import com.skymilk.chatapp.store.presentation.screen.auth.signUp.RegisterValidation

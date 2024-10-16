@@ -26,8 +26,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
-import com.skymilk.chatapp.utils.DateUtil
+import com.skymilk.chatapp.store.presentation.utils.DateUtil
 
 @Composable
 fun ChatSoloRoomItem(
@@ -40,7 +41,7 @@ fun ChatSoloRoomItem(
         .clickable {
             onChatItemClick(chatRoom.id)
         }
-        .padding(MaterialTheme.dimens.small2)
+        .padding(MaterialTheme.dimens.small1),
     ) {
         //나의 이미지 적용
         val image = chatRoom.participants.first().profileImageUrl
@@ -49,7 +50,7 @@ fun ChatSoloRoomItem(
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
-                .clip(CircleShape),
+                .squircleClip(),
             model = ImageRequest.Builder(
                 LocalContext.current
             )

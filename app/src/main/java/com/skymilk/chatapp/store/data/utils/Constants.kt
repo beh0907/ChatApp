@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.store.data.utils
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey

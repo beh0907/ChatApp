@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.utils
+package com.skymilk.chatapp.store.presentation.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

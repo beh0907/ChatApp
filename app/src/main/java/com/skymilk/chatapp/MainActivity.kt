@@ -1,6 +1,5 @@
 package com.skymilk.chatapp
 
-import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
@@ -16,9 +15,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.firebase.messaging.FirebaseMessaging
 import com.skymilk.chatapp.store.presentation.navigation.graph.AppNavigation
 import com.skymilk.chatapp.ui.theme.ChatAppTheme
-import com.skymilk.chatapp.utils.Event
-import com.skymilk.chatapp.utils.EventBus.events
-import com.skymilk.chatapp.utils.PermissionUtil
+import com.skymilk.chatapp.store.presentation.utils.Event
+import com.skymilk.chatapp.store.presentation.utils.EventBus.events
+import com.skymilk.chatapp.store.presentation.utils.PermissionUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject

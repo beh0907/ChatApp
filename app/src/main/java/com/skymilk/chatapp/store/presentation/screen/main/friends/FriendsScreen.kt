@@ -80,7 +80,7 @@ fun TopSection(onNavigateToUserSearch: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+            .padding(start = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

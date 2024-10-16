@@ -13,9 +13,9 @@ import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.utils.Constants
-import com.skymilk.chatapp.utils.Event
-import com.skymilk.chatapp.utils.sendEvent
+import com.skymilk.chatapp.store.data.utils.Constants
+import com.skymilk.chatapp.store.presentation.utils.Event
+import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

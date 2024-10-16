@@ -17,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -36,7 +37,7 @@ fun SelectionUserItem(
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
-                .clip(CircleShape),
+                .squircleClip(),
             model = user.profileImageUrl,
             contentScale = ContentScale.Crop,
             contentDescription = null,

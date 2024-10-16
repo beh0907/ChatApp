@@ -24,7 +24,7 @@ fun FullDateItem(
         Text(
             text = fullDate,
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
         )

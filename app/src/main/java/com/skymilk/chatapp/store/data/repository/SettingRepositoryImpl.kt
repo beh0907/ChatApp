@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.skymilk.chatapp.store.domain.repository.SettingRepository
-import com.skymilk.chatapp.utils.Constants.PreferencesKeys
+import com.skymilk.chatapp.store.data.utils.Constants.PreferencesKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Icon
@@ -10,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -21,6 +19,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 
 @Composable
 fun SelectedUserItem(
@@ -34,7 +33,7 @@ fun SelectedUserItem(
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
-                .clip(CircleShape)
+                .squircleClip()
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)

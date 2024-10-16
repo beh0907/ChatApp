@@ -25,6 +25,7 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
@@ -44,7 +45,7 @@ fun UserSearchItem(
         AsyncImage(
             modifier = Modifier
                 .size(50.dp)
-                .clip(CircleShape),
+                .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
                     if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
@@ -97,7 +98,7 @@ fun UserSearchItemShimmer() {
             modifier = Modifier
                 .size(50.dp)
                 .shimmerEffect()
-                .clip(CircleShape)
+                .squircleClip()
         )
 
         // 유저 정보

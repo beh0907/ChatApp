@@ -3,8 +3,8 @@ package com.skymilk.chatapp.store.presentation.screen.main.userSearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
-import com.skymilk.chatapp.utils.Event
-import com.skymilk.chatapp.utils.sendEvent
+import com.skymilk.chatapp.store.presentation.utils.Event
+import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.presentation.screen.main.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -48,6 +50,7 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 
 @Composable
 fun ProfileScreen(
@@ -169,11 +172,12 @@ fun UserProfileSection(
     //프로필 이미지
     Surface(
         shadowElevation = 4.dp,
-        shape = RoundedCornerShape(30.dp)
+        modifier = Modifier.squircleClip()
     ) {
         AsyncImage(
             modifier = Modifier
                 .size(120.dp)
+                .squircleClip()
                 .clickable {
                     //프로필 이미지가 있다면 이동
                     user.profileImageUrl?.let {
@@ -192,28 +196,63 @@ fun UserProfileSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(17.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
     //유저 이름
-    Text(
-        modifier = Modifier.padding(horizontal = 48.dp),
-        text = user.username,
-        style = MaterialTheme.typography.titleLarge,
-        color = Color.White,
-        fontWeight = FontWeight.Bold
-    )
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.titleLarge,
+            text = user.username,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            color = Color.White
+        )
+
+        Icon(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            imageVector = Icons.Rounded.Edit,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary
+        )
+
+    }
 
     Spacer(modifier = Modifier.height(34.dp))
 
-    //유저 상대 메시지
-    Text(
-        modifier = Modifier.padding(horizontal = 48.dp),
-        text = user.statusMessage,
-        style = MaterialTheme.typography.titleMedium,
-        color = Color.White
-    )
 
-    Spacer(modifier = Modifier.height(15.dp))
+    //상태 메시지
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth()
+    ) {
+
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.titleMedium,
+            text = user.statusMessage,
+            textAlign = TextAlign.Center,
+            color = Color.White
+        )
+
+        Icon(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            imageVector = Icons.Rounded.Edit,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary
+        )
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @Composable

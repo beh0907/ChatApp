@@ -38,9 +38,9 @@ import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
+import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.Black
-import com.skymilk.chatapp.ui.theme.SamsungOneFont
-import com.skymilk.chatapp.utils.DateUtil
+import com.skymilk.chatapp.store.presentation.utils.DateUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
@@ -74,7 +74,7 @@ fun OtherMessageItem(
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
+                    .squircleClip()
                     .align(Alignment.Top)
                     .clickable {
                         if (sender.id.isNotBlank())
@@ -170,7 +170,7 @@ fun OtherMessageItemShimmer() {
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
+                    .squircleClip()
                     .shimmerEffect()
             )
 

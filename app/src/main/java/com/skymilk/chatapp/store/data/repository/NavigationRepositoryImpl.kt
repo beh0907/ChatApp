@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.skymilk.chatapp.store.domain.model.NavigationState
 import com.skymilk.chatapp.store.domain.repository.NavigationRepository
-import com.skymilk.chatapp.utils.Constants.PreferencesKeys
+import com.skymilk.chatapp.store.data.utils.Constants.PreferencesKeys
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking

@@ -28,8 +28,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.utils.DateUtil
-import com.skymilk.chatapp.utils.FileSizeUtil
+import com.skymilk.chatapp.store.presentation.utils.DateUtil
+import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable

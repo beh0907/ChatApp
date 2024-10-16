@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,16 +25,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastFirst
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
+import com.skymilk.chatapp.store.presentation.common.squircleClip
+import com.skymilk.chatapp.store.presentation.utils.DateUtil
 import com.skymilk.chatapp.ui.theme.dimens
-import com.skymilk.chatapp.utils.DateUtil
 
 @Composable
 fun ChatRoomItem(
@@ -41,31 +43,22 @@ fun ChatRoomItem(
     currentUser: User,
     onChatItemClick: (String) -> Unit
 ) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            onChatItemClick(chatRoom.id)
-        }
-        .padding(MaterialTheme.dimens.small2)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onChatItemClick(chatRoom.id)
+            }
+            .padding(MaterialTheme.dimens.small1),
     ) {
 
-        //타인의 이미지를 찾아 적용
-        val image = chatRoom.participants.fastFirst { it.id != currentUser.id }.profileImageUrl
+        //나를 제외한 나머지 참여자
+        val otherParticipants = chatRoom.participants.filter { it.id != currentUser.id }
 
-        //이미지 정보
-        AsyncImage(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape),
-            model = ImageRequest.Builder(
-                LocalContext.current
-            )
-                .data(image)
-                .crossfade(true)
-                .build(),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-        )
+
+        //채팅방 참여 유저 프로필 그리드
+        ChatProfileGrid(otherParticipants = otherParticipants.take(4))
+
 
         //채팅방 정보
         Column(
@@ -74,35 +67,31 @@ fun ChatRoomItem(
                 .weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = buildAnnotatedString {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
                 //참여자 이름 정보 표시
-                chatRoom.participants.forEach { participant ->
-                    if (participant.id != currentUser.id) { // 내 이름은 표시 X
-                        withStyle(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append("${participant.username} ")
-                        }
-                    }
-                }
-
+                Text(
+                    modifier = Modifier.weight(weight = 1f, fill = false),
+                    text = otherParticipants
+                        .filter { it.id != currentUser.id }
+                        .joinToString(", ") { it.username },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
                 //다수의 채팅방은 경우 참여자 수 표시
-                withStyle(
-                    style = SpanStyle(
-                        color = Color.Gray,
-                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                        fontWeight = FontWeight.Medium
-                    )
-                ) {
-                    append("${chatRoom.participants.size}")
-                }
-            })
+                Text(
+                    text = "${chatRoom.participants.size}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
 
             Spacer(Modifier.height(5.dp))
 
@@ -130,6 +119,51 @@ fun ChatRoomItem(
 }
 
 @Composable
+fun ChatProfileGrid(
+    otherParticipants: List<User>,
+) {
+    val boxSize = 50.dp
+
+    Box(modifier = Modifier.size(boxSize)) {
+        otherParticipants.forEachIndexed { index, user ->
+            val (widthFraction, heightFraction, xOffset, yOffset) = when (otherParticipants.size) {
+                1 -> listOf(1f, 1f, 0f, 0f)
+                2 -> when (index) {
+                    0 -> listOf(0.7f, 0.7f, 0f, 0f)
+                    else -> listOf(0.7f, 0.7f, 0.3f, 0.3f)
+                }
+
+                3 -> when (index) {
+                    0 -> listOf(0.7f, 0.7f, 0.15f, 0f)
+                    1 -> listOf(0.5f, 0.5f, 0f, 0.5f)
+                    else -> listOf(0.5f, 0.5f, 0.5f, 0.5f)
+                }
+
+                else -> when (index) {
+                    0 -> listOf(0.5f, 0.5f, 0f, 0f)
+                    1 -> listOf(0.5f, 0.5f, 0.5f, 0f)
+                    2 -> listOf(0.5f, 0.5f, 0f, 0.5f)
+                    else -> listOf(0.5f, 0.5f, 0.5f, 0.5f)
+                }
+            }
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(user.profileImageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(boxSize * widthFraction, boxSize * heightFraction)
+                    .offset(x = boxSize * xOffset, y = boxSize * yOffset)
+                    .squircleClip()
+            )
+        }
+    }
+}
+
+@Composable
 fun ChatRoomItemShimmer() {
     Row(
         modifier = Modifier
@@ -140,8 +174,8 @@ fun ChatRoomItemShimmer() {
         Box(
             modifier = Modifier
                 .size(50.dp)
+                .squircleClip()
                 .shimmerEffect()
-                .clip(CircleShape)
         )
 
         // 채팅방 정보
