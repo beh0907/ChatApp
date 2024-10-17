@@ -5,7 +5,7 @@ import com.skymilk.chatapp.store.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetIsFriend @Inject constructor(
+class GetIsFriend(
     private val userRepository: UserRepository
 ) {
     operator fun invoke(myUserId:String, otherUserId:String): Flow<Boolean> {

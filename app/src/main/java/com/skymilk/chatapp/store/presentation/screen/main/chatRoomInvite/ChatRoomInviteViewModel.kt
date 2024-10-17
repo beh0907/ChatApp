@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomsEvent
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +17,30 @@ class ChatRoomInviteViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
 ) : ViewModel() {
 
+    fun onEvent(event: ChatRoomInviteEvent) {
+        when(event) {
+            is ChatRoomInviteEvent.GetChatRoomId -> {
+                getChatRoomId(
+                    currentUser = event.currentUser,
+                    participants = event.participants,
+                    onNavigateToChatRoom = event.onNavigateToChatRoom
+                )
+            }
+
+            is ChatRoomInviteEvent.AddParticipants -> {
+                addParticipants(
+                    currentUser = event.currentUser,
+                    chatRoomId = event.chatRoomId,
+                    participants = event.participants,
+                    onNavigateToChatRoom = event.onNavigateToChatRoom
+                )
+            }
+        }
+    }
+
+
     //파라미터와 일치한 참여자가 있는 채팅방 찾기
-    fun getChatRoomId(
+    private fun getChatRoomId(
         currentUser: User,
         participants: List<User>,
         onNavigateToChatRoom: (String) -> Unit
@@ -38,7 +61,7 @@ class ChatRoomInviteViewModel @Inject constructor(
         }
     }
 
-    fun addParticipantsToChatRoom(
+    private fun addParticipants(
         currentUser: User,
         chatRoomId: String,
         participants: List<User>,

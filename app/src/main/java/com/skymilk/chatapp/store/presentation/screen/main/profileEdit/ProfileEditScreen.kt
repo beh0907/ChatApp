@@ -15,14 +15,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -64,6 +65,7 @@ import kotlinx.coroutines.launch
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileEditViewModel,
+    onEvent: (ProfileEditEvent) -> Unit,
     user: User,
     onNavigateToBack: () -> Unit
 ) {
@@ -92,11 +94,13 @@ fun ProfileEditScreen(
             modifier = if (showEditDialog) Modifier.alpha(0f) else Modifier,
             onNavigateToBack = { onNavigateToBack() },
             onProfileUpdate = {
-                viewModel.updateUserProfile(
-                    userId = user.id,
-                    name = editName,
-                    statusMessage = editStatusMessage,
-                    imageBitmap = selectedImage
+                onEvent(
+                    ProfileEditEvent.UpdateUserProfile(
+                        userId = user.id,
+                        name = editName,
+                        statusMessage = editStatusMessage,
+                        imageBitmap = selectedImage
+                    )
                 )
             }
         )
@@ -154,7 +158,7 @@ fun ProfileEditScreen(
     if (showEditDialog) {
         CustomFullScreenEditDialog(
             initText = if (editingField == "name") editName else editStatusMessage,
-            maxLength = 20,
+            maxLength = if (editingField == "name") 20 else 60,
             onDismiss = { showEditDialog = false },
             onConfirm = { newText ->
                 if (editingField == "name") editName = newText
@@ -223,11 +227,56 @@ private fun EditProfileSection(
     onSelectedImage: (ImageBitmap) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    Box(
-        modifier = Modifier
-            .squircleClip()
-            .shadow(4.dp)
-            .clickable {
+    Box {
+        //프로필 이미지
+        if (selectedImage != null) {
+            //Coil Image는 ImageBitmap을 적용시키지 못함
+            Image(
+                modifier = Modifier
+                    .size(120.dp)
+                    .squircleClip()
+                    .shadow(4.dp),
+                bitmap = selectedImage,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            AsyncImage(
+                modifier = Modifier
+                    .size(120.dp)
+                    .squircleClip()
+                    .shadow(4.dp),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                        if (profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                        else profileImageUrl
+                    )
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build(),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
+        }
+
+//        Text(
+//            modifier = Modifier
+//                .width(120.dp)
+//                .background(Color(0x88888888))
+//                .padding(vertical = 2.dp)
+//                .align(Alignment.BottomCenter),
+//            textAlign = TextAlign.Center,
+//            text = "편집",
+//            style = MaterialTheme.typography.bodyMedium,
+//            color = Color.White,
+//        )
+
+        SmallFloatingActionButton(
+            modifier = Modifier
+                .size(30.dp)
+                .align(Alignment.BottomEnd),
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            onClick = {
                 //테드 이미지 픽커
                 TedImagePicker
                     .with(context)
@@ -243,44 +292,12 @@ private fun EditProfileSection(
                         }
                     }
             }
-    ) {
-        //프로필 이미지
-        if (selectedImage != null) {
-            //Coil Image는 ImageBitmap을 적용시키지 못함
-            Image(
-                modifier = Modifier
-                    .size(120.dp),
-                bitmap = selectedImage,
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.CameraAlt,
                 contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            AsyncImage(
-                modifier = Modifier
-                    .size(120.dp),
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(
-                        if (profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
-                        else profileImageUrl
-                    )
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build(),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
             )
         }
-
-        Text(
-            modifier = Modifier
-                .width(120.dp)
-                .background(Color(0x88888888))
-                .padding(vertical = 2.dp)
-                .align(Alignment.BottomCenter),
-            textAlign = TextAlign.Center,
-            text = "편집",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White,
-        )
     }
 
     Spacer(modifier = Modifier.height(16.dp))

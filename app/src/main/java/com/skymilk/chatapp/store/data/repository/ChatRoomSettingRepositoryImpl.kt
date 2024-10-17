@@ -3,8 +3,8 @@ package com.skymilk.chatapp.store.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.skymilk.chatapp.store.domain.repository.SettingRepository
 import com.skymilk.chatapp.store.data.utils.Constants.PreferencesKeys
+import com.skymilk.chatapp.store.domain.repository.ChatRoomSettingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -14,9 +14,9 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 
-class SettingRepositoryImpl @Inject constructor(
+class ChatRoomSettingRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
-) : SettingRepository {
+) : ChatRoomSettingRepository {
 
     //알람 설정은 비활성화된 채팅방을 저장한다
     override suspend fun saveAlarmSetting(chatRoomId: String) {
@@ -76,28 +76,6 @@ class SettingRepositoryImpl @Inject constructor(
             preferences[PreferencesKeys.DISABLE_ALARM_SETTING_CHATROOM_KEY]?.let {
                 Json.decodeFromString(it)
             } ?: emptyList()
-        }
-    }
-
-    //유저 알람설정 정보 저장하기
-    override suspend fun saveUserSetting(isAlarmEnabled: Boolean) {
-        dataStore.edit { preferences ->
-            // 저장
-            preferences[PreferencesKeys.USER_ALARM_SETTING_KEY] = isAlarmEnabled
-        }
-    }
-
-    //유저 알람설정 정보 동기 가져오기
-    override fun getUserSetting(): Boolean {
-        return runBlocking {
-            getUserSettingAsync().first()
-        }
-    }
-
-    //유저 알람설정 정보 비동기 가져오기
-    override fun getUserSettingAsync(): Flow<Boolean> {
-        return dataStore.data.map { preferences ->
-            preferences[PreferencesKeys.USER_ALARM_SETTING_KEY] != false
         }
     }
 }

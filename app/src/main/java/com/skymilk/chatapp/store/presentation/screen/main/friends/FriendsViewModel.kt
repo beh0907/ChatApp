@@ -44,7 +44,13 @@ class FriendsViewModel @AssistedInject constructor(
         loadFriends()
     }
 
-    fun loadFriends() {
+    fun onEvent(event: FriendsEvent) {
+        when(event) {
+            is FriendsEvent.LoadFriends -> loadFriends()
+        }
+    }
+
+    private fun loadFriends() {
         viewModelScope.launch {
             userUseCases.getFriends(userId)
                 .onStart {

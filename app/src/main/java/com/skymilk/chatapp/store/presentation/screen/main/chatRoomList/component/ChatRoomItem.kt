@@ -129,12 +129,12 @@ fun ChatProfileGrid(
             val (widthFraction, heightFraction, xOffset, yOffset) = when (otherParticipants.size) {
                 1 -> listOf(1f, 1f, 0f, 0f)
                 2 -> when (index) {
-                    0 -> listOf(0.7f, 0.7f, 0f, 0f)
-                    else -> listOf(0.7f, 0.7f, 0.3f, 0.3f)
+                    0 -> listOf(0.6f, 0.6f, 0f, 0f)
+                    else -> listOf(0.6f, 0.6f, 0.4f, 0.4f)
                 }
 
                 3 -> when (index) {
-                    0 -> listOf(0.7f, 0.7f, 0.15f, 0f)
+                    0 -> listOf(0.5f, 0.5f, 0.25f, 0f)
                     1 -> listOf(0.5f, 0.5f, 0f, 0.5f)
                     else -> listOf(0.5f, 0.5f, 0.5f, 0.5f)
                 }

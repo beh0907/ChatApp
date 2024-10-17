@@ -8,15 +8,15 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.skymilk.chatapp.MainActivity
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
-import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
+import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
 import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,7 +29,10 @@ class FirebaseMessageService : FirebaseMessagingService() {
     lateinit var firebaseAuth: FirebaseAuth
 
     @Inject
-    lateinit var settingUseCases: SettingUseCases
+    lateinit var chatRoomSettingUseCases: ChatRoomSettingUseCases
+
+    @Inject
+    lateinit var userSettingUseCases: UserSettingUseCases
 
     @Inject
     lateinit var navigationUseCases: NavigationUseCases
@@ -75,10 +78,10 @@ class FirebaseMessageService : FirebaseMessagingService() {
         if (firebaseAuth.currentUser?.uid == senderId) return
 
         //유저가 알림 설정을 하지 않았다면
-        if (!settingUseCases.getUserSetting()) return
+        if (!userSettingUseCases.getUserAlarmSetting()) return
 
         //알림이 해제된 채팅방이라면 알림X
-        if (settingUseCases.getAlarmSetting(chatRoomId)) return
+        if (chatRoomSettingUseCases.getAlarmSetting(chatRoomId)) return
 
         //현재 참여하고 있는 채팅방이라면 알림X
         if (navigationState.destination == MainNavigation.ChatRoomScreen.javaClass.toString()

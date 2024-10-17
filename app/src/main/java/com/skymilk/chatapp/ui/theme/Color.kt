@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.Color
 
 val Black = Color(0xFF1C1E21) //Dark Background

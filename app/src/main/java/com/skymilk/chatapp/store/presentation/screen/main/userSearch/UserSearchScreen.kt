@@ -38,8 +38,9 @@ import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 @Composable
 fun UserSearchScreen(
     modifier: Modifier = Modifier,
-    currentUser: User,
     viewModel: UserSearchViewModel,
+    onEvent: (UserSearchEvent) -> Unit,
+    currentUser: User,
     onNavigateToProfile: (User) -> Unit,
     onNavigateToBack: () -> Unit
 ) {
@@ -55,7 +56,7 @@ fun UserSearchScreen(
 
         //검색 영역
         UserSearchSection(
-            searchUser = viewModel::searchUser
+            searchUser = { onEvent(UserSearchEvent.UserSearch(it)) }
         )
 
         when (userSearchState) {

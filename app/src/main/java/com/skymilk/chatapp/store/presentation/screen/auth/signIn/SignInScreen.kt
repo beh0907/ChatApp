@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.presentation.screen.auth.signIn
 
 import android.app.Activity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -49,17 +48,20 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.presentation.screen.auth.AuthEvent
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
-import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.store.presentation.utils.CredentialUtil
+import com.skymilk.chatapp.ui.theme.dimens
+import com.skymilk.chatapp.ui.theme.isAppInDarkTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel(),
+    onEvent: (AuthEvent) -> Unit,
     onNavigateToSignUp: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
@@ -81,7 +83,7 @@ fun SignInScreen(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.5f)
                 .align(CenterHorizontally),
-            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.bg_chat_dark)
+            painter = if (isAppInDarkTheme()) painterResource(R.drawable.bg_chat_dark)
             else painterResource(R.drawable.bg_chat),
             contentDescription = ""
         )
@@ -91,11 +93,21 @@ fun SignInScreen(
                 .fillMaxSize()
                 .padding(30.dp)
         ) {
-            SignInSection(viewModel::signInWithEmailAndPassword)
+            SignInSection(
+                onSignInWithEmailAndPassword = { email, password ->
+                    onEvent(AuthEvent.SignInWithEmailAndPassword(email, password))
+                }
+            )
+
             Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
+
             SocialSection(
-                onSignInWithGoogle = viewModel::signInWithGoogle,
-                onSignInWithKaKao = viewModel::signInWithKakao
+                onSignInWithGoogle = { googleIdTokenCredential ->
+                    onEvent(AuthEvent.SignInWithGoogle(googleIdTokenCredential))
+                },
+                onSignInWithKaKao = { oAuthToken ->
+                    onEvent(AuthEvent.SignInWithKakao(oAuthToken))
+                }
             )
         }
 
@@ -187,7 +199,8 @@ private fun SocialSection(
                 backgroundColor = Color(0xFFFEE500),
             ) {
                 scope.launch {
-                    val kakaoToken = CredentialUtil.getKakaoToken(context as Activity, UserApiClient.instance)
+                    val kakaoToken =
+                        CredentialUtil.getKakaoToken(context as Activity, UserApiClient.instance)
                     onSignInWithKaKao(kakaoToken)
                 }
             }

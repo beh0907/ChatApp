@@ -6,7 +6,7 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SignInWithGoogle @Inject constructor(
+class SignInWithGoogle(
     private val authRepository: AuthRepository
 ) {
     operator fun invoke(googleIdTokenCredential: GoogleIdTokenCredential): Flow<User> {

@@ -3,9 +3,10 @@ package com.skymilk.chatapp.di
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
 import com.skymilk.chatapp.store.domain.repository.NavigationRepository
-import com.skymilk.chatapp.store.domain.repository.SettingRepository
+import com.skymilk.chatapp.store.domain.repository.ChatRoomSettingRepository
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import com.skymilk.chatapp.store.domain.repository.UserRepository
+import com.skymilk.chatapp.store.domain.repository.UserSettingRepository
 import com.skymilk.chatapp.store.domain.usecase.auth.AuthUseCases
 import com.skymilk.chatapp.store.domain.usecase.auth.GetCurrentUser
 import com.skymilk.chatapp.store.domain.usecase.auth.SignInWithEmailAndPassword
@@ -26,15 +27,15 @@ import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
 import com.skymilk.chatapp.store.domain.usecase.navigation.GetCurrentDestination
 import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.navigation.SaveCurrentDestination
-import com.skymilk.chatapp.store.domain.usecase.setting.DeleteAlarmSetting
-import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSetting
-import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmSettingAsync
-import com.skymilk.chatapp.store.domain.usecase.setting.GetAlarmsSetting
-import com.skymilk.chatapp.store.domain.usecase.setting.GetUserSetting
-import com.skymilk.chatapp.store.domain.usecase.setting.GetUserSettingAsync
-import com.skymilk.chatapp.store.domain.usecase.setting.SaveAlarmSetting
-import com.skymilk.chatapp.store.domain.usecase.setting.SaveUserSetting
-import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.DeleteAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.GetAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.GetAlarmSettingAsync
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.GetAlarmsSetting
+import com.skymilk.chatapp.store.domain.usecase.userSetting.GetUserAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.userSetting.GetUserAlarmSettingAsync
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.SaveAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.userSetting.ToggleUserAlarmSetting
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveProfileImage
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
@@ -46,6 +47,9 @@ import com.skymilk.chatapp.store.domain.usecase.user.SetFriend
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateFcmToken
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
+import com.skymilk.chatapp.store.domain.usecase.userSetting.GetUserDarkModeSetting
+import com.skymilk.chatapp.store.domain.usecase.userSetting.ToggleUserDarkModeSetting
+import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -106,17 +110,25 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideSettingUseCases(settingRepository: SettingRepository): SettingUseCases =
-        SettingUseCases(
-            GetAlarmSetting(settingRepository),
-            GetAlarmSettingAsync(settingRepository),
-            GetAlarmsSetting(settingRepository),
-            SaveAlarmSetting(settingRepository),
-            DeleteAlarmSetting(settingRepository),
+    fun provideChatRoomSettingUseCases(chatRoomSettingRepository: ChatRoomSettingRepository): ChatRoomSettingUseCases =
+        ChatRoomSettingUseCases(
+            GetAlarmSetting(chatRoomSettingRepository),
+            GetAlarmSettingAsync(chatRoomSettingRepository),
+            GetAlarmsSetting(chatRoomSettingRepository),
+            SaveAlarmSetting(chatRoomSettingRepository),
+            DeleteAlarmSetting(chatRoomSettingRepository),
+        )
 
-            GetUserSetting(settingRepository),
-            GetUserSettingAsync(settingRepository),
-            SaveUserSetting(settingRepository),
+    @Provides
+    @Singleton
+    fun provideUserSettingUseCases(userSettingRepository: UserSettingRepository): UserSettingUseCases =
+        UserSettingUseCases(
+            GetUserAlarmSetting(userSettingRepository),
+            GetUserAlarmSettingAsync(userSettingRepository),
+            ToggleUserAlarmSetting(userSettingRepository),
+
+            GetUserDarkModeSetting(userSettingRepository),
+            ToggleUserDarkModeSetting(userSettingRepository),
         )
 
     @Provides

@@ -5,7 +5,7 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import javax.inject.Inject
 
-class GetUser @Inject constructor(
+class GetUser(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(userId: String): Result<User> {

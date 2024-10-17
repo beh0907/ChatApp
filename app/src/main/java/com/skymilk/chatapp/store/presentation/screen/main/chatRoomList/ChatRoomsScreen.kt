@@ -26,9 +26,10 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomListShimmer
 
 @Composable
-fun ChatListScreen(
+fun ChatRoomsScreen(
     modifier: Modifier = Modifier,
-    viewModel: ChatRoomListViewModel,
+    viewModel: ChatRoomsViewModel,
+    onEvent: (ChatRoomsEvent) -> Unit,
     currentUser: User,
     onNavigateToChatRoom: (String) -> Unit,
     onNavigateToChatRoomInvite: () -> Unit
@@ -66,7 +67,7 @@ fun ChatListScreen(
                 // 에러 발생 시 표시
                 val message = (chatListState as ChatRoomsState.Error).message
 
-                ErrorScreen(message = message, retry = viewModel::loadChatRooms)
+                ErrorScreen(message = message, retry = { onEvent(ChatRoomsEvent.LoadChatRooms) })
             }
         }
     }

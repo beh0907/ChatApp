@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.auth.signUp
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -41,15 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.presentation.screen.auth.AuthEvent
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.components.AuthTextField
 import com.skymilk.chatapp.ui.theme.dimens
+import com.skymilk.chatapp.ui.theme.isAppInDarkTheme
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel(),
+    onEvent: (AuthEvent) -> Unit,
     onNavigateToSignIn: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
@@ -71,7 +73,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.5f)
                 .align(CenterHorizontally),
-            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.bg_chat_dark)
+            painter = if (isAppInDarkTheme()) painterResource(R.drawable.bg_chat_dark)
             else painterResource(R.drawable.bg_chat),
             contentDescription = ""
         )
@@ -82,7 +84,18 @@ fun SignUpScreen(
                 .padding(30.dp)
         ) {
 
-            SignUpSection(viewModel::signUpWithEmailAndPassword)
+            SignUpSection(
+                onSignUpWithEmailAndPassword = { name, email, password, passwordConfirm ->
+                    viewModel.onEvent(
+                        AuthEvent.SignUpWithEmailAndPassword(
+                            name = name,
+                            email = email,
+                            password = password,
+                            passwordConfirm = passwordConfirm
+                        )
+                    )
+                }
+            )
         }
 
         CreateSection(onNavigateToSignIn)

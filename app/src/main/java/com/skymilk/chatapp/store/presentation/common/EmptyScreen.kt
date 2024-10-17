@@ -3,7 +3,6 @@ package com.skymilk.chatapp.store.presentation.common
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.ui.theme.isAppInDarkTheme
 
 @Composable
 fun EmptyScreen(message: String, icon: Int = R.drawable.ic_error) {
@@ -58,7 +58,7 @@ fun EmptyContent(alphaAnim: Float, message: String, icon: Int) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = null,
-            tint = if (isSystemInDarkTheme()) LightGray else DarkGray,
+            tint = if (isAppInDarkTheme()) LightGray else DarkGray,
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .alpha(alphaAnim)
@@ -69,7 +69,7 @@ fun EmptyContent(alphaAnim: Float, message: String, icon: Int) {
                 .alpha(alphaAnim),
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            color = if (isSystemInDarkTheme()) LightGray else DarkGray,
+            color = if (isAppInDarkTheme()) LightGray else DarkGray,
         )
     }
 }

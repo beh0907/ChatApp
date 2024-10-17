@@ -4,6 +4,5 @@
 
         <!--        기본 splash 없애기-->
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">#FF111318</item>
     </style>
 </resources>

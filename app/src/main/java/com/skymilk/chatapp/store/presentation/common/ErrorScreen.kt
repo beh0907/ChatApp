@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.presentation.common
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +24,7 @@ import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.ui.theme.isAppInDarkTheme
 
 @Composable
 fun ErrorScreen(message: String, icon: Int = R.drawable.ic_error, retry: (() -> Unit)? = null) {
@@ -55,7 +55,7 @@ fun ErrorContent(alphaAnim: Float, message: String, icon: Int, retry: (() -> Uni
         Icon(
             painter = painterResource(id = icon),
             contentDescription = null,
-            tint = if (isSystemInDarkTheme()) LightGray else DarkGray,
+            tint = if (isAppInDarkTheme()) LightGray else DarkGray,
             modifier = Modifier
                 .alpha(alphaAnim)
         )
@@ -65,7 +65,7 @@ fun ErrorContent(alphaAnim: Float, message: String, icon: Int, retry: (() -> Uni
                 .alpha(alphaAnim),
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            color = if (isSystemInDarkTheme()) LightGray else DarkGray,
+            color = if (isAppInDarkTheme()) LightGray else DarkGray,
         )
 
         //다시 시도 버튼 기능이 적용될 때 표시

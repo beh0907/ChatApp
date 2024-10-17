@@ -44,7 +44,7 @@ fun ParticipantItem(
         //이미지 정보
         AsyncImage(
             modifier = Modifier
-                .size(40.dp)
+                .size(50.dp)
                 .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(

@@ -3,6 +3,7 @@ package com.skymilk.chatapp.store.presentation.screen.main.userSearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
+import com.skymilk.chatapp.store.presentation.screen.main.setting.SettingEvent
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,15 @@ class UserSearchViewModel @Inject constructor(
     private val _userSearchState = MutableStateFlow<UserSearchState>(UserSearchState.Initial)
     val userSearchState = _userSearchState.asStateFlow()
 
-    fun searchUser(query: String) {
+    fun onEvent(event: UserSearchEvent) {
+        when (event) {
+            is UserSearchEvent.UserSearch -> {
+                searchUser(event.query)
+            }
+        }
+    }
+
+    private fun searchUser(query: String) {
         viewModelScope.launch {
             val result = userUseCase.searchUser(query)
 

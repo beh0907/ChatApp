@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.setting
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.rounded.MapsUgc
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +32,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsItem
 fun SettingScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
+    onEvent: (SettingEvent) -> Unit,
     currentUser: User,
     onNavigateToProfile: (User) -> Unit
 ) {
@@ -42,16 +45,21 @@ fun SettingScreen(
         TopSection()
 
         //내 정보
-        FriendsItem(user = currentUser, onUserItemClick = {
-            onNavigateToProfile(currentUser)
-        })
+        FriendsItem(
+            user = currentUser,
+            profileSize = 60.dp,
+            onUserItemClick = {
+                onNavigateToProfile(currentUser)
+            }
+        )
 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 10.dp))
 
         //설정 섹션
         SettingSection(
             settingState = settingState.value,
-            toggleAlarmSetting = viewModel::toggleAlarmSetting
+            toggleAlarmSetting = { onEvent(SettingEvent.ToggleAlarmSetting) },
+            toggleDarkModeSetting = { onEvent(SettingEvent.ToggleDarkModeSetting) }
         )
     }
 }
@@ -91,7 +99,8 @@ fun TopSection() {
 @Composable
 fun SettingSection(
     settingState: SettingState,
-    toggleAlarmSetting: (Boolean) -> Unit
+    toggleAlarmSetting: () -> Unit,
+    toggleDarkModeSetting: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -100,7 +109,7 @@ fun SettingSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { toggleAlarmSetting(!settingState.isAlarmEnabled) }
+                .clickable { toggleAlarmSetting() }
                 .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -121,7 +130,36 @@ fun SettingSection(
 
             Switch(
                 checked = settingState.isAlarmEnabled,
-                onCheckedChange = { toggleAlarmSetting(it) }
+                onCheckedChange = { toggleAlarmSetting() }
+            )
+        }
+
+        //설정 상태
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { toggleDarkModeSetting() }
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.DarkMode,
+                contentDescription = null
+            )
+
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp),
+                text = "어두운 모드",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Switch(
+                checked = settingState.isDarkModeEnabled,
+                onCheckedChange = { toggleDarkModeSetting() }
             )
         }
 

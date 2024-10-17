@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
@@ -34,6 +35,7 @@ import com.skymilk.chatapp.ui.theme.dimens
 @Composable
 fun FriendsItem(
     user: User,
+    profileSize:Dp = 50.dp,
     onUserItemClick: () -> Unit
 ) {
     Row(
@@ -47,7 +49,7 @@ fun FriendsItem(
         //이미지 정보
         AsyncImage(
             modifier = Modifier
-                .size(50.dp)
+                .size(profileSize)
                 .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
@@ -93,7 +95,9 @@ fun FriendsItem(
 }
 
 @Composable
-fun FriendsItemShimmer() {
+fun FriendsItemShimmer(
+    profileSize:Dp = 50.dp
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,7 +106,7 @@ fun FriendsItemShimmer() {
         // 이미지 정보
         Box(
             modifier = Modifier
-                .size(50.dp)
+                .size(profileSize)
                 .squircleClip()
                 .shimmerEffect()
         )

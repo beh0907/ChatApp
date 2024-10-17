@@ -4,7 +4,7 @@ import com.skymilk.chatapp.store.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SetFriend @Inject constructor(
+class SetFriend(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(

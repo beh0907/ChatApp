@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.presentation.screen.main.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.filled.PersonAddAlt1
@@ -56,6 +54,7 @@ import com.skymilk.chatapp.store.presentation.common.squircleClip
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel,
+    onEvent: (ProfileEvent) -> Unit,
     user: User,
     loginUserId: String,
     onNavigateToBack: () -> Unit,
@@ -82,20 +81,17 @@ fun ProfileScreen(
 
         //상단 아이콘
         TopSection(
-            modifier = Modifier,
-            onNavigateToBack = onNavigateToBack
+            modifier = Modifier, onNavigateToBack = onNavigateToBack
         )
 
         //프로필 정보
         Column(
-            modifier = modifier
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
             UserProfileSection(
-                user = user,
-                onNavigateToImageViewer = onNavigateToImageViewer
+                user = user, onNavigateToImageViewer = onNavigateToImageViewer
             )
 
             HorizontalDivider(
@@ -106,31 +102,30 @@ fun ProfileScreen(
             // 이벤트 UI과 동작을 별개로 구현
             when (user.id == loginUserId) {
                 true -> {
-                    MyProfileEventSection(
-                        onNavigateToMyChatRoom = { viewModel.getChatRoomId(listOf(user.id)) },
+                    MyProfileEventSection(onNavigateToMyChatRoom = {
+                        onEvent(
+                            ProfileEvent.GetChatRoomId(
+                                listOf(user.id)
+                            )
+                        )
+                    },
                         onNavigateToProfileEdit = onNavigateToProfileEdit,
                         visibleSignOutDialog = {
                             visibleSignOutDialog = true
-                        }
-                    )
+                        })
                 }
 
                 else -> {
                     OtherProfileEventSection(
                         viewModel = viewModel,
                         onNavigateToMyChatRoom = {
-                            viewModel.getChatRoomId(
-                                listOf(
-                                    user.id,
-                                    loginUserId
-                                )
-                            )
+                            onEvent(ProfileEvent.GetChatRoomId(listOf(user.id, loginUserId)))
                         },
                         getFriendState = {
-                            viewModel.getFriendState(loginUserId, user.id)
+                            onEvent(ProfileEvent.GetFriendState(loginUserId, user.id))
                         },
                         setFriendState = { state ->
-                            viewModel.setFriendState(loginUserId, user.id, state)
+                            onEvent(ProfileEvent.SetFriendState(loginUserId, user.id, state))
                         }
                     )
                 }
@@ -138,27 +133,21 @@ fun ProfileScreen(
         }
     }
 
-    if (visibleSignOutDialog)
-        CustomAlertDialog(
-            message = "로그아웃 하시겠습니까?",
-            onConfirm = { onSignOut() },
-            onDismiss = { visibleSignOutDialog = false }
-        )
+    if (visibleSignOutDialog) CustomAlertDialog(message = "로그아웃 하시겠습니까?",
+        onConfirm = { onSignOut() },
+        onDismiss = { visibleSignOutDialog = false })
 }
 
 @Composable
 fun TopSection(
-    modifier: Modifier = Modifier,
-    onNavigateToBack: () -> Unit
+    modifier: Modifier = Modifier, onNavigateToBack: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = null,
-                tint = Color.White
+                imageVector = Icons.Rounded.Close, contentDescription = null, tint = Color.White
             )
         }
     }
@@ -171,8 +160,7 @@ fun UserProfileSection(
 ) {
     //프로필 이미지
     Surface(
-        shadowElevation = 4.dp,
-        modifier = Modifier.squircleClip()
+        shadowElevation = 4.dp, modifier = Modifier.squircleClip()
     ) {
         AsyncImage(
             modifier = Modifier
@@ -184,13 +172,10 @@ fun UserProfileSection(
                         onNavigateToImageViewer(it)
                     }
                 },
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(
-                    if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
-                    else user.profileImageUrl
-                )
-                .decoderFactory(SvgDecoder.Factory())
-                .build(),
+            model = ImageRequest.Builder(LocalContext.current).data(
+                if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                else user.profileImageUrl
+            ).decoderFactory(SvgDecoder.Factory()).build(),
             contentScale = ContentScale.Crop,
             contentDescription = null
         )
@@ -270,16 +255,14 @@ fun MyProfileEventSection(
     ) {
 
         //나와의 채팅
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                    onNavigateToMyChatRoom()
-                }
-                .padding(horizontal = 10.dp),
+        Column(modifier = Modifier
+            .fillMaxHeight()
+            .clickable {
+                onNavigateToMyChatRoom()
+            }
+            .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.Rounded.ChatBubble,
                 contentDescription = null,
@@ -297,20 +280,16 @@ fun MyProfileEventSection(
         }
 
         //프로필 편집
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                    onNavigateToProfileEdit()
-                }
-                .padding(horizontal = 10.dp),
+        Column(modifier = Modifier
+            .fillMaxHeight()
+            .clickable {
+                onNavigateToProfileEdit()
+            }
+            .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
-                imageVector = Icons.Rounded.Edit,
-                contentDescription = null,
-                tint = Color.White
+                imageVector = Icons.Rounded.Edit, contentDescription = null, tint = Color.White
             )
 
             Spacer(Modifier.height(10.dp))
@@ -324,16 +303,14 @@ fun MyProfileEventSection(
         }
 
         //로그아웃
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                    visibleSignOutDialog()
-                }
-                .padding(horizontal = 10.dp),
+        Column(modifier = Modifier
+            .fillMaxHeight()
+            .clickable {
+                visibleSignOutDialog()
+            }
+            .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.Logout,
                 contentDescription = null,
@@ -375,16 +352,14 @@ fun OtherProfileEventSection(
     ) {
 
         //나와의 채팅
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clickable {
-                    onNavigateToMyChatRoom()
-                }
-                .padding(horizontal = 10.dp),
+        Column(modifier = Modifier
+            .fillMaxHeight()
+            .clickable {
+                onNavigateToMyChatRoom()
+            }
+            .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.Rounded.ChatBubble,
                 contentDescription = null,
@@ -402,20 +377,18 @@ fun OtherProfileEventSection(
         }
 
         when (isFriendState) {
-            is FriendState.Success -> {
-                val isFriend = (isFriendState as FriendState.Success).isFriend
+            is ProfileState.Success -> {
+                val isFriend = (isFriendState as ProfileState.Success).isFriend
 
                 //친구 추가
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .clickable {
-                            setFriendState(isFriend)
-                        }
-                        .padding(horizontal = 10.dp),
+                Column(modifier = Modifier
+                    .fillMaxHeight()
+                    .clickable {
+                        setFriendState(isFriend)
+                    }
+                    .padding(horizontal = 10.dp),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                    horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         imageVector = if (isFriend) Icons.Rounded.PersonRemoveAlt1 else Icons.Default.PersonAddAlt1,
                         contentDescription = null,

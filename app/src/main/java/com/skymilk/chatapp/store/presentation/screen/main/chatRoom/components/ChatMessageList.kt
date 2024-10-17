@@ -3,7 +3,6 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,6 +39,7 @@ import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
+import com.skymilk.chatapp.ui.theme.isAppInDarkTheme
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -181,14 +181,14 @@ fun ChatMessageList(
                     .padding(5.dp),
                 color = MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(10.dp),
-                shadowElevation = if (isSystemInDarkTheme()) 0.dp else 5.dp,
+                shadowElevation = if (isAppInDarkTheme()) 0.dp else 5.dp,
                 onClick = {
                     scope.launch {
                         listState.scrollToItem(0)
                         showNewMessageNotification = false
                     }
                 },
-                border = if (isSystemInDarkTheme()) BorderStroke(
+                border = if (isAppInDarkTheme()) BorderStroke(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline
                 ) else null

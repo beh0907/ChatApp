@@ -4,7 +4,7 @@ import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
 import javax.inject.Inject
 
-class SendImageMessage @Inject constructor(
+class SendImageMessage(
     private val chatRepository: ChatRepository
 ) {
     suspend operator fun invoke(

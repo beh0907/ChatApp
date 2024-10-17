@@ -6,7 +6,7 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SignInWithKakao @Inject constructor(
+class SignInWithKakao(
     private val authRepository: AuthRepository
 ) {
     operator fun invoke(kakaoToken: OAuthToken): Flow<User> {

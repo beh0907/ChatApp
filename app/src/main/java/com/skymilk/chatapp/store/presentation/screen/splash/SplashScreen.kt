@@ -1,7 +1,9 @@
 package com.skymilk.chatapp.store.presentation.screen.splash
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,8 +31,7 @@ fun SplashScreen(onAnimationFinished: () -> Unit) {
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         LottieAnimation(
             modifier = Modifier.fillMaxSize(),

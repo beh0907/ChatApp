@@ -23,9 +23,20 @@ class ProfileEditViewModel @Inject constructor(
     private val _profileEditState = MutableStateFlow<ProfileEditState>(ProfileEditState.Initial)
     val profileEditState = _profileEditState.asStateFlow()
 
+    fun onEvent(event: ProfileEditEvent) {
+        when (event) {
+            is ProfileEditEvent.UpdateUserProfile -> {
+                updateUserProfile(
+                    event.userId,
+                    event.name,
+                    event.statusMessage,
+                    event.imageBitmap,
+                )
+            }
+        }
+    }
 
-
-    fun updateUserProfile(
+    private fun updateUserProfile(
         userId: String,
         name: String,
         statusMessage: String,

@@ -5,15 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
-import com.skymilk.chatapp.store.domain.usecase.setting.SettingUseCases
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
-import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.assisted.Assisted
@@ -32,7 +32,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     @Assisted private val chatRoomId: String,
     private val chatUseCases: ChatUseCases,
     private val storageUseCases: StorageUseCases,
-    private val settingUseCases: SettingUseCases
+    private val chatRoomSettingUseCases: ChatRoomSettingUseCases
 ) : ViewModel() {
 
     @AssistedFactory
@@ -65,15 +65,51 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     //알람 상태
     //저장된 값이 알람 비활성화
-    val alarmState = settingUseCases.getAlarmSettingAsync(chatRoomId)
+    val alarmState = chatRoomSettingUseCases.getAlarmSettingAsync(chatRoomId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     init {
-        loadChatRoom()
+        onEvent(ChatRoomEvent.LoadChatRoom)
 
-        loadChatMessages()
+        onEvent(ChatRoomEvent.LoadChatMessages)
 
-        subscribeForNotification()
+        onEvent(ChatRoomEvent.UnsubscribeForNotification)
+    }
+
+
+    fun onEvent(event: ChatRoomEvent) {
+        when (event) {
+            is ChatRoomEvent.LoadChatRoom -> loadChatRoom()
+            is ChatRoomEvent.LoadChatMessages -> loadChatMessages()
+
+            is ChatRoomEvent.SendMessage -> {
+                sendMessage(
+                    sender = event.sender,
+                    content = event.content,
+                    participants = event.participants,
+                    type = event.type
+                )
+            }
+
+            is ChatRoomEvent.SendImageMessage -> {
+                sendImageMessage(
+                    sender = event.sender,
+                    imageUri = event.imageUri,
+                    participants = event.participants
+                )
+            }
+
+            is ChatRoomEvent.ExitChatRoom -> {
+                exitChatRoom(
+                    user = event.user,
+                    onNavigateToBack = event.onNavigateToBack
+                )
+            }
+
+            is ChatRoomEvent.ToggleAlarmState -> toggleAlarmState()
+            is ChatRoomEvent.SubscribeForNotification -> subscribeForNotification()
+            is ChatRoomEvent.UnsubscribeForNotification -> unsubscribeForNotification()
+        }
     }
 
     //채팅방 정보 불러오기
@@ -96,7 +132,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //채팅 메시지 목록 불러오기
-    fun loadChatMessages() {
+    private fun loadChatMessages() {
         viewModelScope.launch {
             chatUseCases.getMessages(chatRoomId)
                 .onStart {
@@ -114,7 +150,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //텍스트 메시지 전송
-    fun sendMessage(sender: User, content: String, participants: List<User>, type: MessageType = MessageType.TEXT) {
+    private fun sendMessage(sender: User, content: String, participants: List<User>, type: MessageType) {
         viewModelScope.launch {
             try {
                 chatUseCases.sendMessage(chatRoomId, sender, content, participants, type)
@@ -125,7 +161,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //이미지 메시지 전송
-    fun sendImageMessage(sender: User, imageUri: Uri, participants: List<User>) {
+    private fun sendImageMessage(sender: User, imageUri: Uri, participants: List<User>) {
         //이미지 업로드 결과
         uploadImage(sender.id, imageUri) { url ->
 
@@ -167,25 +203,8 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
-    //알림 상태 저장
-    fun toggleAlarmState() {
-        viewModelScope.launch {
-            when (alarmState.value) {
-                true -> {
-                    settingUseCases.deleteAlarmSetting(chatRoomId)
-                    sendEvent(Event.Toast("채팅방 알람이 설정되었습니다"))
-                }
-
-                false -> {
-                    settingUseCases.saveAlarmSetting(chatRoomId)
-                    sendEvent(Event.Toast("채팅방 알람이 해제되었습니다"))
-                }
-            }
-        }
-    }
-
     //채팅방 나가기
-    fun exitChatRoom(user: User, onNavigateToBack: () -> Unit) {
+    private fun exitChatRoom(user: User, onNavigateToBack: () -> Unit) {
         viewModelScope.launch {
             val result = chatUseCases.exitChatRoom(chatRoomId, user)
 
@@ -193,10 +212,15 @@ class ChatRoomViewModel @AssistedInject constructor(
                 result.isSuccess -> {
                     //퇴장 시스템 메시지 전송
                     //시스템 메시지는 알림을 표시하지 않기 위해 emptyList 전송
-                    sendMessage(user, "${user.username}님이 퇴장하셨습니다.", emptyList(), MessageType.SYSTEM)
+                    sendMessage(
+                        user,
+                        "${user.username}님이 퇴장하셨습니다.",
+                        emptyList(),
+                        MessageType.SYSTEM
+                    )
 
                     //알림 토픽 구독 제거
-                    unsubscribeForNotification()
+                    onEvent(ChatRoomEvent.UnsubscribeForNotification)
 
                     //알림 메시지 출력
                     sendEvent(Event.Toast("채팅방에서 퇴장하였습니다."))
@@ -207,6 +231,23 @@ class ChatRoomViewModel @AssistedInject constructor(
 
                 result.isFailure -> {
                     sendEvent(Event.Toast("채팅방을 나가지 못하였습니다."))
+                }
+            }
+        }
+    }
+
+    //알림 상태 저장
+    private fun toggleAlarmState() {
+        viewModelScope.launch {
+            when (alarmState.value) {
+                true -> {
+                    chatRoomSettingUseCases.deleteAlarmSetting(chatRoomId)
+                    sendEvent(Event.Toast("채팅방 알람이 설정되었습니다"))
+                }
+
+                false -> {
+                    chatRoomSettingUseCases.saveAlarmSetting(chatRoomId)
+                    sendEvent(Event.Toast("채팅방 알람이 해제되었습니다"))
                 }
             }
         }

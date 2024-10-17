@@ -29,7 +29,36 @@ class AuthViewModel @Inject constructor(
     val authState = _authState.asStateFlow()
 
     init {
-        checkCurrentUser()
+        onEvent(AuthEvent.CheckCurrentUser)
+    }
+
+    fun onEvent(event: AuthEvent) {
+        when (event) {
+            is AuthEvent.CheckCurrentUser -> checkCurrentUser()
+
+            is AuthEvent.SignInWithGoogle -> {
+                signInWithGoogle(event.googleIdTokenCredential)
+            }
+
+            is AuthEvent.SignInWithKakao -> {
+                signInWithKakao(event.kakaoToken)
+            }
+
+            is AuthEvent.SignInWithEmailAndPassword -> {
+                signInWithEmailAndPassword(event.email, event.password)
+            }
+
+            is AuthEvent.SignUpWithEmailAndPassword -> {
+                signUpWithEmailAndPassword(
+                    event.name,
+                    event.email,
+                    event.password,
+                    event.passwordConfirm
+                )
+            }
+
+            is AuthEvent.SignOut -> signOut()
+        }
     }
 
     //로그인 정보 체크
@@ -55,7 +84,7 @@ class AuthViewModel @Inject constructor(
     }
 
     //구글 로그인
-    fun signInWithGoogle(googleIdTokenCredential: GoogleIdTokenCredential?) {
+    private fun signInWithGoogle(googleIdTokenCredential: GoogleIdTokenCredential?) {
         viewModelScope.launch {
             if (googleIdTokenCredential == null) {
                 //토스트 메시지 전달
@@ -81,7 +110,7 @@ class AuthViewModel @Inject constructor(
 
     //카카오 로그인
     //카카오 로그인 화면 전환 시 activity로 이동하기 때문에 acitivity가 필요하다
-    fun signInWithKakao(kakaoToken: OAuthToken?) {
+    private fun signInWithKakao(kakaoToken: OAuthToken?) {
         viewModelScope.launch {
             if (kakaoToken == null) {
                 //토스트 메시지 전달
@@ -106,7 +135,7 @@ class AuthViewModel @Inject constructor(
     }
 
     //이메일,패스워드 계정정보 로그인
-    fun signInWithEmailAndPassword(email: String, password: String) {
+    private fun signInWithEmailAndPassword(email: String, password: String) {
         if (email.isBlank()) {
             //토스트 메시지 전달
             sendEvent(Event.Toast("이메일을 입력해주세요."))
@@ -137,7 +166,7 @@ class AuthViewModel @Inject constructor(
     }
 
     //이메일,패스워드 계정정보 회원가입
-    fun signUpWithEmailAndPassword(
+    private fun signUpWithEmailAndPassword(
         name: String,
         email: String,
         password: String,
@@ -186,7 +215,7 @@ class AuthViewModel @Inject constructor(
     }
 
     //로그아웃
-    fun signOut() {
+    private fun signOut() {
         viewModelScope.launch {
             authUseCases.signOut()
             _authState.update { AuthState.Unauthenticated }

@@ -2,7 +2,6 @@ package com.skymilk.chatapp.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -12,12 +11,20 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skymilk.chatapp.MainEvent
+import com.skymilk.chatapp.MainViewModel
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -95,22 +102,26 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+val LocalThemeMode = staticCompositionLocalOf { false }
+
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ChatAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    viewModel: MainViewModel = hiltViewModel(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     activity: Activity = LocalContext.current as Activity,
     content: @Composable () -> Unit
 ) {
+    val themeState = viewModel.darkModeState.collectAsState()
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (themeState.value) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkScheme
+        themeState.value -> darkScheme
         else -> lightScheme
     }
 
@@ -119,7 +130,7 @@ fun ChatAppTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = themeState.value
         }
     }
 
@@ -154,14 +165,19 @@ fun ChatAppTheme(
         }
     }
 
-    ProvideAppUtils(appDimens = appDimens) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = typography,
-            content = content
-        )
+    CompositionLocalProvider(LocalThemeMode provides themeState.value) {
+        ProvideAppUtils(appDimens = appDimens) {
+            MaterialTheme(
+                colorScheme = colorScheme,
+                typography = typography,
+                content = content
+            )
+        }
     }
 }
+
+@Composable
+fun isAppInDarkTheme(): Boolean = LocalThemeMode.current
 
 val MaterialTheme.dimens
     @Composable

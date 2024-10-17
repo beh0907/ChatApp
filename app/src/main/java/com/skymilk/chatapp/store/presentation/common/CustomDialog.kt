@@ -53,14 +53,14 @@ fun CustomProgressDialog(message: String) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(40.dp)
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Text(
                     text = message,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }

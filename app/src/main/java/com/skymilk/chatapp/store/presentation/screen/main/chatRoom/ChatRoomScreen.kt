@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
-import android.R.attr.contentDescription
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -90,6 +89,7 @@ import kotlin.math.roundToInt
 fun ChatRoomScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatRoomViewModel,
+    onEvent: (ChatRoomEvent) -> Unit,
     currentUser: User,
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
@@ -168,7 +168,8 @@ fun ChatRoomScreen(
 
                         is ChatMessagesState.Error -> {
                             ErrorScreen(
-                                message = "메시지를 불러오지 못했습니다.", retry = viewModel::loadChatMessages
+                                message = "메시지를 불러오지 못했습니다.",
+                                retry = { onEvent(ChatRoomEvent.LoadChatMessages) }
                             )
                         }
                     }
@@ -178,10 +179,22 @@ fun ChatRoomScreen(
                     BottomSection(
                         modifier = Modifier.imePadding(),
                         onSendMessage = { sender, content ->
-                            viewModel.sendMessage(sender, content, chatRoom.participants)
+                            onEvent(
+                                ChatRoomEvent.SendMessage(
+                                    sender,
+                                    content,
+                                    chatRoom.participants
+                                )
+                            )
                         },
                         onSendImageMessage = { sender, uri ->
-                            viewModel.sendImageMessage(sender, uri, chatRoom.participants)
+                            onEvent(
+                                ChatRoomEvent.SendImageMessage(
+                                    sender,
+                                    uri,
+                                    chatRoom.participants
+                                )
+                            )
                         },
                         user = currentUser,
                     )
@@ -193,7 +206,7 @@ fun ChatRoomScreen(
                     chatRoom = chatRoom,
                     alarmState = alarmState,
                     onVisibleExitDialog = { visibleExitDialog = true },
-                    onToggleAlarmState = viewModel::toggleAlarmState,
+                    onToggleAlarmState = { onEvent(ChatRoomEvent.ToggleAlarmState) },
                     onNavigateToProfile = onNavigateToProfile,
                     onNavigateToInviteFriends = {
                         //채팅방 아이디, 현재 참여자 목록
@@ -215,7 +228,7 @@ fun ChatRoomScreen(
             CustomAlertDialog(
                 message = "채팅방을 나가시겠습니까?",
                 onConfirm = {
-                    viewModel.exitChatRoom(currentUser, onNavigateToBack)
+                    onEvent(ChatRoomEvent.ExitChatRoom(currentUser, onNavigateToBack))
                 },
                 onDismiss = { visibleExitDialog = false }
             )

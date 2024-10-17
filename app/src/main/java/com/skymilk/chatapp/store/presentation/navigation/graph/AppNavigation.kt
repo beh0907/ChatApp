@@ -12,6 +12,7 @@ import androidx.navigation.navigation
 import com.skymilk.chatapp.store.presentation.navigation.routes.AuthNavigation
 import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
 import com.skymilk.chatapp.store.presentation.navigation.routes.StartNavigation
+import com.skymilk.chatapp.store.presentation.screen.auth.AuthEvent
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
 import com.skymilk.chatapp.store.presentation.screen.auth.signIn.SignInScreen
@@ -63,6 +64,7 @@ fun AppNavigation(isDeepLink: Boolean) {
                 SignInScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
+                    onEvent = authViewModel::onEvent,
                     onNavigateToSignUp = { navController.navigate(AuthNavigation.SignUpScreen) },
                     onNavigateToHome = {
                         navController.navigate(Navigations.Main) {
@@ -77,6 +79,7 @@ fun AppNavigation(isDeepLink: Boolean) {
                 SignUpScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
+                    onEvent = authViewModel::onEvent,
                     onNavigateToSignIn = { navController.popBackStack() },
                     onNavigateToHome = {
                         navController.navigate(Navigations.Main) {
@@ -100,7 +103,7 @@ fun AppNavigation(isDeepLink: Boolean) {
                         }
 
                         //로그아웃 처리
-                        authViewModel.signOut()
+                        authViewModel.onEvent(AuthEvent.SignOut)
                     },
                     parentNavController = navController
                 )

@@ -26,8 +26,9 @@ import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 @Composable
 fun FriendsScreen(
     modifier: Modifier = Modifier,
-    currentUser: User,
     viewModel: FriendsViewModel,
+    onEvent: (FriendsEvent) -> Unit,
+    currentUser: User,
     onNavigateToProfile: (User) -> Unit,
     onNavigateToUserSearch: () -> Unit
 ) {
@@ -40,9 +41,13 @@ fun FriendsScreen(
         TopSection(onNavigateToUserSearch = onNavigateToUserSearch)
 
         //내 정보
-        FriendsItem(user = currentUser, onUserItemClick = {
-            onNavigateToProfile(currentUser)
-        })
+        FriendsItem(
+            user = currentUser,
+            profileSize = 60.dp,
+            onUserItemClick = {
+                onNavigateToProfile(currentUser)
+            }
+        )
 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 10.dp))
 
@@ -68,7 +73,7 @@ fun FriendsScreen(
             is FriendsState.Error -> {
                 val message = (friendsState as FriendsState.Error).message
 
-                ErrorScreen(message = message, retry = viewModel::loadFriends)
+                ErrorScreen(message = message, retry = { onEvent(FriendsEvent.LoadFriends) })
             }
         }
     }

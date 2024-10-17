@@ -5,7 +5,7 @@ import com.skymilk.chatapp.store.domain.repository.NavigationRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SaveCurrentDestination @Inject constructor(
+class SaveCurrentDestination(
     private val navigationRepository: NavigationRepository
 ) {
     suspend operator fun invoke(navigationState: NavigationState) {

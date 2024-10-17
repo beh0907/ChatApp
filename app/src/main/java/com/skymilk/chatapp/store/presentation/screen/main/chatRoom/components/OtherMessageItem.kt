@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,8 +37,8 @@ import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.common.squircleClip
-import com.skymilk.chatapp.ui.theme.Black
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
+import com.skymilk.chatapp.ui.theme.Black
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
@@ -73,7 +71,7 @@ fun OtherMessageItem(
                     .build(),
                 contentDescription = "Profile Image",
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(50.dp)
                     .squircleClip()
                     .align(Alignment.Top)
                     .clickable {
@@ -91,6 +89,8 @@ fun OtherMessageItem(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Row {
                     Surface(

@@ -3,7 +3,7 @@ package com.skymilk.chatapp.store.domain.usecase.user
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import javax.inject.Inject
 
-class UpdateProfile @Inject constructor(
+class UpdateProfile(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(

@@ -24,15 +24,31 @@ class ProfileViewModel @Inject constructor(
     val chatRoomId = _chatRoomId.asStateFlow()
 
     //타인의 프로필에 대해 친구 추가/삭제 상태
-    private val _isFriendState = MutableStateFlow<FriendState>(FriendState.Initial)
-    val isFriendState = _isFriendState.asStateFlow()
+    private val _isProfileState = MutableStateFlow<ProfileState>(ProfileState.Initial)
+    val isFriendState = _isProfileState.asStateFlow()
+
+    fun onEvent(event: ProfileEvent) {
+        when (event) {
+            is ProfileEvent.GetChatRoomId -> {
+                getChatRoomId(event.participants)
+            }
+
+            is ProfileEvent.GetFriendState -> {
+                getFriendState(event.myUserId, event.otherUserId)
+            }
+
+            is ProfileEvent.SetFriendState -> {
+                setFriendState(event.myUserId, event.otherUserId, event.isFriend)
+            }
+        }
+    }
 
     //파라미터와 일치한 참여자가 있는 채팅방 찾기
-    fun getChatRoomId(userIds: List<String>) {
+    private fun getChatRoomId(participants: List<String>) {
         viewModelScope.launch {
             //유저 아이디가 일치한 채팅방의 아이디값을 가져온다
             //없다면 내부에서 채팅방 생성
-            val result = chatUseCases.getOrCreateChatRoom(userIds)
+            val result = chatUseCases.getOrCreateChatRoom(participants)
 
             when {
                 result.isSuccess -> {
@@ -48,20 +64,20 @@ class ProfileViewModel @Inject constructor(
     }
 
     //친구 추가/삭제 상태 가져오기
-    fun getFriendState(myUserId: String, otherUserId: String) {
+    private fun getFriendState(myUserId: String, otherUserId: String) {
         viewModelScope.launch {
             userUseCases.getIsFriend(myUserId, otherUserId)
                 .onEach {
                     //시작 시 로딩 상태
-                    _isFriendState.value = FriendState.Loading
+                    _isProfileState.value = ProfileState.Loading
                 }.collect { isFriend ->
                     //친구 여부 상태를 저장
-                    _isFriendState.value = FriendState.Success(isFriend)
+                    _isProfileState.value = ProfileState.Success(isFriend)
                 }
         }
     }
 
-    fun setFriendState(myUserId: String, otherUserId: String, isFriend: Boolean) {
+    private fun setFriendState(myUserId: String, otherUserId: String, isFriend: Boolean) {
         viewModelScope.launch {
             userUseCases.setFriend(myUserId, otherUserId, !isFriend)
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
+import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsEvent
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.assisted.Assisted
@@ -17,14 +18,14 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 
-class ChatRoomListViewModel @AssistedInject constructor(
+class ChatRoomsViewModel @AssistedInject constructor(
     @Assisted private val userId: String,
     private val chatUseCases: ChatUseCases
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
-        fun create(userId: String): ChatRoomListViewModel
+        fun create(userId: String): ChatRoomsViewModel
     }
 
     companion object {
@@ -45,7 +46,13 @@ class ChatRoomListViewModel @AssistedInject constructor(
         loadChatRooms()
     }
 
-    fun loadChatRooms() {
+    fun onEvent(event: ChatRoomsEvent) {
+        when(event) {
+            is ChatRoomsEvent.LoadChatRooms -> loadChatRooms()
+        }
+    }
+
+    private fun loadChatRooms() {
         viewModelScope.launch {
             chatUseCases.getChatRooms(userId)
                 .onStart {

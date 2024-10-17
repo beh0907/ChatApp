@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
-class SaveProfileImage @Inject constructor(
+class SaveProfileImage(
     private val storageRepository: StorageRepository
 ) {
     operator fun invoke(userId: String, bitmap: ImageBitmap): Flow<UploadProgress> {

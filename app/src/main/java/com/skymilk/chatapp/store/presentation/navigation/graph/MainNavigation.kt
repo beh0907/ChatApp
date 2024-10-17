@@ -42,8 +42,8 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScree
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.ChatRoomInviteScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.ChatRoomInviteViewModel
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatListScreen
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomListViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomsScreen
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomsViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.imageViewer.ImageViewerScreen
@@ -145,8 +145,9 @@ fun MainNavigation(
             composable<MainNavigation.FriendsScreen> {
 
                 FriendsScreen(
-                    currentUser = currentUser,
                     viewModel = friendsViewModel,
+                    onEvent = friendsViewModel::onEvent,
+                    currentUser = currentUser,
                     onNavigateToProfile = { user ->
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)
@@ -163,15 +164,16 @@ fun MainNavigation(
 
             //채팅방 목록 화면
             composable<MainNavigation.ChatsScreen> {
-                val chatRoomListViewModel: ChatRoomListViewModel = viewModel(
-                    factory = ChatRoomListViewModel.provideFactory(
+                val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
+                    factory = ChatRoomsViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
                         currentUser.id
                     )
                 )
 
-                ChatListScreen(
-                    viewModel = chatRoomListViewModel,
+                ChatRoomsScreen(
+                    viewModel = chatRoomsViewModel,
+                    onEvent = chatRoomsViewModel::onEvent,
                     currentUser = currentUser,
                     onNavigateToChatRoom = { chatRoomId ->
                         navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
@@ -190,8 +192,9 @@ fun MainNavigation(
                 val settingViewModel: SettingViewModel = hiltViewModel()
 
                 SettingScreen(
-                    currentUser = currentUser,
                     viewModel = settingViewModel,
+                    onEvent = settingViewModel::onEvent,
+                    currentUser = currentUser,
                     onNavigateToProfile = { user ->
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)
@@ -210,6 +213,7 @@ fun MainNavigation(
 
                 ChatRoomInviteScreen(
                     viewModel = chatRoomInviteViewModel,
+                    onEvent = chatRoomInviteViewModel::onEvent,
                     friendsState = friends,
                     currentUser = currentUser,
                     existingChatRoomId = args.existingChatRoomId,
@@ -258,6 +262,7 @@ fun MainNavigation(
 
                 ProfileScreen(
                     viewModel = profileViewModel,
+                    onEvent = profileViewModel::onEvent,
                     user = if (currentUser.id == argsUser.id) currentUser else argsUser, //프로필 갱신 시 실시간 반영처리를 위해 currentUser를 넣는다
                     loginUserId = currentUser.id,
                     onNavigateToBack = { navController.popBackStack() },
@@ -287,6 +292,7 @@ fun MainNavigation(
 
                 ProfileEditScreen(
                     viewModel = profileEditViewModel,
+                    onEvent = profileEditViewModel::onEvent,
                     user = currentUser,
                     onNavigateToBack = { navController.popBackStack() }
                 )
@@ -327,6 +333,7 @@ fun MainNavigation(
 
                 ChatRoomScreen(
                     viewModel = chatRoomViewModel,
+                    onEvent = chatRoomViewModel::onEvent,
                     currentUser = currentUser,
                     onNavigateToBack = { navController.popBackStack() },
                     onNavigateToProfile = { user ->
@@ -363,8 +370,9 @@ fun MainNavigation(
                 val userSearchViewModel: UserSearchViewModel = hiltViewModel()
 
                 UserSearchScreen(
-                    currentUser = currentUser,
                     viewModel = userSearchViewModel,
+                    onEvent = userSearchViewModel::onEvent,
+                    currentUser = currentUser,
                     onNavigateToProfile = { user ->
                         navController.navigate(
                             MainNavigation.ProfileScreen(user = user)

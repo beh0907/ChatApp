@@ -5,7 +5,7 @@ import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetCurrentUser @Inject constructor(
+class GetCurrentUser(
     private val authRepository: AuthRepository
 ) {
     operator fun invoke(): Flow<User> {

@@ -39,6 +39,7 @@ fun ChatRoomInviteScreen(
     modifier: Modifier = Modifier,
     friendsState: FriendsState,
     viewModel: ChatRoomInviteViewModel = hiltViewModel(),
+    onEvent: (ChatRoomInviteEvent) -> Unit,
     currentUser: User,
     existingChatRoomId: String?,
     existingParticipants: List<String>,
@@ -56,15 +57,23 @@ fun ChatRoomInviteScreen(
             onCreateChatRoom = {
                 if (existingChatRoomId != null)
                 //이미 채팅방이 있다면 참여자만 추가한다
-                    viewModel.addParticipantsToChatRoom(
-                        currentUser,
-                        existingChatRoomId,
-                        selectedUsers,
-                        onNavigateToChatRoom
+                    onEvent(
+                        ChatRoomInviteEvent.AddParticipants(
+                            currentUser = currentUser,
+                            chatRoomId = existingChatRoomId,
+                            participants = selectedUsers,
+                            onNavigateToChatRoom = onNavigateToChatRoom
+                        )
                     )
                 else
                 //채팅방을 새로 생성한다
-                    viewModel.getChatRoomId(currentUser, selectedUsers, onNavigateToChatRoom)
+                    onEvent(
+                        ChatRoomInviteEvent.GetChatRoomId(
+                            currentUser = currentUser,
+                            participants = selectedUsers,
+                            onNavigateToChatRoom = onNavigateToChatRoom
+                        )
+                    )
             }
         )
 

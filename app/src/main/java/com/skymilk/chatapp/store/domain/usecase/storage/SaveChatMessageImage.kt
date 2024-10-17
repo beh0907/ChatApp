@@ -6,7 +6,7 @@ import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SaveChatMessageImage @Inject constructor(
+class SaveChatMessageImage(
     private val storageRepository: StorageRepository
 ) {
     operator fun invoke(chatRoomId: String, uri: Uri): Flow<UploadProgress> {
