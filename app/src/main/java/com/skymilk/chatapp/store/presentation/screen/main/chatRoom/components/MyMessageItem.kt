@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.skymilk.chatapp.store.domain.model.ChatMessage
+import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.ui.theme.Black
@@ -35,7 +35,8 @@ import com.skymilk.chatapp.store.presentation.utils.DateUtil
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun MyMessageItem(
-    chatMessage: ChatMessage,
+    messageContent: MessageContent,
+    timestamp: Long,
     onNavigateToImageViewer: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -53,7 +54,7 @@ fun MyMessageItem(
             verticalAlignment = Alignment.Bottom
         ) {
             Text(
-                text = DateUtil.getTime(chatMessage.timestamp),
+                text = DateUtil.getTime(timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(end = 8.dp),
             )
@@ -64,12 +65,12 @@ fun MyMessageItem(
                 color = Color(0xFF90CAF9),
                 modifier = Modifier.widthIn(max = maxWidth)
             ) {
-                when (chatMessage.type) {
+                when (messageContent.type) {
                     //텍스트 타입
                     MessageType.TEXT -> {
                         Text(
                             color = Black,
-                            text = chatMessage.content,
+                            text = messageContent.content,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(8.dp),
                         )
@@ -82,9 +83,9 @@ fun MyMessageItem(
                                 .widthIn(max = maxWidth)
                                 .heightIn(max = maxWidth)
                                 .clickable {
-                                    onNavigateToImageViewer(chatMessage.content)
+                                    onNavigateToImageViewer(messageContent.content)
                                 },
-                            model = ImageRequest.Builder(context).data(chatMessage.content).build(),
+                            model = ImageRequest.Builder(context).data(messageContent.content).build(),
                             contentDescription = null,
                             loading = {
                                 Box(

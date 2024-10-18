@@ -84,8 +84,8 @@ fun ChatMessageList(
                             ?: "알 수 없음"
 
                     //메시지 저장
-                    showNewMessage = when (newMessage.type) {
-                        MessageType.TEXT -> newMessage.content
+                    showNewMessage = when (newMessage.messageContents.first().type) {
+                        MessageType.TEXT -> newMessage.messageContents.first().content
                         MessageType.IMAGE -> "이미지"
                         MessageType.VIDEO -> "비디오"
                         MessageType.SYSTEM -> "시스템 메시지"
@@ -98,6 +98,7 @@ fun ChatMessageList(
 
     //스크롤이 최하단에 위치할 경우
     ScrollToEndCallback(listState, isReverse = true) {
+
         //최신 메시지 알림 영역을 제거한다
         showNewMessage = ""
         showNewMessageNotification = false
@@ -110,6 +111,7 @@ fun ChatMessageList(
             state = listState,
             verticalArrangement = Arrangement.Top,
         ) {
+
             //내가 전송중인 이미지 정보
             //이미지가 전송중일때만 정보를 표시
             if (uploadState is ImageUploadState.Progress) {
@@ -125,36 +127,41 @@ fun ChatMessageList(
             items(count = chatMessages.size, key = { index -> chatMessages[index].id }) { index ->
                 val chatMessage = chatMessages[index]
 
-                when (chatMessage.type) {
-                    //시스템 메시지는 별도 표시
-                    MessageType.SYSTEM -> {
-                        SystemMessageItem(
-                            content = chatMessage.content
-                        )
-                    }
+                for (messageContent in chatMessage.messageContents) {
 
-                    //채팅 메시지 표시
-                    else -> {
-                        //내가 작성한 메시지
-                        if (chatMessage.senderId == currentUser.id) {
-                            MyMessageItem(
-                                chatMessage = chatMessage,
-                                onNavigateToImageViewer = onNavigateToImageViewer
+                    when (messageContent.type) {
+                        //시스템 메시지는 별도 표시
+                        MessageType.SYSTEM -> {
+                            SystemMessageItem(
+                                content = messageContent.content
                             )
+                        }
 
-                        } else {
-                            // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
-                            val sender =
-                                chatRoom.participants.find { it.id == chatMessage.senderId }
-                                    ?: User()
+                        //채팅 메시지 표시
+                        else -> {
+                            //내가 작성한 메시지
+                            if (chatMessage.senderId == currentUser.id) {
+                                MyMessageItem(
+                                    messageContent = messageContent,
+                                    timestamp = chatMessage.timestamp,
+                                    onNavigateToImageViewer = onNavigateToImageViewer
+                                )
 
-                            //다른 사람이 작성한 메시지
-                            OtherMessageItem(
-                                chatMessage = chatMessage,
-                                sender = sender,
-                                onNavigateToProfile = onNavigateToProfile,
-                                onNavigateToImageViewer = onNavigateToImageViewer
-                            )
+                            } else {
+                                // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
+                                val sender =
+                                    chatRoom.participants.find { it.id == chatMessage.senderId }
+                                        ?: User()
+
+                                //다른 사람이 작성한 메시지
+                                OtherMessageItem(
+                                    messageContent = messageContent,
+                                    timestamp = chatMessage.timestamp,
+                                    sender = sender,
+                                    onNavigateToProfile = onNavigateToProfile,
+                                    onNavigateToImageViewer = onNavigateToImageViewer
+                                )
+                            }
                         }
                     }
                 }
@@ -247,6 +254,7 @@ fun ChatMessageListShimmer(
         }
     }
 }
+
 
 @Composable
 @Preview(showBackground = true)

@@ -155,7 +155,7 @@ private fun SignInSection(onSignInWithEmailAndPassword: (String, String) -> Unit
         ),
         shape = RoundedCornerShape(size = 4.dp)
     ) {
-        Text(text = "로그인", style = MaterialTheme.typography.bodyLarge)
+        Text(text = "로그인", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
     }
 }
 
@@ -229,7 +229,7 @@ private fun ColumnScope.CreateSection(onNavigateToSignUp: () -> Unit) {
             withStyle(
                 style = SpanStyle(
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+                    fontStyle = MaterialTheme.typography.labelLarge.fontStyle,
                     fontWeight = FontWeight.Bold
                 )
             ) {

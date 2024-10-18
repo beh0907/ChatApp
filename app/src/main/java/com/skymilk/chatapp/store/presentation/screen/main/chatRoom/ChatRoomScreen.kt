@@ -97,7 +97,9 @@ fun ChatRoomScreen(
     onNavigateToInviteFriends: (String, List<String>) -> Unit,
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
+
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
+
     val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
     val alarmState by viewModel.alarmState.collectAsStateWithLifecycle()
 

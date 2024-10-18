@@ -88,7 +88,7 @@ fun ChatSoloRoomItem(
 
                 Text(
                     text = currentUser.username,
-                    fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1

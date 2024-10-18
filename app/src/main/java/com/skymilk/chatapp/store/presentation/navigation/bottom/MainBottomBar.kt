@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation.bottom
 
+import android.R.attr.fontStyle
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.R
 
@@ -26,7 +28,13 @@ fun MainBottomBar(
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
-                label = { Text(text = item.title) },
+                label = {
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
                 selected = selected == index,
                 onClick = { onItemClick(index) },
                 icon = {

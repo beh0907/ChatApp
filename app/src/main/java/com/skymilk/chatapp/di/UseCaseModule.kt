@@ -20,7 +20,7 @@ import com.skymilk.chatapp.store.domain.usecase.chat.CreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.ExitChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatRooms
-import com.skymilk.chatapp.store.domain.usecase.chat.GetMessages
+import com.skymilk.chatapp.store.domain.usecase.chat.GetRealtimeMessages
 import com.skymilk.chatapp.store.domain.usecase.chat.GetOrCreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
 import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
@@ -79,7 +79,7 @@ object UseCaseModule {
             GetChatRoom(chatRepository),
             GetChatRooms(chatRepository),
             GetOrCreateChatRoom(chatRepository),
-            GetMessages(chatRepository),
+            GetRealtimeMessages(chatRepository),
             SendMessage(chatRepository),
             SendImageMessage(chatRepository),
             CreateChatRoom(chatRepository),

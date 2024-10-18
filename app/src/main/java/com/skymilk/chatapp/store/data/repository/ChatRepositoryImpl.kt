@@ -17,12 +17,13 @@ import com.skymilk.chatapp.store.data.dto.FcmAndroidSetting
 import com.skymilk.chatapp.store.data.dto.FcmMessage
 import com.skymilk.chatapp.store.data.dto.Message
 import com.skymilk.chatapp.store.data.remote.FcmApi
+import com.skymilk.chatapp.store.data.utils.FirebaseUtil
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
+import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
-import com.skymilk.chatapp.store.data.utils.FirebaseUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -38,6 +39,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.collections.listOf
 
 class ChatRepositoryImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase,
@@ -203,7 +205,7 @@ class ChatRepositoryImpl @Inject constructor(
         }
 
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)
-    override fun getMessages(chatRoomId: String): Flow<List<ChatMessage>> = callbackFlow {
+    override fun getRealtimeMessages(chatRoomId: String): Flow<List<ChatMessage>> = callbackFlow {
         val query = firebaseDatabase.getReference("messages").child(chatRoomId)
 
         val listener = query.addValueEventListener(object : ValueEventListener {
@@ -236,9 +238,10 @@ class ChatRepositoryImpl @Inject constructor(
             val chatMessage = ChatMessage(
                 id = newMessageRef.key ?: UUID.randomUUID().toString(),
                 senderId = sender.id,
-                content = content, // 메시지 내용
                 timestamp = System.currentTimeMillis(),
-                type = type
+                messageContents = listOf(
+                    MessageContent(content = content, type = type)
+                )
             )
             // 메시지를 Realtime Database에 저장
             newMessageRef.setValue(chatMessage).await()
@@ -278,9 +281,10 @@ class ChatRepositoryImpl @Inject constructor(
             val chatMessage = ChatMessage(
                 id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
                 senderId = sender.id,
-                content = content, // 이미지가 저장된 URL
                 timestamp = System.currentTimeMillis(),
-                type = MessageType.IMAGE
+                messageContents = listOf(
+                    MessageContent(content = content, type = MessageType.IMAGE)
+                )
             )
 
             // 메시지를 Realtime Database에 저장

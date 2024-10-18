@@ -3,12 +3,18 @@ package com.skymilk.chatapp.store.domain.model
 data class ChatMessage(
     val id: String,
     val senderId: String,
-    val content: String,
+    val messageContents: List<MessageContent>,
     val timestamp: Long,
-    val type: MessageType
 ) {
-    constructor() : this("", "", "", System.currentTimeMillis(), MessageType.TEXT)
+    constructor() : this("", "", listOf(), System.currentTimeMillis())
 }
+
+data class MessageContent(
+    val content: String = "",
+    val type: MessageType = MessageType.TEXT
+)
+
+
 
 enum class MessageType {
     TEXT, IMAGE, VIDEO, SYSTEM

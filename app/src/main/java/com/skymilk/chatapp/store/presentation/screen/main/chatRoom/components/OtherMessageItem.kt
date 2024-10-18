@@ -32,7 +32,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.model.ChatMessage
+import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
@@ -43,7 +43,8 @@ import com.skymilk.chatapp.ui.theme.Black
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun OtherMessageItem(
-    chatMessage: ChatMessage,
+    messageContent: MessageContent,
+    timestamp: Long,
     sender: User,
     onNavigateToProfile: (User) -> Unit,
     onNavigateToImageViewer: (String) -> Unit
@@ -99,12 +100,12 @@ fun OtherMessageItem(
                         color = Color.White,
                         modifier = Modifier.widthIn(max = maxWidth)
                     ) {
-                        when (chatMessage.type) {
+                        when (messageContent.type) {
                             //텍스트 타입
                             MessageType.TEXT -> {
                                 Text(
                                     color = Black,
-                                    text = chatMessage.content,
+                                    text = messageContent.content,
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(8.dp)
                                 )
@@ -117,10 +118,10 @@ fun OtherMessageItem(
                                         .widthIn(max = maxWidth)
                                         .heightIn(max = maxWidth)
                                         .clickable {
-                                            onNavigateToImageViewer(chatMessage.content)
+                                            onNavigateToImageViewer(messageContent.content)
                                         },
                                     model = ImageRequest.Builder(context)
-                                        .data(chatMessage.content)
+                                        .data(messageContent.content)
                                         .crossfade(true)
                                         .build(),
                                     contentDescription = null,
@@ -142,7 +143,7 @@ fun OtherMessageItem(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = DateUtil.getTime(chatMessage.timestamp),
+                        text = DateUtil.getTime(timestamp),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.align(Alignment.Bottom)
                     )

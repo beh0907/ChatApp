@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.domain.repository
 
-import com.skymilk.chatapp.store.data.dto.ChatRoom
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.MessageType
@@ -19,7 +18,7 @@ interface ChatRepository {
 
     suspend fun addParticipants(chatRoomId: String, newParticipants: List<String>): Result<String>
 
-    fun getMessages(chatRoomId: String): Flow<List<ChatMessage>>
+    fun getRealtimeMessages(chatRoomId: String): Flow<List<ChatMessage>>
 
     suspend fun sendMessage(
         chatRoomId: String,

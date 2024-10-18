@@ -134,7 +134,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     //채팅 메시지 목록 불러오기
     private fun loadChatMessages() {
         viewModelScope.launch {
-            chatUseCases.getMessages(chatRoomId)
+            chatUseCases.getRealtimeMessages(chatRoomId)
                 .onStart {
                     _chatMessagesState.value = ChatMessagesState.Loading
                 }

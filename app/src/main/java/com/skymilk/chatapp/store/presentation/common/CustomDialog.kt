@@ -203,10 +203,7 @@ fun CustomFullScreenEditDialog(
                             //20자로 이름 제한
                             if (it.length <= maxLength) inputText = it
                         },
-                        textStyle = TextStyle(
-                            fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                            color = Color.White
-                        ),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),

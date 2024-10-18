@@ -1,8 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.setting
 
-import android.util.Log
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +13,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -105,64 +101,23 @@ fun SettingSection(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        //설정 상태
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { toggleAlarmSetting() }
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Notifications,
-                contentDescription = null
-            )
 
-            Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp),
-                text = "알림",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+        //알림
+        SettingToggleItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = "알림",
+            icon = Icons.Outlined.Notifications,
+            value = settingState.isAlarmEnabled,
+            onToggle = toggleAlarmSetting
+        )
 
-            Switch(
-                checked = settingState.isAlarmEnabled,
-                onCheckedChange = { toggleAlarmSetting() }
-            )
-        }
-
-        //설정 상태
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { toggleDarkModeSetting() }
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.DarkMode,
-                contentDescription = null
-            )
-
-            Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp),
-                text = "어두운 모드",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Switch(
-                checked = settingState.isDarkModeEnabled,
-                onCheckedChange = { toggleDarkModeSetting() }
-            )
-        }
-
-
+        //어두운 모드
+        SettingToggleItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = "어두운 모드",
+            icon = Icons.Outlined.DarkMode,
+            value = settingState.isDarkModeEnabled,
+            onToggle = toggleDarkModeSetting
+        )
     }
 }

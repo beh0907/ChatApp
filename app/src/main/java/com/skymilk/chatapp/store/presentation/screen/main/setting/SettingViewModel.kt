@@ -75,9 +75,6 @@ class SettingViewModel @Inject constructor(
             val isDarkModeEnabled = !settingState.value.isDarkModeEnabled
 
             userSettingUseCases.toggleUserDarkModeSetting(isDarkModeEnabled)
-
-            //토스트 메시지 전달
-            sendEvent(Event.Toast("어두운 모드를 ${if (isDarkModeEnabled) "설정" else "해제"}하였습니다."))
         }
     }
 }
