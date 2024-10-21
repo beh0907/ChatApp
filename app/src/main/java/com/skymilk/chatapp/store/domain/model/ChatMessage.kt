@@ -14,8 +14,6 @@ data class MessageContent(
     val type: MessageType = MessageType.TEXT
 )
 
-
-
 enum class MessageType {
     TEXT, IMAGE, VIDEO, SYSTEM
 }

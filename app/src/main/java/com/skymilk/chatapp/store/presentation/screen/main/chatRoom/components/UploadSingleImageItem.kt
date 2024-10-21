@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,14 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
+import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
 import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun MyUploadImageItem(
-    uploadState: ImageUploadState.Progress
+fun UploadSingleImageItem(
+    imageUploadInfo: ImageUploadInfo
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -66,16 +67,16 @@ fun MyUploadImageItem(
                 ) {
                     // 이미지
                     AsyncImage(
-                        model = uploadState.imageUri,
+                        model = imageUploadInfo.imageUri,
                         contentDescription = "Uploading Image",
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.size(maxWidth),
                         contentScale = ContentScale.Crop
                     )
 
                     // 반투명 오버레이
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .size(maxWidth)
                             .background(Color.Black.copy(alpha = 0.5f))
                     )
 
@@ -88,7 +89,7 @@ fun MyUploadImageItem(
                         verticalArrangement = Arrangement.Center
                     ) {
                         CircularProgressIndicator(
-                            progress = { uploadState.progress / 100f },
+                            progress = { imageUploadInfo.progress / 100f },
                             modifier = Modifier.size(50.dp),
                             color = Color.White,
                             trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
@@ -97,13 +98,13 @@ fun MyUploadImageItem(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "${FileSizeUtil.formatFileSize(uploadState.bytesTransferred)} / ${
+                            text = "${FileSizeUtil.formatFileSize(imageUploadInfo.bytesTransferred)} / ${
                                 FileSizeUtil.formatFileSize(
-                                    uploadState.totalBytes
+                                    imageUploadInfo.totalBytes
                                 )
                             }",
                             color = Color.White,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }

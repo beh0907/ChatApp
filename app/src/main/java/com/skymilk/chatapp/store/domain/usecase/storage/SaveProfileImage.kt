@@ -3,16 +3,15 @@ package com.skymilk.chatapp.store.domain.usecase.storage
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import com.skymilk.chatapp.store.domain.model.UploadProgress
+import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow
 import java.io.ByteArrayOutputStream
-import javax.inject.Inject
 
 class SaveProfileImage(
     private val storageRepository: StorageRepository
 ) {
-    operator fun invoke(userId: String, bitmap: ImageBitmap): Flow<UploadProgress> {
+    operator fun invoke(userId: String, bitmap: ImageBitmap): Flow<ImageUploadInfo> {
         return storageRepository.saveProfileImage(userId, convertBitmapToByteArray(bitmap))
     }
 

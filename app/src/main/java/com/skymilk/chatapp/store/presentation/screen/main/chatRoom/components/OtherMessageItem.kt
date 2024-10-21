@@ -115,8 +115,7 @@ fun OtherMessageItem(
                             MessageType.IMAGE -> {
                                 SubcomposeAsyncImage(
                                     modifier = Modifier
-                                        .widthIn(max = maxWidth)
-                                        .heightIn(max = maxWidth)
+                                        .size(maxWidth)
                                         .clickable {
                                             onNavigateToImageViewer(messageContent.content)
                                         },
@@ -132,7 +131,7 @@ fun OtherMessageItem(
                                                 .shimmerEffect()
                                         )
                                     },
-                                    contentScale = ContentScale.FillWidth // 이미지의 크기 조정
+                                    contentScale = ContentScale.Crop // 이미지의 크기 조정
                                 )
                             }
 

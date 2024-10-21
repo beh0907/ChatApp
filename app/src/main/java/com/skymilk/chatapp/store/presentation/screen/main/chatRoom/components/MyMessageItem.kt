@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -80,8 +81,7 @@ fun MyMessageItem(
                     MessageType.IMAGE -> {
                         SubcomposeAsyncImage(
                             modifier = Modifier
-                                .widthIn(max = maxWidth)
-                                .heightIn(max = maxWidth)
+                                .size(maxWidth)
                                 .clickable {
                                     onNavigateToImageViewer(messageContent.content)
                                 },
@@ -94,7 +94,7 @@ fun MyMessageItem(
                                         .shimmerEffect()
                                 )
                             },
-                            contentScale = ContentScale.FillWidth // 이미지의 크기 조정
+                            contentScale = ContentScale.Crop // 이미지의 크기 조정
                         )
                     }
 

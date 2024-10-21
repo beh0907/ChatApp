@@ -114,13 +114,19 @@ fun ChatMessageList(
 
             //내가 전송중인 이미지 정보
             //이미지가 전송중일때만 정보를 표시
-            if (uploadState is ImageUploadState.Progress) {
-                item {
-                    MyUploadImageItem(uploadState)
+            when (uploadState) {
+                is ImageUploadState.Progress -> {
+                    item {
+                        if (uploadState.imageUploadInfoList.size == 1)
+                            UploadSingleImageItem(uploadState.imageUploadInfoList.first())
+                        else
+                            UploadMultiImageItem(uploadState)
+                    }
+
+                    if (chatMessages.isNotEmpty()) scope.launch { listState.scrollToItem(0) }
                 }
 
-                if (chatMessages.isNotEmpty()) scope.launch { listState.scrollToItem(0) }
-
+                else -> Unit
             }
 
             //메시지 이력 목록

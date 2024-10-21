@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
@@ -38,7 +39,7 @@ fun ParticipantItem(
             .clickable {
                 onUserItemClick(participant)
             }
-            .padding(MaterialTheme.dimens.small2),
+            .padding(MaterialTheme.dimens.small1),
         verticalAlignment = Alignment.CenterVertically
     ) {
         //이미지 정보
@@ -68,7 +69,8 @@ fun ParticipantItem(
                     ),
                 text = " 나 ",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.surface
+                color = MaterialTheme.colorScheme.surface,
+                fontWeight = FontWeight.SemiBold
             )
         }
 

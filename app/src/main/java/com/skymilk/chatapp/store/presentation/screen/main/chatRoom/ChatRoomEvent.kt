@@ -19,7 +19,7 @@ sealed interface ChatRoomEvent {
 
     data class SendImageMessage(
         val sender: User,
-        val imageUri: Uri,
+        val imageUris: List<Uri>,
         val participants: List<User>,
     ) : ChatRoomEvent
 

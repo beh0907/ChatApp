@@ -90,7 +90,6 @@ class ChatRepositoryImpl @Inject constructor(
 
                 // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보를 비동기적으로 가져오기
                 launch {
-
                     val chatRooms = snapshots?.documents?.mapNotNull { doc ->
                         doc.toObject(ChatRoom::class.java)
                     }.orEmpty()
@@ -274,7 +273,7 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun sendImageMessage(
         chatRoomId: String,
         sender: User,
-        content: String,
+        imageUrls: List<String>,
         participants: List<User>
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
@@ -282,9 +281,12 @@ class ChatRepositoryImpl @Inject constructor(
                 id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
                 senderId = sender.id,
                 timestamp = System.currentTimeMillis(),
-                messageContents = listOf(
-                    MessageContent(content = content, type = MessageType.IMAGE)
-                )
+                messageContents = imageUrls.map { imageUrl ->
+                    MessageContent(
+                        content = imageUrl,
+                        type = MessageType.IMAGE
+                    )
+                }
             )
 
             // 메시지를 Realtime Database에 저장
@@ -296,7 +298,7 @@ class ChatRepositoryImpl @Inject constructor(
 
             // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
             val chatRoomUpdates = mapOf(
-                "lastMessage" to "이미지",  // 이미지 파일을 전송했기 때문에 이미지라 고정 설정
+                "lastMessage" to "사진 ${imageUrls.size}장을 보냈습니다.",  // 이미지 전송 고정 코멘트
                 "lastMessageTimestamp" to System.currentTimeMillis()  // 마지막 메시지 타임스탬프
             )
 
@@ -396,7 +398,7 @@ class ChatRepositoryImpl @Inject constructor(
     ) = coroutineScope {
         // DB에서 참가자들의 FCM 토큰을 가져옵니다.
         // 한 계정에 복수의 로그인 이력이 있을 수 있으니 중복 제거
-        val tokens = participants.map { it.fcmToken }.fastDistinctBy { it }
+        val tokens = participants.map { it.fcmToken }.filter { sender.fcmToken != it }.fastDistinctBy { it }
 
         // 토큰이 없는 경우 처리
         if (tokens.isEmpty()) {

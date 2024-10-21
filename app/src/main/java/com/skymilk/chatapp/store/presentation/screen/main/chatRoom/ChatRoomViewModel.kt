@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -94,7 +96,7 @@ class ChatRoomViewModel @AssistedInject constructor(
             is ChatRoomEvent.SendImageMessage -> {
                 sendImageMessage(
                     sender = event.sender,
-                    imageUri = event.imageUri,
+                    imageUris = event.imageUris,
                     participants = event.participants
                 )
             }
@@ -150,7 +152,12 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //텍스트 메시지 전송
-    private fun sendMessage(sender: User, content: String, participants: List<User>, type: MessageType) {
+    private fun sendMessage(
+        sender: User,
+        content: String,
+        participants: List<User>,
+        type: MessageType
+    ) {
         viewModelScope.launch {
             try {
                 chatUseCases.sendMessage(chatRoomId, sender, content, participants, type)
@@ -161,13 +168,12 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //이미지 메시지 전송
-    private fun sendImageMessage(sender: User, imageUri: Uri, participants: List<User>) {
+    private fun sendImageMessage(sender: User, imageUris: List<Uri>, participants: List<User>) {
         //이미지 업로드 결과
-        uploadImage(sender.id, imageUri) { url ->
-
+        uploadImage(chatRoomId, imageUris) { urls ->
             viewModelScope.launch {
                 try {
-                    chatUseCases.sendImageMessage(chatRoomId, sender, url, participants)
+                    chatUseCases.sendImageMessage(chatRoomId, sender, urls, participants)
                 } catch (e: Exception) {
                     _uploadState.value =
                         ImageUploadState.Error("Failed to send image message: ${e.message}")
@@ -178,28 +184,43 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //이미지 업로드
-    private fun uploadImage(id: String, uri: Uri, onSuccess: (String) -> Unit) {
+    private fun uploadImage(
+        chatRoomId: String,
+        imageUris: List<Uri>,
+        onCompleted: (List<String>) -> Unit
+    ) {
         viewModelScope.launch {
-            _uploadState.value = ImageUploadState.Loading(imageUri = uri)
-            try {
-                storageUseCases.saveChatMessageImage(id, uri).collect { progress ->
-                    _uploadState.value = when {
-                        progress.downloadUrl != null -> {
-                            onSuccess(progress.downloadUrl)
-                            ImageUploadState.Success(progress.downloadUrl)
-                        }
-
-                        else -> ImageUploadState.Progress(
-                            progress = progress.progress,
-                            bytesTransferred = progress.bytesTransferred,
-                            totalBytes = progress.totalBytes,
-                            imageUri = uri
+            //스토리지 업로드 작업
+            storageUseCases.saveChatMessageImage(chatRoomId, imageUris)
+                .catch { e ->
+                    _uploadState.update {
+                        ImageUploadState.Error(
+                            e.message ?: "Unknown error occurred"
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _uploadState.value = ImageUploadState.Error(e.message ?: "Unknown error occurred")
-            }
+                .collect { uploadInfoList ->
+                    //이미지 업로드 성공 or 실패 처리 완료된 이미지 수 확인
+                    val completedOrFailedImages =
+                        uploadInfoList.count { it.downloadUrl != null || it.error != null }
+
+                    //업로드 완료 여부 확인
+                    _uploadState.update {
+                        if (completedOrFailedImages == imageUris.size) {
+                            val successfulUploads = uploadInfoList.filter { it.downloadUrl != null }
+                            val failedUploads = uploadInfoList.filter { it.error != null }
+
+                            //업로드가 완료된 이미지 경로 전달
+                            onCompleted(successfulUploads.mapNotNull { it.downloadUrl })
+
+                            //완료 되었다면 완료된 이미지 url로 업데이트
+                            ImageUploadState.Completed(successfulUploads, failedUploads)
+                        } else {
+                            //현재 업로드중인 상태 저장
+                            ImageUploadState.Progress(uploadInfoList, completedOrFailedImages)
+                        }
+                    }
+                }
         }
     }
 

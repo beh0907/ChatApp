@@ -10,13 +10,13 @@ class SendImageMessage(
     suspend operator fun invoke(
         chatRoomId: String,
         sender: User,
-        content: String,
+        imageUrls: List<String>,
         participants: List<User>
     ): Result<Unit> {
         return chatRepository.sendImageMessage(
             chatRoomId,
             sender,
-            content,
+            imageUrls,
             participants
         )
     }

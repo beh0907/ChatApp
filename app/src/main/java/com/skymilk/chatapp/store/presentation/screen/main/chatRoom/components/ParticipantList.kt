@@ -34,7 +34,7 @@ fun ParticipantList(
             Text(
                 modifier = Modifier.padding(start = 15.dp),
                 text = "참여자 ${participants.size}",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
             )
         }
 

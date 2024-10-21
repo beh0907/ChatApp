@@ -189,11 +189,11 @@ fun ChatRoomScreen(
                                 )
                             )
                         },
-                        onSendImageMessage = { sender, uri ->
+                        onSendImageMessage = { sender, uris ->
                             onEvent(
                                 ChatRoomEvent.SendImageMessage(
                                     sender,
-                                    uri,
+                                    uris,
                                     chatRoom.participants
                                 )
                             )
@@ -294,7 +294,7 @@ fun TopSection(
 fun BottomSection(
     modifier: Modifier = Modifier,
     onSendMessage: (User, String) -> Unit,
-    onSendImageMessage: (User, Uri) -> Unit,
+    onSendImageMessage: (User, List<Uri>) -> Unit,
     user: User,
 ) {
     var message by remember { mutableStateOf("") }
@@ -341,9 +341,13 @@ fun BottomSection(
                 .clickable {
                     TedImagePicker
                         .with(context)
-                        .start { uri ->
-                            onSendImageMessage(user, uri)
+                        .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
+                        .startMultiImage { uris ->
+                          onSendImageMessage(user, uris)
                         }
+//                        .start { uri ->
+//                            onSendImageMessage(user, uri)
+//                        }
                 }, contentAlignment = Alignment.BottomCenter
         ) {
             Icon(

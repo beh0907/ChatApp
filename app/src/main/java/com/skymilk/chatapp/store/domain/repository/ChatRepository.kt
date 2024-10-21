@@ -31,7 +31,7 @@ interface ChatRepository {
     suspend fun sendImageMessage(
         chatRoomId: String,
         sender: User,
-        content: String,
+        imageUrls: List<String>,
         participants: List<User>
     ): Result<Unit>
 
