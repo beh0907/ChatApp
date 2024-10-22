@@ -37,7 +37,7 @@ import com.skymilk.chatapp.store.presentation.navigation.bottom.BottomNavigation
 import com.skymilk.chatapp.store.presentation.navigation.CustomNavType
 import com.skymilk.chatapp.store.presentation.navigation.NavigationViewModel
 import com.skymilk.chatapp.store.presentation.navigation.bottom.MainBottomBar
-import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
+import com.skymilk.chatapp.store.presentation.navigation.routes.MainScreens
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.ChatRoomInviteScreen
@@ -71,19 +71,19 @@ fun MainNavigation(
                 icon = Icons.Outlined.People,
                 selectedIcon = Icons.Filled.People,
                 title = "친구",
-                route = MainNavigation.FriendsScreen
+                route = MainScreens.FriendsScreen
             ),
             BottomNavigationItem(
                 icon = Icons.AutoMirrored.Outlined.Chat,
                 selectedIcon = Icons.AutoMirrored.Rounded.Chat,
                 title = "채팅",
-                route = MainNavigation.ChatsScreen
+                route = MainScreens.ChatsScreen
             ),
             BottomNavigationItem(
                 icon = Icons.Outlined.Settings,
                 selectedIcon = Icons.Filled.Settings,
                 title = "설정",
-                route = MainNavigation.SettingScreen
+                route = MainScreens.SettingScreen
             )
         )
     }
@@ -139,10 +139,10 @@ fun MainNavigation(
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDestination = MainNavigation.FriendsScreen
+            startDestination = MainScreens.FriendsScreen
         ) {
             //친구 목록 화면
-            composable<MainNavigation.FriendsScreen> {
+            composable<MainScreens.FriendsScreen> {
 
                 FriendsScreen(
                     viewModel = friendsViewModel,
@@ -150,20 +150,20 @@ fun MainNavigation(
                     currentUser = currentUser,
                     onNavigateToProfile = { user ->
                         navController.navigate(
-                            MainNavigation.ProfileScreen(user = user)
+                            MainScreens.ProfileScreen(user = user)
                         ) {
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
                     },
                     onNavigateToUserSearch = {
-                        navController.navigate(MainNavigation.UserSearchScreen)
+                        navController.navigate(MainScreens.UserSearchScreen)
                     }
                 )
             }
 
             //채팅방 목록 화면
-            composable<MainNavigation.ChatsScreen> {
+            composable<MainScreens.ChatsScreen> {
                 val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
                     factory = ChatRoomsViewModel.provideFactory(
                         viewModelFactoryProvider.chatListViewModelFactory(),
@@ -176,19 +176,19 @@ fun MainNavigation(
                     onEvent = chatRoomsViewModel::onEvent,
                     currentUser = currentUser,
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                        navController.navigate(MainScreens.ChatRoomScreen(chatRoomId = chatRoomId)) {
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
                     },
                     onNavigateToChatRoomInvite = {
-                        navController.navigate(MainNavigation.ChatRoomInviteScreen())
+                        navController.navigate(MainScreens.ChatRoomInviteScreen())
                     }
                 )
             }
 
             //설정 화면
-            composable<MainNavigation.SettingScreen> {
+            composable<MainScreens.SettingScreen> {
                 val settingViewModel: SettingViewModel = hiltViewModel()
 
                 SettingScreen(
@@ -197,19 +197,19 @@ fun MainNavigation(
                     currentUser = currentUser,
                     onNavigateToProfile = { user ->
                         navController.navigate(
-                            MainNavigation.ProfileScreen(user = user)
+                            MainScreens.ProfileScreen(user = user)
                         )
                     }
                 )
             }
 
             //채팅방 생성 화면
-            composable<MainNavigation.ChatRoomInviteScreen> {
+            composable<MainScreens.ChatRoomInviteScreen> {
                 val chatRoomInviteViewModel: ChatRoomInviteViewModel = hiltViewModel()
                 val friends by friendsViewModel.friendsState.collectAsStateWithLifecycle()
 
                 //특정 채팅방에서 유저를 추가할 땐 채팅방과 현재 참여자 정보를 가지고 있다
-                val args = it.toRoute<MainNavigation.ChatRoomInviteScreen>()
+                val args = it.toRoute<MainScreens.ChatRoomInviteScreen>()
 
                 ChatRoomInviteScreen(
                     viewModel = chatRoomInviteViewModel,
@@ -219,7 +219,7 @@ fun MainNavigation(
                     existingChatRoomId = args.existingChatRoomId,
                     existingParticipants = args.existingParticipants,
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                        navController.navigate(MainScreens.ChatRoomScreen(chatRoomId = chatRoomId)) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
                                 inclusive = false
                             }
@@ -231,13 +231,13 @@ fun MainNavigation(
             }
 
             //프로필 화면
-            composable<MainNavigation.ProfileScreen>(
+            composable<MainScreens.ProfileScreen>(
                 typeMap = mapOf(
                     typeOf<User>() to CustomNavType.UserType
                 ),
                 enterTransition = {
                     when (initialState.destination.route) {
-                        MainNavigation.ProfileEditScreen::class.qualifiedName -> {
+                        MainScreens.ProfileEditScreen::class.qualifiedName -> {
                             EnterTransition.None
                         }
 
@@ -257,7 +257,7 @@ fun MainNavigation(
                     )
                 }
             ) {
-                val argsUser = it.toRoute<MainNavigation.ProfileScreen>().user
+                val argsUser = it.toRoute<MainScreens.ProfileScreen>().user
                 val profileViewModel: ProfileViewModel = hiltViewModel()
 
                 ProfileScreen(
@@ -267,12 +267,12 @@ fun MainNavigation(
                     loginUserId = currentUser.id,
                     onNavigateToBack = { navController.popBackStack() },
                     onNavigateToProfileEdit = {
-                        navController.navigate(MainNavigation.ProfileEditScreen) {
+                        navController.navigate(MainScreens.ProfileEditScreen) {
                             launchSingleTop = true
                         }
                     },
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(MainNavigation.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                        navController.navigate(MainScreens.ChatRoomScreen(chatRoomId = chatRoomId)) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
                                 inclusive = false
                             }
@@ -280,14 +280,14 @@ fun MainNavigation(
                         }
                     },
                     onNavigateToImageViewer = { imageUrl ->
-                        navController.navigate(MainNavigation.ImageViewerScreen(imageUrl = imageUrl))
+                        navController.navigate(MainScreens.ImageViewerScreen(imageUrls = listOf(imageUrl)))
                     },
                     onSignOut = onSignOut
                 )
             }
 
             //프로필 편집 화면
-            composable<MainNavigation.ProfileEditScreen> {
+            composable<MainScreens.ProfileEditScreen> {
                 val profileEditViewModel: ProfileEditViewModel = hiltViewModel()
 
                 ProfileEditScreen(
@@ -300,14 +300,14 @@ fun MainNavigation(
 
 
             //채팅방 화면
-            composable<MainNavigation.ChatRoomScreen>(
+            composable<MainScreens.ChatRoomScreen>(
                 deepLinks = listOf(
-                    navDeepLink<MainNavigation.ChatRoomScreen>(
+                    navDeepLink<MainScreens.ChatRoomScreen>(
                         basePath = "chatapp://chatrooms"
                     )
                 )
             ) {
-                val args = it.toRoute<MainNavigation.ChatRoomScreen>()
+                val args = it.toRoute<MainScreens.ChatRoomScreen>()
 
                 val chatRoomViewModel: ChatRoomViewModel = viewModel(
                     factory = ChatRoomViewModel.provideFactory(
@@ -321,7 +321,7 @@ fun MainNavigation(
                     args.javaClass.toString()
                     // 현재 화면 정보 저장
                     navigationViewmodel.updateCurrentDestination(
-                        MainNavigation.ChatRoomScreen.javaClass.toString(),
+                        MainScreens.ChatRoomScreen.javaClass.toString(),
                         mapOf("chatRoomId" to args.chatRoomId)
                     )
 
@@ -338,15 +338,15 @@ fun MainNavigation(
                     onNavigateToBack = { navController.popBackStack() },
                     onNavigateToProfile = { user ->
                         navController.navigate(
-                            MainNavigation.ProfileScreen(user = user)
+                            MainScreens.ProfileScreen(user = user)
                         )
                     },
-                    onNavigateToImageViewer = { imageUrl ->
-                        navController.navigate(MainNavigation.ImageViewerScreen(imageUrl = imageUrl))
+                    onNavigateToImageViewer = { imageUrls, startPage  ->
+                        navController.navigate(MainScreens.ImageViewerScreen(imageUrls = imageUrls, initialPage = startPage))
                     },
                     onNavigateToInviteFriends = { chatRoomId, participants ->
                         navController.navigate(
-                            MainNavigation.ChatRoomInviteScreen(
+                            MainScreens.ChatRoomInviteScreen(
                                 existingChatRoomId = chatRoomId,
                                 existingParticipants = participants
                             )
@@ -356,17 +356,18 @@ fun MainNavigation(
             }
 
             //이미지 뷰어 화면
-            composable<MainNavigation.ImageViewerScreen> {
-                val args = it.toRoute<MainNavigation.ImageViewerScreen>()
+            composable<MainScreens.ImageViewerScreen> {
+                val args = it.toRoute<MainScreens.ImageViewerScreen>()
 
                 ImageViewerScreen(
-                    imageUrl = args.imageUrl,
+                    imageUrls = args.imageUrls,
+                    initialPage = args.initialPage,
                     onNavigateToBack = { navController.popBackStack() }
                 )
             }
 
             //유저 검색 화면
-            composable<MainNavigation.UserSearchScreen> {
+            composable<MainScreens.UserSearchScreen> {
                 val userSearchViewModel: UserSearchViewModel = hiltViewModel()
 
                 UserSearchScreen(
@@ -375,7 +376,7 @@ fun MainNavigation(
                     currentUser = currentUser,
                     onNavigateToProfile = { user ->
                         navController.navigate(
-                            MainNavigation.ProfileScreen(user = user)
+                            MainScreens.ProfileScreen(user = user)
                         )
                     },
                     onNavigateToBack = { navController.popBackStack() }
@@ -385,7 +386,7 @@ fun MainNavigation(
     }
 }
 
-fun navigationToTab(navController: NavController, route: MainNavigation) {
+fun navigationToTab(navController: NavController, route: MainScreens) {
     navController.navigate(route) {
         navController.graph.startDestinationRoute?.let { screen ->
             popUpTo(screen) {

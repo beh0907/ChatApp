@@ -93,7 +93,7 @@ fun ChatRoomScreen(
     currentUser: User,
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImageViewer: (String) -> Unit,
+    onNavigateToImageViewer: (List<String>, Int) -> Unit,
     onNavigateToInviteFriends: (String, List<String>) -> Unit,
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()

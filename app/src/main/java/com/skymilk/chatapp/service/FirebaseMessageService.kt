@@ -17,7 +17,7 @@ import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
-import com.skymilk.chatapp.store.presentation.navigation.routes.MainNavigation
+import com.skymilk.chatapp.store.presentation.navigation.routes.MainScreens
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.random.Random
@@ -84,7 +84,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
         if (chatRoomSettingUseCases.getAlarmSetting(chatRoomId)) return
 
         //현재 참여하고 있는 채팅방이라면 알림X
-        if (navigationState.destination == MainNavigation.ChatRoomScreen.javaClass.toString()
+        if (navigationState.destination == MainScreens.ChatRoomScreen.javaClass.toString()
             && navigationState.params["chatRoomId"] == chatRoomId) return
 
         val notificationManager = getSystemService<NotificationManager>()!!

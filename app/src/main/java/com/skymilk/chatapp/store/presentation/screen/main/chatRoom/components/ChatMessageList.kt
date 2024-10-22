@@ -51,7 +51,7 @@ fun ChatMessageList(
     currentUser: User,
     uploadState: ImageUploadState,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImageViewer: (String) -> Unit
+    onNavigateToImageViewer: (List<String>, Int) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -132,42 +132,40 @@ fun ChatMessageList(
             //메시지 이력 목록
             items(count = chatMessages.size, key = { index -> chatMessages[index].id }) { index ->
                 val chatMessage = chatMessages[index]
+                val messageContent = chatMessage.messageContents.first()
 
-                for (messageContent in chatMessage.messageContents) {
+                when (messageContent.type) {
+                    //시스템 메시지는 별도 표시
+                    MessageType.SYSTEM -> {
+                        SystemMessageItem(
+                            content = messageContent.content
+                        )
+                    }
 
-                    when (messageContent.type) {
-                        //시스템 메시지는 별도 표시
-                        MessageType.SYSTEM -> {
-                            SystemMessageItem(
-                                content = messageContent.content
+                    //채팅 메시지 표시
+                    else -> {
+                        //내가 작성한 메시지
+                        if (chatMessage.senderId == currentUser.id) {
+                            MyMessageItem(
+                                messageContents = chatMessage.messageContents,
+                                timestamp = chatMessage.timestamp,
+                                onNavigateToImageViewer = onNavigateToImageViewer
                             )
-                        }
 
-                        //채팅 메시지 표시
-                        else -> {
-                            //내가 작성한 메시지
-                            if (chatMessage.senderId == currentUser.id) {
-                                MyMessageItem(
-                                    messageContent = messageContent,
-                                    timestamp = chatMessage.timestamp,
-                                    onNavigateToImageViewer = onNavigateToImageViewer
-                                )
+                        } else {
+                            // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
+                            val sender =
+                                chatRoom.participants.find { it.id == chatMessage.senderId }
+                                    ?: User()
 
-                            } else {
-                                // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
-                                val sender =
-                                    chatRoom.participants.find { it.id == chatMessage.senderId }
-                                        ?: User()
-
-                                //다른 사람이 작성한 메시지
-                                OtherMessageItem(
-                                    messageContent = messageContent,
-                                    timestamp = chatMessage.timestamp,
-                                    sender = sender,
-                                    onNavigateToProfile = onNavigateToProfile,
-                                    onNavigateToImageViewer = onNavigateToImageViewer
-                                )
-                            }
+                            //다른 사람이 작성한 메시지
+                            OtherMessageItem(
+                                messageContents = chatMessage.messageContents,
+                                timestamp = chatMessage.timestamp,
+                                sender = sender,
+                                onNavigateToProfile = onNavigateToProfile,
+                                onNavigateToImageViewer = onNavigateToImageViewer
+                            )
                         }
                     }
                 }

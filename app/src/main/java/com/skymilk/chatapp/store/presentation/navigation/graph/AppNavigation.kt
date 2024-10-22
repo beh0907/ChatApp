@@ -9,9 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.skymilk.chatapp.store.presentation.navigation.routes.AuthNavigation
+import com.skymilk.chatapp.store.presentation.navigation.routes.AuthScreens
 import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
-import com.skymilk.chatapp.store.presentation.navigation.routes.StartNavigation
+import com.skymilk.chatapp.store.presentation.navigation.routes.StartScreens
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthEvent
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
@@ -42,9 +42,9 @@ fun AppNavigation(isDeepLink: Boolean) {
     ) {
         //시작 네비게이션
         navigation<Navigations.Start>(
-            startDestination = StartNavigation.SplashScreen
+            startDestination = StartScreens.SplashScreen
         ) {
-            composable<StartNavigation.SplashScreen> {
+            composable<StartScreens.SplashScreen> {
                 SplashScreen(
                     onAnimationFinished = {
                         navController.navigate(startDestination) {
@@ -57,15 +57,15 @@ fun AppNavigation(isDeepLink: Boolean) {
 
         //인증 네비게이션
         navigation<Navigations.Auth>(
-            startDestination = AuthNavigation.SignInScreen
+            startDestination = AuthScreens.SignInScreen
         ) {
             //로그인 화면
-            composable<AuthNavigation.SignInScreen> {
+            composable<AuthScreens.SignInScreen> {
                 SignInScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
                     onEvent = authViewModel::onEvent,
-                    onNavigateToSignUp = { navController.navigate(AuthNavigation.SignUpScreen) },
+                    onNavigateToSignUp = { navController.navigate(AuthScreens.SignUpScreen) },
                     onNavigateToHome = {
                         navController.navigate(Navigations.Main) {
                             popUpTo(Navigations.Auth) { inclusive = true }
@@ -75,7 +75,7 @@ fun AppNavigation(isDeepLink: Boolean) {
             }
 
             //회원가입 화면
-            composable<AuthNavigation.SignUpScreen> {
+            composable<AuthScreens.SignUpScreen> {
                 SignUpScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
@@ -98,7 +98,7 @@ fun AppNavigation(isDeepLink: Boolean) {
                 MainNavigation(
                     currentUser = currentUser,
                     onSignOut = {
-                        navController.navigate(AuthNavigation.SignInScreen) {
+                        navController.navigate(AuthScreens.SignInScreen) {
                             popUpTo(Navigations.Main) { inclusive = true }
                         }
 
@@ -110,7 +110,7 @@ fun AppNavigation(isDeepLink: Boolean) {
             } else {
                 // 로그인된 정보가 없다면 로그인 화면으로 강제 이동
                 LaunchedEffect(Unit) {
-                    navController.navigate(AuthNavigation.SignInScreen) {
+                    navController.navigate(AuthScreens.SignInScreen) {
                         popUpTo(Navigations.Main) { inclusive = true }
                     }
                 }
