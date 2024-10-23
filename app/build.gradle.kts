@@ -150,8 +150,8 @@ dependencies {
     //Image Cropper
     implementation(libs.easycrop)
 
-    //Image Viewer
-    implementation(libs.image.viewer)
+    //Image Zoomable
+    implementation (libs.zoomable)
 
     //lottie
     implementation(libs.lottie.compose)

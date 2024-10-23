@@ -8,7 +8,6 @@ datastorePreferences = "1.1.1"
 easycrop = "0.1.1"
 firebaseBom = "33.5.0"
 googleAuthLibraryOauth2Http = "1.11.0"
-imageViewer = "1.1.0-alpha.5"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -33,6 +32,7 @@ transformations = "2.0.3"
 loggingInterceptor = "4.12.0"
 v2User = "2.20.6"
 generativeai = "0.9.0"
+zoomable = "1.6.2"
 
 
 [libraries]
@@ -64,7 +64,6 @@ easycrop = { module = "io.github.mr0xf00:easycrop", version.ref = "easycrop" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "googleAuthLibraryOauth2Http" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
-image-viewer = { module = "com.jvziyaoyao.scale:image-viewer", version.ref = "imageViewer" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
@@ -83,6 +82,7 @@ retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "ret
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kakao-sdk-user = { module = "com.kakao.sdk:v2-user", version.ref = "v2User" }
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
