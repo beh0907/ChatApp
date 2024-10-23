@@ -21,6 +21,14 @@ val localProperties = rootProject.file("local.properties").inputStream().use {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\project\\ChatApp\\chatApp.jks")
+            storePassword = localProperties.getProperty("jks.store.password")
+            keyAlias = "chatApp"
+            keyPassword = localProperties.getProperty("jks.key.password")
+        }
+    }
     namespace = "com.skymilk.chatapp"
     compileSdk = 35
 
@@ -62,6 +70,7 @@ android {
         )
 
         resValue("string", "KAKAO_SDK_OAUTH_SCHEME", localProperties.getProperty("kakao.sdk.oauth.scheme"))
+        signingConfig = signingConfigs.getByName("release")
     }
 
     buildTypes {
@@ -71,6 +80,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

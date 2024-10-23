@@ -107,7 +107,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(this, "messages")
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)  // 알림 클릭 시 인텐트 실행

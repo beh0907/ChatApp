@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,7 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.SubcomposeAsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
@@ -52,8 +49,6 @@ fun OtherMessageItem(
     onNavigateToProfile: (User) -> Unit,
     onNavigateToImageViewer: (List<String>, Int) -> Unit
 ) {
-    val context = LocalContext.current
-
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,38 +113,15 @@ fun OtherMessageItem(
 
                         //이미지 타입
                         MessageType.IMAGE -> {
-
                             // 이미지 그리드
                             FixedSizeImageMessageGrid(
-                                modifier = Modifier.clip(RoundedCornerShape(12.dp)),
-                                maxWidth = maxWidth,
+                                modifier = Modifier
+                                    .width(maxWidth)
+                                    .clip(RoundedCornerShape(12.dp)),
                                 messageContents = messageContents,
-                                maxColumnCount = 3
-                            ) { imageUrl, index ->
-                                SubcomposeAsyncImage(
-                                    modifier = Modifier
-                                        .aspectRatio(1f)
-                                        .fillMaxSize()
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .clickable {
-                                            onNavigateToImageViewer(messageContents.map { it.content }, index)
-                                        },
-                                    model = ImageRequest.Builder(context)
-                                        .data(imageUrl)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = null,
-                                    loading = {
-                                        Box(
-                                            modifier = Modifier
-                                                .aspectRatio(1f)
-                                                .fillMaxSize()
-                                                .shimmerEffect()
-                                        )
-                                    },
-                                    contentScale = ContentScale.Crop // 이미지의 크기 조정
-                                )
-                            }
+                                maxColumnCount = 3,
+                                onNavigateToImageViewer = onNavigateToImageViewer
+                            )
                         }
 
                         else -> Unit

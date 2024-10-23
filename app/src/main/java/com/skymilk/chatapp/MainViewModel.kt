@@ -1,6 +1,5 @@
 package com.skymilk.chatapp
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases

@@ -2,13 +2,10 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,12 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
-import com.google.common.collect.Multimaps.index
 import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
@@ -43,8 +35,6 @@ fun MyMessageItem(
     timestamp: Long,
     onNavigateToImageViewer: (List<String>, Int) -> Unit
 ) {
-    val context = LocalContext.current
-
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,35 +77,13 @@ fun MyMessageItem(
                 MessageType.IMAGE -> {
                     // 이미지 그리드
                     FixedSizeImageMessageGrid(
-                        modifier = Modifier.clip(RoundedCornerShape(12.dp)),
-                        maxWidth = maxWidth,
+                        modifier = Modifier
+                            .width(maxWidth)
+                            .clip(RoundedCornerShape(12.dp)),
                         messageContents = messageContents,
-                        maxColumnCount = 3
-                    ) { imageUrl, index ->
-                        SubcomposeAsyncImage(
-                            modifier = Modifier
-                                .aspectRatio(1f)
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(4.dp))
-                                .clickable {
-                                    onNavigateToImageViewer(messageContents.map { it.content }, index)
-                                },
-                            model = ImageRequest.Builder(context)
-                                .data(imageUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = null,
-                            loading = {
-                                Box(
-                                    modifier = Modifier
-                                        .aspectRatio(1f)
-                                        .fillMaxSize()
-                                        .shimmerEffect()
-                                )
-                            },
-                            contentScale = ContentScale.Crop // 이미지의 크기 조정
-                        )
-                    }
+                        maxColumnCount = 3,
+                        onNavigateToImageViewer = onNavigateToImageViewer
+                    )
                 }
 
                 else -> Unit
@@ -132,8 +100,6 @@ fun MyMessageItemShimmer() {
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        maxWidth * 0.6f
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
