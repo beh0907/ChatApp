@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,7 +78,7 @@ fun ProfileEditScreen(
     val cropState = imageCropper.cropState
 
     //프로필 편집 정보
-    var showEditDialog by remember { mutableStateOf(false) }
+    var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var editingField by remember { mutableStateOf("") }
     var editName by remember { mutableStateOf(user.username) }
     var editStatusMessage by remember { mutableStateOf(user.statusMessage) }

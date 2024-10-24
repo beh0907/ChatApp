@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,8 @@ import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 fun UploadSingleImageItem(
     imageUploadInfo: ImageUploadInfo
 ) {
+    Log.d("UploadSingleImageItem", "imageUploadInfo: $imageUploadInfo")
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,11 +91,11 @@ fun UploadSingleImageItem(
                     ) {
                         CircularProgressIndicator(
                             progress = { imageUploadInfo.progress / 100f },
-                            modifier = Modifier.size(50.dp),
+                            modifier = Modifier.size(40.dp),
                             color = Color.White,
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
                             text = "${FileSizeUtil.formatFileSize(imageUploadInfo.bytesTransferred)} / ${

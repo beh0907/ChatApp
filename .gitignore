@@ -1,6 +1,7 @@
 *.iml
 .gradle
 /local.properties
+/key.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -13,6 +14,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+key.properties
 app/google-services.json
 app/src/main/res/raw/service_account.json
 chatApp.jks

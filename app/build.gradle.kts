@@ -15,18 +15,37 @@ plugins {
 //val properties = Properties()
 //properties.load(FileInputStream(rootProject.file("local.properties")))
 
-// local.properties 사용
+//properties 사용
 val localProperties = rootProject.file("local.properties").inputStream().use {
+    Properties().apply { load(it) }
+}
+val keyProperties = rootProject.file("key.properties").inputStream().use {
     Properties().apply { load(it) }
 }
 
 android {
     signingConfigs {
         create("release") {
-            storeFile = file("C:\\project\\ChatApp\\chatApp.jks")
-            storePassword = localProperties.getProperty("jks.store.password")
-            keyAlias = "chatApp"
-            keyPassword = localProperties.getProperty("jks.key.password")
+            storeFile = file(keyProperties.getProperty("key.store.file"))
+            storePassword = keyProperties.getProperty("key.store.password")
+            keyAlias = keyProperties.getProperty("key.alias.name")
+            keyPassword = keyProperties.getProperty("key.alias.password")
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
     namespace = "com.skymilk.chatapp"
@@ -72,23 +91,12 @@ android {
         resValue("string", "KAKAO_SDK_OAUTH_SCHEME", localProperties.getProperty("kakao.sdk.oauth.scheme"))
         signingConfig = signingConfigs.getByName("release")
     }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.getByName("release")
-        }
-    }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     buildFeatures {
         compose = true

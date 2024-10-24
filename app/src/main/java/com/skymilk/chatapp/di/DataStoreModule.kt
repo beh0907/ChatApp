@@ -1,13 +1,11 @@
 package com.skymilk.chatapp.di
 
 import android.content.Context
-import android.preference.PreferenceDataStore
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.skymilk.chatapp.store.data.utils.Constants
 import dagger.Module

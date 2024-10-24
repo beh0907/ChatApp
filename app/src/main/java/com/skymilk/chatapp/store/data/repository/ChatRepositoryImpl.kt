@@ -309,7 +309,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .await()
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
-            sendFcmMessage(chatRoomId, sender, "이미지", participants)
+            sendFcmMessage(chatRoomId, sender, "사진 ${imageUrls.size}장을 보냈습니다.", participants)
 
             Result.success(Unit)
         } catch (e: Exception) {

@@ -78,11 +78,11 @@ fun FixedSizeImageUploadGrid(
         ) {
             CircularProgressIndicator(
                 progress = { uploadState.completedOrFailedImages.toFloat() / images.size },
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier.size(40.dp),
                 color = Color.White,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Text(
                 text = "${uploadState.completedOrFailedImages} / ${images.size}",

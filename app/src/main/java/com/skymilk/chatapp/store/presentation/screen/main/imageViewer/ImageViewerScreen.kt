@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +56,7 @@ fun ImageViewerScreen(
     val pagerState = rememberPagerState(initialPage = initialPage) { imageUrls.size }
 
     //썸네일 표시 여부
-    var visibleThumbnails by remember { mutableStateOf(true) }
+    var visibleThumbnails by rememberSaveable { mutableStateOf(true) }
 
     //페이지마다 줌 상태를 저장하고 싶다면 사용
 //    val zoomableStates = imageUrls.map { rememberZoomState() }

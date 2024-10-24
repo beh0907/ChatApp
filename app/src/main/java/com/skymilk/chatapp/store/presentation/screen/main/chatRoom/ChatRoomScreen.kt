@@ -1,5 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
+import android.R.attr.onClick
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -31,6 +33,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -53,6 +56,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +69,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -103,8 +108,8 @@ fun ChatRoomScreen(
     val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
     val alarmState by viewModel.alarmState.collectAsStateWithLifecycle()
 
-    var visibleExitDialog by remember { mutableStateOf(false) }
-    var visibleDrawer by remember { mutableStateOf(false) }
+    var visibleExitDialog by rememberSaveable { mutableStateOf(false) }
+    var visibleDrawer by rememberSaveable { mutableStateOf(false) }
 
     // 드로어가 오픈되어 있을경우 백버튼을 누르면 드로어만 닫는다
     BackHandler(enabled = visibleDrawer) {
@@ -343,7 +348,7 @@ fun BottomSection(
                         .with(context)
                         .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
                         .startMultiImage { uris ->
-                          onSendImageMessage(user, uris)
+                            onSendImageMessage(user, uris)
                         }
 //                        .start { uri ->
 //                            onSendImageMessage(user, uri)
@@ -413,7 +418,6 @@ fun BottomSection(
         }
     }
 }
-
 
 //우 -> 좌 방향 커스텀 드로어
 //기본은 좌 -> 우이기 때문에 별도 구현

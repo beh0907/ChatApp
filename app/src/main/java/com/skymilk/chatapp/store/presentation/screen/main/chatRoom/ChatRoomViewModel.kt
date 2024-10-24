@@ -171,6 +171,11 @@ class ChatRoomViewModel @AssistedInject constructor(
     private fun sendImageMessage(sender: User, imageUris: List<Uri>, participants: List<User>) {
         //이미지 업로드 결과
         uploadImage(chatRoomId, imageUris) { urls ->
+            if (urls.isEmpty()) {
+                sendEvent(Event.Toast("이미지 업로드에 실패하였습니다."))
+                return@uploadImage
+            }
+
             viewModelScope.launch {
                 try {
                     chatUseCases.sendImageMessage(chatRoomId, sender, urls, participants)
@@ -199,27 +204,35 @@ class ChatRoomViewModel @AssistedInject constructor(
                         )
                     }
                 }
-                .collect { uploadInfoList ->
+                .collect { imageUploadInfoList ->
                     //이미지 업로드 성공 or 실패 처리 완료된 이미지 수 확인
                     val completedOrFailedImages =
-                        uploadInfoList.count { it.downloadUrl != null || it.error != null }
+                        imageUploadInfoList.count { it.downloadUrl != null || it.error != null }
 
                     //업로드 완료 여부 확인
                     _uploadState.update {
                         if (completedOrFailedImages == imageUris.size) {
-                            val successfulUploads = uploadInfoList.filter { it.downloadUrl != null }
-                            val failedUploads = uploadInfoList.filter { it.error != null }
+                            val successfulUploads = imageUploadInfoList.filter { it.downloadUrl != null }
+                            val failedUploads = imageUploadInfoList.filter { it.error != null }
 
                             //업로드가 완료된 이미지 경로 전달
                             onCompleted(successfulUploads.mapNotNull { it.downloadUrl })
 
                             //완료 되었다면 완료된 이미지 url로 업데이트
-                            ImageUploadState.Completed(successfulUploads, failedUploads)
+                            ImageUploadState.Completed(
+                                successfulUploads = successfulUploads,
+                                failedUploads = failedUploads
+                            )
                         } else {
                             //현재 업로드중인 상태 저장
-                            ImageUploadState.Progress(uploadInfoList, completedOrFailedImages)
+                            ImageUploadState.Progress(
+                                imageUploadInfoList = imageUploadInfoList.toList(), // 새 인스턴스 생성하여 방출 처리
+                                completedOrFailedImages = completedOrFailedImages
+                            )
                         }
                     }
+
+                    Log.d("uploadImage", "_uploadState: ${_uploadState.value}")
                 }
         }
     }
