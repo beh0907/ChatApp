@@ -49,7 +49,7 @@ fun ParticipantItem(
                 .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
-                    if (participant.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                    if (participant.profileImageUrl.isBlank()) R.drawable.bg_default_profile
                     else participant.profileImageUrl
                 )
                 .decoderFactory(SvgDecoder.Factory())
@@ -69,8 +69,8 @@ fun ParticipantItem(
                     ),
                 text = " 나 ",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.surface,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.surface
             )
         }
 

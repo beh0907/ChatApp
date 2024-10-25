@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profileEdit
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -71,7 +71,6 @@ fun ProfileEditScreen(
     onNavigateToBack: () -> Unit
 ) {
     val profileEditState by viewModel.profileEditState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     //이미지 자르기
     val imageCropper = rememberImageCropper()
@@ -82,7 +81,7 @@ fun ProfileEditScreen(
     var editingField by remember { mutableStateOf("") }
     var editName by remember { mutableStateOf(user.username) }
     var editStatusMessage by remember { mutableStateOf(user.statusMessage) }
-    var selectedImage by remember { mutableStateOf<ImageBitmap?>(null) }
+    var selectedImage by remember { mutableStateOf<ProfileImage>(ProfileImage.Initial) }
 
     Box(
         modifier = modifier
@@ -100,7 +99,7 @@ fun ProfileEditScreen(
                         userId = user.id,
                         name = editName,
                         statusMessage = editStatusMessage,
-                        imageBitmap = selectedImage
+                        profileImage = selectedImage
                     )
                 )
             }
@@ -114,7 +113,6 @@ fun ProfileEditScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             EditProfileSection(
-                context = context,
                 imageCropper = imageCropper,
                 profileImageUrl = user.profileImageUrl,
                 editName = editName,
@@ -217,87 +215,108 @@ fun TopSection(
 
 @Composable
 private fun EditProfileSection(
-    context: Context,
     imageCropper: ImageCropper,
     profileImageUrl: String?,
     editName: String,
     editStatusMessage: String,
-    selectedImage: ImageBitmap?,
+    selectedImage: ProfileImage,
     onNameClick: () -> Unit,
     onStatusClick: () -> Unit,
-    onSelectedImage: (ImageBitmap) -> Unit
+    onSelectedImage: (ProfileImage) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var showDropdownMenu by rememberSaveable { mutableStateOf(false) }
+
     Box {
         //프로필 이미지
-        if (selectedImage != null) {
-            //Coil Image는 ImageBitmap을 적용시키지 못함
-            Image(
-                modifier = Modifier
-                    .size(120.dp)
-                    .squircleClip()
-                    .shadow(4.dp),
-                bitmap = selectedImage,
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            AsyncImage(
-                modifier = Modifier
-                    .size(120.dp)
-                    .squircleClip()
-                    .shadow(4.dp),
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(
-                        if (profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
-                        else profileImageUrl
-                    )
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build(),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
+        when (selectedImage) {
+            is ProfileImage.Custom -> {
+                //Coil Image는 ImageBitmap을 적용시키지 못함
+                Image(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .squircleClip()
+                        .shadow(4.dp),
+                    bitmap = selectedImage.imageBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            else -> {
+                AsyncImage(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .squircleClip()
+                        .shadow(4.dp),
+                    model = ImageRequest.Builder(context)
+                        .data(
+                            //이미지 url 정보가 없거나 기본 이미지 상태라면 기본 이미지 표시
+                            if (profileImageUrl.isNullOrBlank() || selectedImage is ProfileImage.Default) R.drawable.bg_default_profile
+                            else profileImageUrl
+                        )
+                        .decoderFactory(SvgDecoder.Factory())
+                        .build(),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null
+                )
+            }
         }
 
-//        Text(
-//            modifier = Modifier
-//                .width(120.dp)
-//                .background(Color(0x88888888))
-//                .padding(vertical = 2.dp)
-//                .align(Alignment.BottomCenter),
-//            textAlign = TextAlign.Center,
-//            text = "편집",
-//            style = MaterialTheme.typography.bodyMedium,
-//            color = Color.White,
-//        )
-
-        SmallFloatingActionButton(
+        Box(
             modifier = Modifier
-                .size(30.dp)
-                .align(Alignment.BottomEnd),
-            containerColor = Color.White,
-            contentColor = Color.Black,
-            onClick = {
-                //테드 이미지 픽커
-                TedImagePicker
-                    .with(context)
-                    .start { uri ->
-                        scope.launch {
-                            when (val result = imageCropper.crop(uri = uri, context = context)) {
-                                is CropResult.Success -> {
-                                    onSelectedImage(result.bitmap)
-                                }
-
-                                else -> {}
-                            }
-                        }
-                    }
-            }
+                .align(Alignment.BottomEnd)
         ) {
-            Icon(
-                imageVector = Icons.Rounded.CameraAlt,
-                contentDescription = null,
-            )
+            SmallFloatingActionButton(
+                modifier = Modifier.size(30.dp),
+                containerColor = Color.White,
+                contentColor = Color.Black,
+                onClick = { showDropdownMenu = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.CameraAlt,
+                    contentDescription = null,
+                )
+            }
+
+            DropdownMenu(
+                expanded = showDropdownMenu,
+                onDismissRequest = { showDropdownMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("기본 이미지 선택") },
+                    onClick = {
+                        //드롭다운 메뉴 닫기
+                        showDropdownMenu = false
+
+                        onSelectedImage(ProfileImage.Default)
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text("앨범 사진/카메라 선택") },
+                    onClick = {
+                        showDropdownMenu = false
+                        TedImagePicker
+                            .with(context)
+                            .start { uri ->
+                                //선택한 이미지 자르기
+                                scope.launch {
+                                    when (val result =
+                                        imageCropper.crop(uri = uri, context = context)) {
+                                        is CropResult.Success -> {
+                                            onSelectedImage(ProfileImage.Custom(result.bitmap))
+                                        }
+
+                                        else -> {}
+                                    }
+                                }
+                            }
+                    }
+                )
+            }
         }
     }
 
@@ -391,8 +410,5 @@ fun EditEventSection(
             .height(100.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-
-
-    }
+    ) {}
 }

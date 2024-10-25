@@ -26,13 +26,16 @@ sealed interface MainScreens {
     ) : MainScreens // 채팅방 대화상대 초대 화면
 
     @Serializable
+    data class ChatImagePagerScreen(val imageUrls: List<String>, val initialPage: Int = 0) : MainScreens // 채팅 이미지 페이저 화면
+
+    @Serializable
     data class ProfileScreen(val user: User) : MainScreens // 프로필 화면
 
     @Serializable
     data object ProfileEditScreen : MainScreens // 프로필 편집 화면
 
     @Serializable
-    data class ImageViewerScreen(val imageUrls: List<String>, val initialPage: Int = 0) : MainScreens // 이미지 뷰어 화면
+    data class ProfileImageViewerScreen(val imageUrl: String) : MainScreens // 프로필 이미지 뷰어 화면
 
     @Serializable
     data object UserSearchScreen : MainScreens // 유저 검색 화면

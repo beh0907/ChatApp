@@ -48,7 +48,7 @@ fun UserSearchItem(
                 .squircleClip(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
-                    if (user.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                    if (user.profileImageUrl.isBlank()) R.drawable.bg_default_profile
                     else user.profileImageUrl
                 )
                 .decoderFactory(SvgDecoder.Factory())

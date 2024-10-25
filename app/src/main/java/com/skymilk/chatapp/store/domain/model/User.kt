@@ -12,7 +12,7 @@ data class User(
     var id: String,
     var username: String,
     var email: String,
-    var profileImageUrl: String? = null,
+    var profileImageUrl: String = "",
     var fcmToken: String,
     var statusMessage: String
 ) : Parcelable {

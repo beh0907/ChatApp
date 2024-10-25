@@ -33,7 +33,7 @@ import com.skymilk.chatapp.ui.theme.Black
 fun MyMessageItem(
     messageContents: List<MessageContent>,
     timestamp: Long,
-    onNavigateToImageViewer: (List<String>, Int) -> Unit
+    onNavigateToImagePager: (List<String>, Int) -> Unit
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -82,7 +82,7 @@ fun MyMessageItem(
                             .clip(RoundedCornerShape(12.dp)),
                         messageContents = messageContents,
                         maxColumnCount = 3,
-                        onNavigateToImageViewer = onNavigateToImageViewer
+                        onNavigateToImagePager = onNavigateToImagePager
                     )
                 }
 

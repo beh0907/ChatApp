@@ -35,6 +35,7 @@ fun ChatRoomsScreen(
     onNavigateToChatRoomInvite: () -> Unit
 ) {
     val chatListState by viewModel.chatRoomsState.collectAsStateWithLifecycle()
+    val chatRoomAlarmsDisabled by viewModel.chatRoomAlarmsDisabled.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -60,7 +61,12 @@ fun ChatRoomsScreen(
                     return
                 }
 
-                ChatRoomList(chatRooms, currentUser, onNavigateToChatRoom)
+                ChatRoomList(
+                    chatRooms = chatRooms,
+                    currentUser = currentUser,
+                    chatRoomAlarmsDisabled = chatRoomAlarmsDisabled,
+                    onNavigateToChatRoom = onNavigateToChatRoom
+                )
             }
 
             is ChatRoomsState.Error -> {

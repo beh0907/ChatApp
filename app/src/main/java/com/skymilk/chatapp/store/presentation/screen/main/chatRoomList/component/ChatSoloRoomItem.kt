@@ -24,11 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.squircleClip
-import com.skymilk.chatapp.ui.theme.dimens
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
+import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
 fun ChatSoloRoomItem(
@@ -36,12 +37,13 @@ fun ChatSoloRoomItem(
     currentUser: User,
     onChatItemClick: (String) -> Unit
 ) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            onChatItemClick(chatRoom.id)
-        }
-        .padding(MaterialTheme.dimens.small1),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onChatItemClick(chatRoom.id)
+            }
+            .padding(MaterialTheme.dimens.small1),
     ) {
         //나의 이미지 적용
         val image = chatRoom.participants.first().profileImageUrl
@@ -54,7 +56,10 @@ fun ChatSoloRoomItem(
             model = ImageRequest.Builder(
                 LocalContext.current
             )
-                .data(image)
+                .data(
+                    if (image.isBlank()) R.drawable.bg_default_profile
+                    else image
+                )
                 .crossfade(true)
                 .build(),
             contentScale = ContentScale.Crop,
@@ -81,17 +86,27 @@ fun ChatSoloRoomItem(
                         ),
                     text = " 나 ",
                     style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.surface
                 )
 
                 Spacer(Modifier.width(5.dp))
 
                 Text(
+                    modifier = Modifier.weight(1f),
                     text = currentUser.username,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1
+                )
+
+                Spacer(Modifier.width(5.dp))
+
+                //시간 정보
+                Text(
+                    text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
 
@@ -103,17 +118,6 @@ fun ChatSoloRoomItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1
-            )
-        }
-
-
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
-            //시간 정보
-            Text(
-                text = DateUtil.getDate(chatRoom.lastMessageTimestamp),
-                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }

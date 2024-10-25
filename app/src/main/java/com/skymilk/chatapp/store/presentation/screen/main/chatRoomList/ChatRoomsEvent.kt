@@ -6,4 +6,6 @@ sealed interface ChatRoomsEvent {
 
     data object LoadChatRooms : ChatRoomsEvent
 
+    data object LoadChatRoomSetting : ChatRoomsEvent
+
 }

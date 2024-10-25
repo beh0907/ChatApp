@@ -9,7 +9,7 @@ interface UserRepository {
         userId: String,
         name: String,
         statusMessage: String,
-        imageUrl: String
+        imageUrl: String?
     ): Result<Unit> // 프로필 정보 갱신
 
     fun updateFcmToken(userId: String, token: String) // FCM 토큰 업데이트

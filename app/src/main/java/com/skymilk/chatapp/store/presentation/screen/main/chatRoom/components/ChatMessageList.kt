@@ -51,7 +51,7 @@ fun ChatMessageList(
     currentUser: User,
     uploadState: ImageUploadState,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImageViewer: (List<String>, Int) -> Unit
+    onNavigateToImagePager: (List<String>, Int) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -149,7 +149,7 @@ fun ChatMessageList(
                             MyMessageItem(
                                 messageContents = chatMessage.messageContents,
                                 timestamp = chatMessage.timestamp,
-                                onNavigateToImageViewer = onNavigateToImageViewer
+                                onNavigateToImagePager = onNavigateToImagePager
                             )
 
                         } else {
@@ -164,7 +164,7 @@ fun ChatMessageList(
                                 timestamp = chatMessage.timestamp,
                                 sender = sender,
                                 onNavigateToProfile = onNavigateToProfile,
-                                onNavigateToImageViewer = onNavigateToImageViewer
+                                onNavigateToImagePager = onNavigateToImagePager
                             )
                         }
                     }

@@ -5,13 +5,13 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.hilt.android)
-    kotlin("kapt")
     id("kotlin-parcelize")
     kotlin("plugin.serialization") version "1.9.22"
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
 }
 
-//kotlin 2.0.0으로 버전업 하면서 사용불가
+//AGP 버전업 하면서 사용불가
 //val properties = Properties()
 //properties.load(FileInputStream(rootProject.file("local.properties")))
 
@@ -24,6 +24,15 @@ val keyProperties = rootProject.file("key.properties").inputStream().use {
 }
 
 android {
+    kotlin {
+        jvmToolchain(17)
+
+        // 병렬 컴파일 활성화
+        sourceSets.all {
+            languageSettings.optIn("kotlin.RequiresOptIn")
+        }
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file(keyProperties.getProperty("key.store.file"))
@@ -197,7 +206,7 @@ dependencies {
 
     //Dagger Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Retrofit

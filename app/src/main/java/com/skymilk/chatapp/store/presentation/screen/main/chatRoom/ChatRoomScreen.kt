@@ -1,7 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
-import android.R.attr.onClick
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -33,7 +31,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -69,7 +66,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -98,7 +94,7 @@ fun ChatRoomScreen(
     currentUser: User,
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImageViewer: (List<String>, Int) -> Unit,
+    onNavigateToImagePager: (List<String>, Int) -> Unit,
     onNavigateToInviteFriends: (String, List<String>) -> Unit,
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
@@ -169,7 +165,7 @@ fun ChatRoomScreen(
                                 currentUser = currentUser,
                                 uploadState = uploadState,
                                 onNavigateToProfile = onNavigateToProfile,
-                                onNavigateToImageViewer = onNavigateToImageViewer
+                                onNavigateToImagePager = onNavigateToImagePager
                             )
                         }
 

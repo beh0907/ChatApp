@@ -46,11 +46,12 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRooms
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomsViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
-import com.skymilk.chatapp.store.presentation.screen.main.imageViewer.ImageViewerScreen
+import com.skymilk.chatapp.store.presentation.screen.main.chatImagePager.ChatImageViewerScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditViewModel
+import com.skymilk.chatapp.store.presentation.screen.main.profileImageViewer.ProfileImageViewerScreen
 import com.skymilk.chatapp.store.presentation.screen.main.setting.SettingScreen
 import com.skymilk.chatapp.store.presentation.screen.main.setting.SettingViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.userSearch.UserSearchScreen
@@ -280,7 +281,7 @@ fun MainNavigation(
                         }
                     },
                     onNavigateToImageViewer = { imageUrl ->
-                        navController.navigate(MainScreens.ImageViewerScreen(imageUrls = listOf(imageUrl)))
+                        navController.navigate(MainScreens.ProfileImageViewerScreen(imageUrl = imageUrl))
                     },
                     onSignOut = onSignOut
                 )
@@ -294,6 +295,16 @@ fun MainNavigation(
                     viewModel = profileEditViewModel,
                     onEvent = profileEditViewModel::onEvent,
                     user = currentUser,
+                    onNavigateToBack = { navController.popBackStack() }
+                )
+            }
+
+            //프로필 이미지 화면
+            composable<MainScreens.ProfileImageViewerScreen> {
+                val args = it.toRoute<MainScreens.ProfileImageViewerScreen>()
+
+                ProfileImageViewerScreen(
+                    imageUrl = args.imageUrl,
                     onNavigateToBack = { navController.popBackStack() }
                 )
             }
@@ -341,8 +352,8 @@ fun MainNavigation(
                             MainScreens.ProfileScreen(user = user)
                         )
                     },
-                    onNavigateToImageViewer = { imageUrls, startPage  ->
-                        navController.navigate(MainScreens.ImageViewerScreen(imageUrls = imageUrls, initialPage = startPage))
+                    onNavigateToImagePager = { imageUrls, startPage  ->
+                        navController.navigate(MainScreens.ChatImagePagerScreen(imageUrls = imageUrls, initialPage = startPage))
                     },
                     onNavigateToInviteFriends = { chatRoomId, participants ->
                         navController.navigate(
@@ -355,11 +366,11 @@ fun MainNavigation(
                 )
             }
 
-            //이미지 뷰어 화면
-            composable<MainScreens.ImageViewerScreen> {
-                val args = it.toRoute<MainScreens.ImageViewerScreen>()
+            //채팅 이미지 페이저 화면
+            composable<MainScreens.ChatImagePagerScreen> {
+                val args = it.toRoute<MainScreens.ChatImagePagerScreen>()
 
-                ImageViewerScreen(
+                ChatImageViewerScreen(
                     imageUrls = args.imageUrls,
                     initialPage = args.initialPage,
                     onNavigateToBack = { navController.popBackStack() }

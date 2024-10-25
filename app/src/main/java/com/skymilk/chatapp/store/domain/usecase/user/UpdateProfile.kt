@@ -10,7 +10,7 @@ class UpdateProfile(
         userId: String,
         name: String,
         statusMessage: String,
-        imageUrl: String
+        imageUrl: String?
     ): Result<Unit> {
         return userRepository.updateProfile(
             userId,

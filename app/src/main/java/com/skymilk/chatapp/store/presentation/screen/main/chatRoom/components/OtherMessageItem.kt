@@ -47,7 +47,7 @@ fun OtherMessageItem(
     timestamp: Long,
     sender: User,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImageViewer: (List<String>, Int) -> Unit
+    onNavigateToImagePager: (List<String>, Int) -> Unit
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -63,7 +63,7 @@ fun OtherMessageItem(
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(
-                        if (sender.profileImageUrl.isNullOrBlank()) R.drawable.bg_default_profile
+                        if (sender.profileImageUrl.isBlank()) R.drawable.bg_default_profile
                         else sender.profileImageUrl
                     )
                     .decoderFactory(SvgDecoder.Factory())
@@ -120,7 +120,7 @@ fun OtherMessageItem(
                                     .clip(RoundedCornerShape(12.dp)),
                                 messageContents = messageContents,
                                 maxColumnCount = 3,
-                                onNavigateToImageViewer = onNavigateToImageViewer
+                                onNavigateToImagePager = onNavigateToImagePager
                             )
                         }
 

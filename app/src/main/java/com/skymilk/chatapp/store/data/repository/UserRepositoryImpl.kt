@@ -24,17 +24,16 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val firebaseFireStore: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth
+//    private val firebaseAuth: FirebaseAuth
 ) : UserRepository {
 
     override suspend fun updateProfile(
         userId: String,
         name: String,
         statusMessage: String,
-        imageUrl: String
+        imageUrl: String?
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val currentUser = firebaseAuth.currentUser ?: throw Exception("현재 사용자가 없습니다")
             val userRef = firebaseFireStore.collection("users").document(userId)
 
             // Firestore 업데이트
@@ -42,21 +41,22 @@ class UserRepositoryImpl @Inject constructor(
                 "username" to name,
                 "statusMessage" to statusMessage
             )
-            if (imageUrl.isNotEmpty()) {
+            if (imageUrl != null) {
                 updates["profileImageUrl"] = imageUrl
             }
             userRef.update(updates).await()
 
             // Firebase Auth 프로필 업데이트
-            val profileUpdates = UserProfileChangeRequest.Builder()
-                .setDisplayName(name)
-                .apply {
-                    if (imageUrl.isNotEmpty()) {
-                        photoUri = Uri.parse(imageUrl)
-                    }
-                }
-                .build()
-            currentUser.updateProfile(profileUpdates).await()
+//            val currentUser = firebaseAuth.currentUser ?: throw Exception("현재 사용자가 없습니다")
+//            val profileUpdates = UserProfileChangeRequest.Builder()
+//                .setDisplayName(name)
+//                .apply {
+//                    if (imageUrl.isNotEmpty()) {
+//                        photoUri = Uri.parse(imageUrl)
+//                    }
+//                }
+//                .build()
+//            currentUser.updateProfile(profileUpdates).await()
 
             Result.success(Unit)
         } catch (e: Exception) {

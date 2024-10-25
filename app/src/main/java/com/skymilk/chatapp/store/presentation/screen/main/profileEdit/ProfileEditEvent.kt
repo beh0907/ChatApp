@@ -8,7 +8,7 @@ sealed interface ProfileEditEvent {
         val userId: String,
         val name: String,
         val statusMessage: String,
-        val imageBitmap: ImageBitmap?
+        val profileImage: ProfileImage
     ) : ProfileEditEvent
 
 }

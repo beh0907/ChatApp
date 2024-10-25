@@ -10,13 +10,19 @@ import com.skymilk.chatapp.store.domain.model.User
 fun ChatRoomList(
     chatRooms: List<ChatRoomWithUsers>,
     currentUser: User,
-    onChatItemClick: (String) -> Unit
-) {
+    chatRoomAlarmsDisabled: List<String>,
+    onNavigateToChatRoom: (String) -> Unit
+    ) {
     LazyColumn {
         items(chatRooms, key = { chatRoom -> chatRoom.id }) { chatRoom ->
-            when(chatRoom.participants.size) {
-                1 -> ChatSoloRoomItem(chatRoom, currentUser, onChatItemClick) // 나의 채팅방
-                else -> ChatRoomItem(chatRoom, currentUser, onChatItemClick) // 한명 이상의 대상이 있는 채팅방
+            when (chatRoom.participants.size) {
+                1 -> ChatSoloRoomItem(chatRoom, currentUser, onNavigateToChatRoom) // 나의 채팅방
+                else -> ChatRoomItem(
+                    chatRoom,
+                    currentUser,
+                    chatRoomAlarmsDisabled.contains(chatRoom.id),
+                    onNavigateToChatRoom
+                ) // 한명 이상의 대상이 있는 채팅방
             }
         }
     }

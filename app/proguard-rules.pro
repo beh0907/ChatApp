@@ -25,7 +25,6 @@
 -keep class * extends com.google.gson.TypeAdapter { <init>(); }
 -keep class com.google.googlesignin.** { *; }
 -keep class retrofit2.** { *; }
--keepattributes *Annotation*
 
 # Gemini API 관련 규칙 추가
 -keep class com.google.ai.client.** { *; }
@@ -48,19 +47,6 @@
 -keep class io.ktor.util.debug.** { *; }
 -keepclassmembers class io.ktor.util.debug.** { *; }
 
-# 추가 안전장치
--keep class kotlin.** { *; }
--keep class kotlinx.** { *; }
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    !static !transient <fields>;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-
 # 리플렉션 관련 규칙 보강
 -keepattributes Signature
 -keepattributes SourceFile,LineNumberTable
@@ -70,7 +56,8 @@
 -keepattributes EnclosingMethod
 
 # API 관련 클래스 보존
--keep class com.skymilk.chatapp.** { *; }
+-keep class com.skymilk.chatapp.model.** { *; }
+-keep class com.skymilk.chatapp.api.** { *; }
 -keep class * implements java.io.Serializable { *; }
 
 # Fix for R8 warnings

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
-import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsEvent
+import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.assisted.Assisted
@@ -14,13 +14,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
 class ChatRoomsViewModel @AssistedInject constructor(
     @Assisted private val userId: String,
-    private val chatUseCases: ChatUseCases
+    private val chatUseCases: ChatUseCases,
+    private val chatRoomSettingUseCases: ChatRoomSettingUseCases
 ) : ViewModel() {
 
     @AssistedFactory
@@ -42,13 +45,20 @@ class ChatRoomsViewModel @AssistedInject constructor(
     private val _chatRoomsState = MutableStateFlow<ChatRoomsState>(ChatRoomsState.Initial)
     val chatRoomsState: StateFlow<ChatRoomsState> = _chatRoomsState.asStateFlow()
 
+    private val _chatRoomAlarmsDisabled = MutableStateFlow<List<String>>(listOf())
+    val chatRoomAlarmsDisabled = _chatRoomAlarmsDisabled.asStateFlow()
+
     init {
-        loadChatRooms()
+        onEvent(ChatRoomsEvent.LoadChatRooms)
+
+        onEvent(ChatRoomsEvent.LoadChatRoomSetting)
     }
 
     fun onEvent(event: ChatRoomsEvent) {
         when(event) {
             is ChatRoomsEvent.LoadChatRooms -> loadChatRooms()
+
+            is ChatRoomsEvent.LoadChatRoomSetting -> loadChatRoomSetting()
         }
     }
 
@@ -67,6 +77,14 @@ class ChatRoomsViewModel @AssistedInject constructor(
                 .collect { chatRooms ->
                     _chatRoomsState.value = ChatRoomsState.Success(chatRooms) // 성공 상태 설정
                 }
+        }
+    }
+
+    private fun loadChatRoomSetting() {
+        viewModelScope.launch {
+            chatRoomSettingUseCases.getAlarmsSetting().collectLatest { setting ->
+                _chatRoomAlarmsDisabled.update { setting }
+            }
         }
     }
 }
