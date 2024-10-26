@@ -6,33 +6,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 
 //채팅방 목록 프로필 이미지 그리드
 @Composable
@@ -86,60 +81,30 @@ fun ChatProfileGrid(
 //이미지 업로드 메시지 그리드 뷰
 @Composable
 fun FixedSizeImageUploadGrid(
-    modifier: Modifier = Modifier,
-    uploadState: ImageUploadState.Progress,
+    imageUploadInfoList: List<ImageUploadInfo>,
     maxColumnCount: Int = 3,
 ) {
-    val images = uploadState.imageUploadInfoList
-    val grid = images.redistributeLastRows(maxColumnCount)
+    val grid = imageUploadInfoList.redistributeLastRows(maxColumnCount)
 
-    Box(
-        modifier = modifier
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            grid.forEach { row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    row.forEach { imageUploadInfo ->
-                        AsyncImage(
-                            model = imageUploadInfo.imageUri,
-                            contentDescription = "Upload Image",
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+        grid.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                row.forEach { imageUploadInfo ->
+                    AsyncImage(
+                        model = imageUploadInfo.imageUri,
+                        contentDescription = "Upload Image",
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f),
+                        contentScale = ContentScale.Crop
+                    )
                 }
             }
-        }
-
-        // 오버레이 뷰
-        Column(
-            modifier = Modifier
-                .matchParentSize() // Box의 부모 크기에 맞춤
-                .background(Color.Black.copy(alpha = 0.5f))
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator(
-                progress = { uploadState.completedOrFailedImages.toFloat() / images.size },
-                modifier = Modifier.size(40.dp),
-                color = Color.White,
-            )
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Text(
-                text = "${uploadState.completedOrFailedImages} / ${images.size}",
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium
-            )
         }
     }
 }
@@ -187,6 +152,16 @@ fun FixedSizeImageMessageGrid(
                                     .aspectRatio(1f)
                                     .fillMaxSize()
                                     .shimmerEffect()
+                            )
+                        },
+                        error = {
+                            Icon(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.onSurface),
+                                painter = painterResource(R.drawable.ic_warning),
+                                tint = MaterialTheme.colorScheme.surface,
+                                contentDescription = null
                             )
                         },
                         contentScale = ContentScale.Crop // 이미지의 크기 조정

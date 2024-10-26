@@ -89,20 +89,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-    //다른 영역을 터치 했을 때 키보드가 내려가도록 설정
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        val inputMethodManager: InputMethodManager =
-            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
-
-        //editText의 포커스도 제거한다
-        if (currentFocus is EditText) {
-            currentFocus!!.clearFocus()
-        }
-
-        return super.dispatchTouchEvent(ev)
-    }
 }
 

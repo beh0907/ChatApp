@@ -6,9 +6,7 @@ import androidx.datastore.preferences.core.edit
 import com.skymilk.chatapp.store.data.utils.Constants.PreferencesKeys
 import com.skymilk.chatapp.store.domain.repository.UserSettingRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class UserSettingRepositoryImpl @Inject constructor(
@@ -22,15 +20,8 @@ class UserSettingRepositoryImpl @Inject constructor(
         }
     }
 
-    //유저 알람설정 동기 가져오기
-    override fun getUserAlarmSetting(): Boolean {
-        return runBlocking {
-            getUserAlarmSettingAsync().first()
-        }
-    }
-
     //유저 알람설정 비동기 가져오기
-    override fun getUserAlarmSettingAsync(): Flow<Boolean> {
+    override fun getUserAlarmSetting(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
             preferences[PreferencesKeys.USER_ALARM_SETTING_KEY] != false
         }

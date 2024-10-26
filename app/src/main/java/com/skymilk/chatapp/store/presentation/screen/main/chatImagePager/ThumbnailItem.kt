@@ -40,9 +40,7 @@ fun ThumbnailItem(
             .clickable(onClick = onClick)
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .build(),
+            model = imageUrl,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

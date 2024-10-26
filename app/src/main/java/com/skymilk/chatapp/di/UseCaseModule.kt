@@ -29,10 +29,8 @@ import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.navigation.SaveCurrentDestination
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.DeleteAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.GetAlarmSetting
-import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.GetAlarmSettingAsync
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.GetAlarmsSetting
 import com.skymilk.chatapp.store.domain.usecase.userSetting.GetUserAlarmSetting
-import com.skymilk.chatapp.store.domain.usecase.userSetting.GetUserAlarmSettingAsync
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.SaveAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.userSetting.ToggleUserAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
@@ -113,7 +111,6 @@ object UseCaseModule {
     fun provideChatRoomSettingUseCases(chatRoomSettingRepository: ChatRoomSettingRepository): ChatRoomSettingUseCases =
         ChatRoomSettingUseCases(
             GetAlarmSetting(chatRoomSettingRepository),
-            GetAlarmSettingAsync(chatRoomSettingRepository),
             GetAlarmsSetting(chatRoomSettingRepository),
             SaveAlarmSetting(chatRoomSettingRepository),
             DeleteAlarmSetting(chatRoomSettingRepository),
@@ -124,7 +121,6 @@ object UseCaseModule {
     fun provideUserSettingUseCases(userSettingRepository: UserSettingRepository): UserSettingUseCases =
         UserSettingUseCases(
             GetUserAlarmSetting(userSettingRepository),
-            GetUserAlarmSettingAsync(userSettingRepository),
             ToggleUserAlarmSetting(userSettingRepository),
 
             GetUserDarkModeSetting(userSettingRepository),

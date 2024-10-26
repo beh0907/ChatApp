@@ -43,7 +43,7 @@ class SettingViewModel @Inject constructor(
 
     private fun loadSetting() {
         viewModelScope.launch {
-            userSettingUseCases.getUserAlarmSettingAsync().collectLatest { isAlarmEnabled ->
+            userSettingUseCases.getUserAlarmSetting().collectLatest { isAlarmEnabled ->
                 _settingState.update {
                     it.copy(isAlarmEnabled = isAlarmEnabled)
                 }

@@ -67,7 +67,7 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     //알람 상태
     //저장된 값이 알람 비활성화
-    val alarmState = chatRoomSettingUseCases.getAlarmSettingAsync(chatRoomId)
+    val alarmState = chatRoomSettingUseCases.getAlarmSetting(chatRoomId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     init {

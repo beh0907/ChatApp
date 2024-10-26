@@ -298,7 +298,7 @@ fun BottomSection(
     onSendImageMessage: (User, List<Uri>) -> Unit,
     user: User,
 ) {
-    var message by remember { mutableStateOf("") }
+    var message by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 

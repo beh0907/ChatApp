@@ -9,9 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.skymilk.chatapp.store.presentation.navigation.routes.AuthScreens
-import com.skymilk.chatapp.store.presentation.navigation.routes.Navigations
-import com.skymilk.chatapp.store.presentation.navigation.routes.StartScreens
+import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthEvent
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
@@ -20,35 +18,37 @@ import com.skymilk.chatapp.store.presentation.screen.auth.signUp.SignUpScreen
 import com.skymilk.chatapp.store.presentation.screen.splash.SplashScreen
 
 @Composable
-fun AppNavigation(isDeepLink: Boolean) {
+fun AppNavigation(
+    isDeepLink: Boolean
+) {
     //계정 처리 뷰모델 및 계정 상태
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     //화면 네비게이션 설정
     val navController = rememberNavController()
-    // 로딩 후 시작 화면
+
     val startDestination =
-        if (authState is AuthState.Authenticated) Navigations.Main else Navigations.Auth
+        if (authState is AuthState.Authenticated) Routes.MainGraph else Routes.AuthGraph
 
     //앱 시작 시 화면
-    val appStartDestination =
-        if (isDeepLink) startDestination else Navigations.Start // 딥링크 정보가 있다면 로딩화면 스킵
+    val appStartGraphDestination =
+        if (isDeepLink) startDestination else Routes.StartGraph // 딥링크 정보가 있다면 로딩화면 스킵
 
 
     NavHost(
         navController = navController,
-        startDestination = appStartDestination
+        startDestination = appStartGraphDestination
     ) {
         //시작 네비게이션
-        navigation<Navigations.Start>(
-            startDestination = StartScreens.SplashScreen
+        navigation<Routes.StartGraph>(
+            startDestination = Routes.SplashScreen
         ) {
-            composable<StartScreens.SplashScreen> {
+            composable<Routes.SplashScreen> {
                 SplashScreen(
                     onAnimationFinished = {
                         navController.navigate(startDestination) {
-                            popUpTo(Navigations.Start) { inclusive = true }
+                            popUpTo(Routes.StartGraph) { inclusive = true }
                         }
                     }
                 )
@@ -56,34 +56,34 @@ fun AppNavigation(isDeepLink: Boolean) {
         }
 
         //인증 네비게이션
-        navigation<Navigations.Auth>(
-            startDestination = AuthScreens.SignInScreen
+        navigation<Routes.AuthGraph>(
+            startDestination = Routes.SignInScreen
         ) {
             //로그인 화면
-            composable<AuthScreens.SignInScreen> {
+            composable<Routes.SignInScreen> {
                 SignInScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
                     onEvent = authViewModel::onEvent,
-                    onNavigateToSignUp = { navController.navigate(AuthScreens.SignUpScreen) },
+                    onNavigateToSignUp = { navController.navigate(Routes.SignUpScreen) },
                     onNavigateToHome = {
-                        navController.navigate(Navigations.Main) {
-                            popUpTo(Navigations.Auth) { inclusive = true }
+                        navController.navigate(Routes.MainGraph) {
+                            popUpTo(Routes.AuthGraph) { inclusive = true }
                         }
                     }
                 )
             }
 
             //회원가입 화면
-            composable<AuthScreens.SignUpScreen> {
+            composable<Routes.SignUpScreen> {
                 SignUpScreen(
 //                        modifier = Modifier.padding(innerPadding),
                     viewModel = authViewModel,
                     onEvent = authViewModel::onEvent,
                     onNavigateToSignIn = { navController.popBackStack() },
                     onNavigateToHome = {
-                        navController.navigate(Navigations.Main) {
-                            popUpTo(Navigations.Auth) { inclusive = true }
+                        navController.navigate(Routes.MainGraph) {
+                            popUpTo(Routes.AuthGraph) { inclusive = true }
                         }
                     }
                 )
@@ -91,15 +91,15 @@ fun AppNavigation(isDeepLink: Boolean) {
         }
 
         //메인 네비게이션
-        composable<Navigations.Main> {
+        composable<Routes.MainGraph> {
             val currentUser = (authState as? AuthState.Authenticated)?.user
             if (currentUser != null) {
 
                 MainNavigation(
                     currentUser = currentUser,
                     onSignOut = {
-                        navController.navigate(AuthScreens.SignInScreen) {
-                            popUpTo(Navigations.Main) { inclusive = true }
+                        navController.navigate(Routes.SignInScreen) {
+                            popUpTo(Routes.MainGraph) { inclusive = true }
                         }
 
                         //로그아웃 처리
@@ -110,8 +110,8 @@ fun AppNavigation(isDeepLink: Boolean) {
             } else {
                 // 로그인된 정보가 없다면 로그인 화면으로 강제 이동
                 LaunchedEffect(Unit) {
-                    navController.navigate(AuthScreens.SignInScreen) {
-                        popUpTo(Navigations.Main) { inclusive = true }
+                    navController.navigate(Routes.SignInScreen) {
+                        popUpTo(Routes.MainGraph) { inclusive = true }
                     }
                 }
             }

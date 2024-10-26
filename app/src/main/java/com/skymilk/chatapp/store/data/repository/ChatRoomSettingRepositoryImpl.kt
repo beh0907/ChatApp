@@ -6,9 +6,7 @@ import androidx.datastore.preferences.core.edit
 import com.skymilk.chatapp.store.data.utils.Constants.PreferencesKeys
 import com.skymilk.chatapp.store.domain.repository.ChatRoomSettingRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -51,14 +49,7 @@ class ChatRoomSettingRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAlarmSetting(chatRoomId: String): Boolean {
-        //동기 처리를 위해 runBlocking
-        return runBlocking {
-            getAlarmSettingAsync(chatRoomId).first()
-        }
-    }
-
-    override fun getAlarmSettingAsync(chatRoomId: String): Flow<Boolean> {
+    override fun getAlarmSetting(chatRoomId: String): Flow<Boolean> {
         return dataStore.data.map { preferences ->
             //현재 저장된 목록 가져오기
             val currentList = preferences[PreferencesKeys.DISABLE_ALARM_SETTING_CHATROOM_KEY]?.let {

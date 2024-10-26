@@ -1,13 +1,12 @@
 package com.skymilk.chatapp.store.domain.usecase.userSetting
 
-import com.skymilk.chatapp.store.domain.repository.ChatRoomSettingRepository
 import com.skymilk.chatapp.store.domain.repository.UserSettingRepository
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 class GetUserAlarmSetting(
     private val userSettingRepository: UserSettingRepository
 ) {
-    operator fun invoke(): Boolean {
+    operator fun invoke(): Flow<Boolean> {
         return userSettingRepository.getUserAlarmSetting()
     }
 

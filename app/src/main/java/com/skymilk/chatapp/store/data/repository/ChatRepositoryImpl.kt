@@ -206,6 +206,7 @@ class ChatRepositoryImpl @Inject constructor(
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)
     override fun getRealtimeMessages(chatRoomId: String): Flow<List<ChatMessage>> = callbackFlow {
         val query = firebaseDatabase.getReference("messages").child(chatRoomId)
+        query.keepSynced(true) // 오프라인 사용 동기화
 
         val listener = query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -250,7 +251,8 @@ class ChatRepositoryImpl @Inject constructor(
                 // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
                 val chatRoomUpdates = mapOf(
                     "lastMessage" to content,  // 마지막 메시지 내용
-                    "lastMessageTimestamp" to System.currentTimeMillis()  // 마지막 메시지 타임스탬프
+                    "lastMessageTimestamp" to System.currentTimeMillis(),  // 마지막 메시지 타임스탬프
+//                    "messageCount" to FieldValue.increment(1)  // messageCount를 1 증가
                 )
 
                 // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
@@ -299,7 +301,8 @@ class ChatRepositoryImpl @Inject constructor(
             // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
             val chatRoomUpdates = mapOf(
                 "lastMessage" to "사진 ${imageUrls.size}장을 보냈습니다.",  // 이미지 전송 고정 코멘트
-                "lastMessageTimestamp" to System.currentTimeMillis()  // 마지막 메시지 타임스탬프
+                "lastMessageTimestamp" to System.currentTimeMillis(),  // 마지막 메시지 타임스탬프
+//                    "messageCount" to FieldValue.increment(1)  // messageCount를 1 증가
             )
 
             // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
@@ -354,6 +357,10 @@ class ChatRepositoryImpl @Inject constructor(
             //채팅방 참여자 중에 유저 아이디를 하나 제거한다
             query.update("participants", FieldValue.arrayRemove(user.id)).await()
 
+            // 오프라인 사용 동기화 제거
+            val messageQuery = firebaseDatabase.getReference("messages").child(chatRoomId)
+            messageQuery.keepSynced(false)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -398,7 +405,8 @@ class ChatRepositoryImpl @Inject constructor(
     ) = coroutineScope {
         // DB에서 참가자들의 FCM 토큰을 가져옵니다.
         // 한 계정에 복수의 로그인 이력이 있을 수 있으니 중복 제거
-        val tokens = participants.map { it.fcmToken }.filter { sender.fcmToken != it }.fastDistinctBy { it }
+        val tokens =
+            participants.map { it.fcmToken }.filter { sender.fcmToken != it }.fastDistinctBy { it }
 
         // 토큰이 없는 경우 처리
         if (tokens.isEmpty()) {

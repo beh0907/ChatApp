@@ -2,7 +2,11 @@ package com.skymilk.chatapp.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.memoryCacheSettings
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
@@ -31,12 +35,31 @@ object AppModule {
     //파이어베이스 데이터베이스 초기화
     @Provides
     @Singleton
-    fun provideFirebaseDatabase() = FirebaseDatabase.getInstance(BuildConfig.FIREBASE_DATABASE_URL)
+    fun provideFirebaseDatabase(): FirebaseDatabase {
+        val firebaseDatabase = FirebaseDatabase.getInstance(BuildConfig.FIREBASE_DATABASE_URL)
+        firebaseDatabase.setPersistenceEnabled(true)
+        return firebaseDatabase
+    }
 
     //파이어베이스 파이어스토어 초기화
     @Provides
     @Singleton
-    fun provideFirebaseFireStore() = Firebase.firestore
+    fun provideFirebaseFireStore(): FirebaseFirestore {
+        val fireStore = Firebase.firestore
+        fireStore.firestoreSettings = firestoreSettings {
+            // 메모시 캐시 사용
+            setLocalCacheSettings(memoryCacheSettings {})
+
+            // 지속성 디스크 캐시 사용
+            setLocalCacheSettings(persistentCacheSettings {})
+        }
+
+        //인덱스 자동 생성
+        fireStore.persistentCacheIndexManager?.apply {
+            enableIndexAutoCreation()
+        }
+        return fireStore
+    }
 
     //파이어베이스 스토리지 초기화
     @Provides

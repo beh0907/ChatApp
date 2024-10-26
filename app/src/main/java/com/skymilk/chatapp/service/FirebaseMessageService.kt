@@ -3,7 +3,9 @@ package com.skymilk.chatapp.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
@@ -13,12 +15,19 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.skymilk.chatapp.MainActivity
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
+import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
-import com.skymilk.chatapp.store.presentation.navigation.routes.MainScreens
+import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -40,11 +49,15 @@ class FirebaseMessageService : FirebaseMessagingService() {
     @Inject
     lateinit var userUseCases: UserUseCases
 
+    // 코루틴 스코프 추가
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // Wake Lock 추가
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        // 현재 로그인된 사용자가 있는 경우에만 토큰 업데이트
         firebaseAuth.currentUser?.let { user ->
             userUseCases.updateFcmToken(user.uid, token)
         }
@@ -53,15 +66,46 @@ class FirebaseMessageService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        //메시지 상태 정보
+        //알림 텍스트
         val title = message.notification?.title ?: message.data["title"]
         val body = message.notification?.body ?: message.data["body"]
 
-        //알림 출력
-        showNotification(title, body, message.data)
+        // Wake Lock 획득
+        acquireWakeLock()
+
+        // 코루틴 스코프에서 실행
+        scope.launch {
+            try {
+                showNotification(title, body, message.data)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                // Wake Lock 해제
+                releaseWakeLock()
+            }
+        }
     }
 
-    private fun showNotification(
+
+    private fun acquireWakeLock() {
+        if (wakeLock == null) {
+            val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+            wakeLock = powerManager.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                "FirebaseMessageService:WakeLock"
+            )
+            wakeLock?.acquire(10 * 60 * 1000L /*10 minutes*/)
+        }
+    }
+
+    private fun releaseWakeLock() {
+        if (wakeLock?.isHeld == true) {
+            wakeLock?.release()
+        }
+        wakeLock = null
+    }
+
+    private suspend fun showNotification(
         title: String? = "",
         message: String? = "",
         messageData: MutableMap<String, String>
@@ -69,50 +113,63 @@ class FirebaseMessageService : FirebaseMessagingService() {
         val senderId = messageData["senderId"] ?: return
         val chatRoomId = messageData["chatRoomId"] ?: return
 
-        val navigationState = navigationUseCases.getCurrentDestination()
-
-        //로그인 상태가 아니라면 알림X
+        //로그인한 유저만 알림 발생
         if (firebaseAuth.currentUser == null) return
 
-        //내가 보낸 메시지라면 알림X
+        //전송한 유저와 일치하지 않은 유저
         if (firebaseAuth.currentUser?.uid == senderId) return
 
-        //유저가 알림 설정을 하지 않았다면
-        if (!userSettingUseCases.getUserAlarmSetting()) return
+        //유저 알람 설정 여부
+        if (!userSettingUseCases.getUserAlarmSetting().first()) return
 
-        //알림이 해제된 채팅방이라면 알림X
-        if (chatRoomSettingUseCases.getAlarmSetting(chatRoomId)) return
+        // 채팅방 알람 비활설화 여부 확인
+        if (chatRoomSettingUseCases.getAlarmSetting(chatRoomId).first()) return
 
-        //현재 참여하고 있는 채팅방이라면 알림X
-        if (navigationState.destination == MainScreens.ChatRoomScreen.javaClass.toString()
-            && navigationState.params["chatRoomId"] == chatRoomId) return
+        //현재 화면이 알람이 발생한 채팅방과 동일한 채팅방인지 체크
+        val navigationState = navigationUseCases.getCurrentDestination().first()
+        if (navigationState.destination == Routes.ChatRoomScreen.javaClass.toString()
+            && navigationState.params["chatRoomId"] == chatRoomId
+        ) return
 
-        val notificationManager = getSystemService<NotificationManager>()!!
+        withContext(Dispatchers.Main) {
+            val notificationManager = getSystemService<NotificationManager>()!!
 
-        //알람 채널 생성
-        val channel = NotificationChannel("messages", "메시지 알림", NotificationManager.IMPORTANCE_HIGH)
-        notificationManager.createNotificationChannel(channel)
+            val channel =
+                NotificationChannel("messages", "메시지 알림", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
 
-        // 알림 클릭 시 MainActivity를 열고 채팅방 ID 전달
-        val activityIntent = Intent(this, MainActivity::class.java).apply {
-            this.data = "chatapp://chatrooms/$chatRoomId".toUri()
+            //딥링크 전송
+            val activityIntent =
+                Intent(this@FirebaseMessageService, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    this.data = "chatapp://chatrooms/$chatRoomId".toUri()
+                }
+
+            val pendingIntent = TaskStackBuilder.create(this@FirebaseMessageService).run {
+                addNextIntentWithParentStack(activityIntent)
+                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
+            }
+
+            val notificationId = Random.nextInt(1000)
+            val notification = NotificationCompat.Builder(this@FirebaseMessageService, "messages")
+                .setContentTitle(title)
+                .setContentText(message)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            notificationManager.notify(notificationId, notification)
         }
+    }
 
-        val pendingIntent = TaskStackBuilder.create(this).run {
-            addNextIntentWithParentStack(activityIntent)
-            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        val notificationId = Random.nextInt(1000)
-        val notification = NotificationCompat.Builder(this, "messages")
-            .setContentTitle(title)
-            .setContentText(message)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)  // 알림 클릭 시 인텐트 실행
-            .build()
-
-        notificationManager.notify(notificationId, notification)
+    // 서비스가 종료될 때 코루틴도 취소
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
     }
 }
