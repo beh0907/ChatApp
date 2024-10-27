@@ -41,4 +41,18 @@ class UserSettingRepositoryImpl @Inject constructor(
             preferences[PreferencesKeys.USER_DARK_MODE_SETTING_KEY] == true
         }
     }
+
+    // 배터리 최적화 해제 요청 다시 묻지 않기
+    override suspend fun setRefuseIgnoringOptimization() {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.USER_REFUSE_IGNORE_OPTIMIZATION_KEY] = true
+        }
+    }
+
+    // 배터리 최적화 해제 요청 거부 여부 가져오기
+    override fun getRefuseIgnoringOptimization(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKeys.USER_REFUSE_IGNORE_OPTIMIZATION_KEY] == true
+        }
+    }
 }

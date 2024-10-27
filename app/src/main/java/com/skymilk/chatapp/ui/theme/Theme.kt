@@ -12,7 +12,6 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -22,8 +21,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skymilk.chatapp.MainEvent
 import com.skymilk.chatapp.MainViewModel
 
 private val lightScheme = lightColorScheme(
@@ -118,7 +115,9 @@ fun ChatAppTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (themeState.value) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (themeState.value) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+                context
+            )
         }
 
         themeState.value -> darkScheme
@@ -130,7 +129,8 @@ fun ChatAppTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = themeState.value
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+                themeState.value
         }
     }
 

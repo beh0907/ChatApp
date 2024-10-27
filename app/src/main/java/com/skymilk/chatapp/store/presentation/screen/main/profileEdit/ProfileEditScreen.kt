@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import coil.util.CoilUtils.result
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.ImageCropper
@@ -59,6 +60,7 @@ import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.store.presentation.common.squircleClip
+import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -304,10 +306,11 @@ private fun EditProfileSection(
                             .start { uri ->
                                 //선택한 이미지 자르기
                                 scope.launch {
-                                    when (val result =
-                                        imageCropper.crop(uri = uri, context = context)) {
+                                    val result = imageCropper.crop(uri = uri, context = context)
+                                    when (result) {
                                         is CropResult.Success -> {
-                                            onSelectedImage(ProfileImage.Custom(result.bitmap))
+                                            //이미지 리사이징 후 전달
+                                            onSelectedImage(ProfileImage.Custom(FileSizeUtil.resizeImageBitmap(result.bitmap)))
                                         }
 
                                         else -> {}

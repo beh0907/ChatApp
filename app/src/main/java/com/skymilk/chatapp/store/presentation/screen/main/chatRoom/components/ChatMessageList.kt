@@ -51,7 +51,7 @@ fun ChatMessageList(
     currentUser: User,
     uploadState: ImageUploadState,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImagePager: (List<String>, Int) -> Unit
+    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -147,6 +147,7 @@ fun ChatMessageList(
                         //내가 작성한 메시지
                         if (chatMessage.senderId == currentUser.id) {
                             MyMessageItem(
+                                userName = currentUser.username,
                                 messageContents = chatMessage.messageContents,
                                 timestamp = chatMessage.timestamp,
                                 onNavigateToImagePager = onNavigateToImagePager

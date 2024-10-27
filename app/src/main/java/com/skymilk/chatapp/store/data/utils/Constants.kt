@@ -13,6 +13,7 @@ object Constants {
     const val DISABLE_ALARM_SETTING_CHATROOM_KEY = "DISABLE_ALARM_SETTING_CHATROOM_KEY" // Datastore 채팅방 알람 비활성화 설정 키
     const val USER_ALARM_SETTING_KEY = "USER_ALARM_SETTING_KEY" // Datastore 유저 알람 설정 키
     const val USER_DARK_MODE_SETTING_KEY = "USER_DARK_MODE_SETTING_KEY" // Datastore 유저 다크모드 설정 키
+    const val USER_REFUSE_IGNORE_OPTIMIZATION_KEY = "USER_REFUSE_IGNORE_OPTIMIZATION_KEY" // 배터리 최적화 해제 요청 거부 키
     const val CURRENT_DESTINATION_KEY = "CURRENT_DESTINATION_KEY" // Datastore 현재 화면 상태 키
 
     //dataStore 키
@@ -22,6 +23,8 @@ object Constants {
         val USER_ALARM_SETTING_KEY = booleanPreferencesKey(name = Constants.USER_ALARM_SETTING_KEY)
 
         val USER_DARK_MODE_SETTING_KEY = booleanPreferencesKey(name = Constants.USER_DARK_MODE_SETTING_KEY)
+
+        val USER_REFUSE_IGNORE_OPTIMIZATION_KEY = booleanPreferencesKey(name = Constants.USER_REFUSE_IGNORE_OPTIMIZATION_KEY)
 
         val CURRENT_DESTINATION_KEY = stringPreferencesKey(name = Constants.CURRENT_DESTINATION_KEY)
     }

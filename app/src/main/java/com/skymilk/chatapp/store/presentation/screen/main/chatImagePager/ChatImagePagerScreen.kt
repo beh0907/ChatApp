@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import com.skymilk.chatapp.store.presentation.utils.DateUtil
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -48,6 +50,8 @@ fun ChatImageViewerScreen(
     modifier: Modifier = Modifier,
     imageUrls: List<String>, // 이미지 URL 리스트
     initialPage: Int, // 페이저 시작 위치
+    senderName: String, // 메시지 보낸 사람 이름
+    timestamp: Long, // 메시지 전송 시간
     onNavigateToBack: () -> Unit,
 ) {
     //시작 위치 설정
@@ -95,7 +99,12 @@ fun ChatImageViewerScreen(
             visible = visibleThumbnails
         ) {
             TopSection(
-                modifier = Modifier, onNavigateToBack = onNavigateToBack
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.8f)),
+                senderName = senderName,
+                timestamp = timestamp,
+                onNavigateToBack = onNavigateToBack
             )
         }
 
@@ -108,6 +117,7 @@ fun ChatImageViewerScreen(
                 visible = visibleThumbnails
             ) {
                 ThumbnailSection(
+                    modifier = Modifier.background(Color.Black.copy(alpha = 0.8f)),
                     pagerState = pagerState, imageUrls = imageUrls
                 )
             }
@@ -118,18 +128,36 @@ fun ChatImageViewerScreen(
 @Composable
 fun TopSection(
     modifier: Modifier = Modifier,
+    senderName: String,
+    timestamp: Long,
     onNavigateToBack: () -> Unit
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.6f))
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { onNavigateToBack() }) {
             Icon(
                 imageVector = Icons.Rounded.Close,
                 contentDescription = null,
                 tint = Color.White
+            )
+        }
+
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = senderName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
+            Text(
+                text = DateUtil.getFullDateTime(timestamp),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
             )
         }
     }
@@ -159,13 +187,13 @@ fun ThumbnailSection(
     }
 
     Column(
-        modifier = modifier.background(Color.Black.copy(alpha = 0.6f))
+        modifier = modifier
     ) {
         //썸네일 목록
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(8.dp),
+            contentPadding = PaddingValues(start = 8.dp, end = 8.dp, top = 8.dp),
             state = listState
         ) {
             items(imageUrls.size) { index ->
@@ -187,14 +215,19 @@ fun ThumbnailSection(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = Icons.Rounded.Filter, contentDescription = null, tint = Color.White)
+            Icon(
+                modifier = Modifier.size(12.dp),
+                imageVector = Icons.Rounded.Filter,
+                contentDescription = null,
+                tint = Color.White
+            )
 
             Spacer(modifier = Modifier.width(8.dp))
 
             //이미지 목록 인덱스
             Text(
                 text = "${pagerState.currentPage + 1} / ${imageUrls.size}",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )

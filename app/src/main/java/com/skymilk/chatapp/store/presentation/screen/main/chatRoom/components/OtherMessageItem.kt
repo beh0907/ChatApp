@@ -47,7 +47,7 @@ fun OtherMessageItem(
     timestamp: Long,
     sender: User,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImagePager: (List<String>, Int) -> Unit
+    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -120,7 +120,9 @@ fun OtherMessageItem(
                                     .clip(RoundedCornerShape(12.dp)),
                                 messageContents = messageContents,
                                 maxColumnCount = 3,
-                                onNavigateToImagePager = onNavigateToImagePager
+                                onNavigateToImagePager = { imageUrls, initialPage ->
+                                    onNavigateToImagePager(imageUrls, initialPage, sender.username, timestamp)
+                                }
                             )
                         }
 

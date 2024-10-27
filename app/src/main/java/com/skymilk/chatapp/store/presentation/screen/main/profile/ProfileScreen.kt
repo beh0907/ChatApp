@@ -31,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -134,9 +133,12 @@ fun ProfileScreen(
         }
     }
 
-    if (visibleSignOutDialog) CustomAlertDialog(message = "로그아웃 하시겠습니까?",
-        onConfirm = { onSignOut() },
-        onDismiss = { visibleSignOutDialog = false })
+    if (visibleSignOutDialog)
+        CustomAlertDialog(
+            message = "로그아웃 하시겠습니까?",
+            onConfirm = { onSignOut() },
+            onDismiss = { visibleSignOutDialog = false }
+        )
 }
 
 @Composable

@@ -66,7 +66,8 @@ class ChatRepositoryImpl @Inject constructor(
                                 participants = users,
                                 lastMessage = chatRoom.lastMessage,
                                 lastMessageTimestamp = chatRoom.lastMessageTimestamp,
-                                createdTimestamp = chatRoom.createdTimestamp
+                                createdTimestamp = chatRoom.createdTimestamp,
+                                totalMessagesCount = chatRoom.totalMessagesCount
                             )
                             trySend(chatRoomWithUsers)
                         }
@@ -103,7 +104,8 @@ class ChatRepositoryImpl @Inject constructor(
                                 participants = users,
                                 lastMessage = chatRoom.lastMessage,
                                 lastMessageTimestamp = chatRoom.lastMessageTimestamp,
-                                createdTimestamp = chatRoom.createdTimestamp
+                                createdTimestamp = chatRoom.createdTimestamp,
+                                totalMessagesCount = chatRoom.totalMessagesCount
                             )
                         }
                     }
@@ -174,7 +176,8 @@ class ChatRepositoryImpl @Inject constructor(
             participants = participants,
             lastMessage = "",
             lastMessageTimestamp = System.currentTimeMillis(),
-            createdTimestamp = System.currentTimeMillis()
+            createdTimestamp = System.currentTimeMillis(),
+            totalMessagesCount = 0L
         )
         try {
             firebaseFireStore.collection("chatRooms").document(key).set(chatRoom).await()
@@ -232,11 +235,8 @@ class ChatRepositoryImpl @Inject constructor(
         type: MessageType
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val messagesRef = firebaseDatabase.getReference("messages").child(chatRoomId)
-            val newMessageRef = messagesRef.push()
-
             val chatMessage = ChatMessage(
-                id = newMessageRef.key ?: UUID.randomUUID().toString(),
+                id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
                 senderId = sender.id,
                 timestamp = System.currentTimeMillis(),
                 messageContents = listOf(
@@ -244,7 +244,11 @@ class ChatRepositoryImpl @Inject constructor(
                 )
             )
             // 메시지를 Realtime Database에 저장
-            newMessageRef.setValue(chatMessage).await()
+            firebaseDatabase.getReference("messages")
+                .child(chatRoomId)
+                .push()
+                .setValue(chatMessage)
+                .await()
 
             //시스템 메시지가 아닐때만 마지막 메시지로 저장한다
             if (type != MessageType.SYSTEM) {
@@ -252,7 +256,7 @@ class ChatRepositoryImpl @Inject constructor(
                 val chatRoomUpdates = mapOf(
                     "lastMessage" to content,  // 마지막 메시지 내용
                     "lastMessageTimestamp" to System.currentTimeMillis(),  // 마지막 메시지 타임스탬프
-//                    "messageCount" to FieldValue.increment(1)  // messageCount를 1 증가
+                    "totalMessagesCount" to FieldValue.increment(1)  // messageCount를 1 증가
                 )
 
                 // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
@@ -279,6 +283,13 @@ class ChatRepositoryImpl @Inject constructor(
         participants: List<User>
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
+            // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
+            val chatRoomUpdates = mapOf(
+                "lastMessage" to "사진 ${imageUrls.size}장을 보냈습니다.",  // 이미지 전송 고정 코멘트
+                "lastMessageTimestamp" to System.currentTimeMillis(),  // 마지막 메시지 타임스탬프
+                "totalMessagesCount" to FieldValue.increment(1)  // messageCount를 1 증가
+            )
+
             val chatMessage = ChatMessage(
                 id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
                 senderId = sender.id,
@@ -291,24 +302,17 @@ class ChatRepositoryImpl @Inject constructor(
                 }
             )
 
+            // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
+            firebaseFireStore.collection("chatRooms")
+                .document(chatRoomId)
+                .update(chatRoomUpdates)
+                .await()
+
             // 메시지를 Realtime Database에 저장
             firebaseDatabase.getReference("messages")
                 .child(chatRoomId)
                 .push()
                 .setValue(chatMessage)
-                .await()
-
-            // Firestore에 있는 chatRooms의 lastMessage와 lastMessageTimestamp 업데이트
-            val chatRoomUpdates = mapOf(
-                "lastMessage" to "사진 ${imageUrls.size}장을 보냈습니다.",  // 이미지 전송 고정 코멘트
-                "lastMessageTimestamp" to System.currentTimeMillis(),  // 마지막 메시지 타임스탬프
-//                    "messageCount" to FieldValue.increment(1)  // messageCount를 1 증가
-            )
-
-            // Firestore chatRooms 컬렉션에서 chatRoomId를 가진 문서 업데이트
-            firebaseFireStore.collection("chatRooms")
-                .document(chatRoomId)
-                .update(chatRoomUpdates)
                 .await()
 
             //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달

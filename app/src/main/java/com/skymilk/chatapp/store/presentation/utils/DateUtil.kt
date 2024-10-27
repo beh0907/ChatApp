@@ -70,7 +70,7 @@ object DateUtil {
             timeInMillis = time
         }.get(Calendar.AM_PM) == Calendar.AM
 
-        val pattern = if (isAM) "yyyy년 MM월 dd일 (E) 오전 hh:mm" else "yyyy년 MM월 dd일 (E) 오후 hh:mm"
+        val pattern = if (isAM) "yyyy. MM. dd. 오전 hh:mm" else "yyyy. MM. dd. 오후 hh:mm"
         return formatNormalDate(pattern, time)
     }
 

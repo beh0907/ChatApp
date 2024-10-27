@@ -24,14 +24,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -39,38 +42,34 @@ import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
 import com.skymilk.chatapp.store.domain.model.User
@@ -83,7 +82,9 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
+import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 import gun0912.tedimagepicker.builder.TedImagePicker
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -94,7 +95,7 @@ fun ChatRoomScreen(
     currentUser: User,
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImagePager: (List<String>, Int) -> Unit,
+    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit,
     onNavigateToInviteFriends: (String, List<String>) -> Unit,
 ) {
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
@@ -238,7 +239,6 @@ fun ChatRoomScreen(
     }
 }
 
-
 //상단 타이틀
 @Composable
 fun TopSection(
@@ -289,8 +289,8 @@ fun TopSection(
     }
 }
 
-
 //하단 텍스트 입력
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BottomSection(
     modifier: Modifier = Modifier,
@@ -299,117 +299,116 @@ fun BottomSection(
     user: User,
 ) {
     var message by rememberSaveable { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
+
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val scope = rememberCoroutineScope()
 
-    val constraints = ConstraintSet {
-        val messageTextField = createRefFor("messageTextField")
-        val attachIcon = createRefFor("attachIcon")
-        val sendIcon = createRefFor("sendIcon")
-
-        constrain(messageTextField) {
-            top.linkTo(parent.top)
-            bottom.linkTo(parent.bottom)
-            start.linkTo(attachIcon.end)
-            end.linkTo(sendIcon.start)
-            width = Dimension.fillToConstraints
-            height = Dimension.wrapContent
-        }
-        constrain(attachIcon) {
-            top.linkTo(messageTextField.top)
-            bottom.linkTo(messageTextField.bottom)
-            start.linkTo(parent.start)
-            height = Dimension.fillToConstraints
-        }
-        constrain(sendIcon) {
-            top.linkTo(messageTextField.top)
-            bottom.linkTo(messageTextField.bottom)
-            end.linkTo(parent.end)
-            height = Dimension.fillToConstraints
-        }
-    }
-
-    ConstraintLayout(
-        constraintSet = constraints,
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(10.dp),
     ) {
-        //이미지 첨부 버튼
-        Box(
+        Row(
             modifier = Modifier
-                .layoutId("attachIcon")
-                .clickable {
-                    TedImagePicker
-                        .with(context)
-                        .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
-                        .startMultiImage { uris ->
-                            onSendImageMessage(user, uris)
-                        }
-//                        .start { uri ->
-//                            onSendImageMessage(user, uri)
-//                        }
-                }, contentAlignment = Alignment.BottomCenter
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
         ) {
-            Icon(
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
-                    .size(24.dp),
-                imageVector = Icons.Rounded.Add,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        //채팅 입력
-        OutlinedTextField(
-            modifier = Modifier.layoutId("messageTextField"),
-            maxLines = 5,
-            value = message,
-            onValueChange = { message = it },
-            placeholder = {
-                Text(
-                    text = "채팅을 입력해주세요.",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color.Gray,
-                )
-            },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
-            ),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
-        )
-
-        //메시지 전송 버튼
-        if (message.isNotEmpty()) {
+            //이미지 첨부 버튼
             Box(
                 modifier = Modifier
-                    .layoutId("sendIcon")
-                    .background(MaterialTheme.colorScheme.inversePrimary)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.inverseOnSurface)
                     .clickable {
-                        //메시지 전송
-                        onSendMessage(user, message)
-
-                        //메시지 초기화
-                        message = ""
-
-                        //키보드 숨기기
-                        keyboardController?.hide()
-                    },
-                contentAlignment = Alignment.BottomCenter
+                        TedImagePicker
+                            .with(context)
+                            .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
+                            .startMultiImage { uris ->
+                                scope.launch {
+                                    //이미지 파일 리사이징 처리
+                                    onSendImageMessage(
+                                        user,
+                                        FileSizeUtil.resizeAndCompressImages(context, uris)
+                                    )
+                                }
+                            }
+                    }
             ) {
                 Icon(
                     modifier = Modifier
-                        .padding(start = 10.dp, end = 10.dp, bottom = 16.dp)
-                        .rotate(-45f)
-                        .size(24.dp),
-                    imageVector = Icons.AutoMirrored.Rounded.Send,
+                        .padding(10.dp),
+                    imageVector = Icons.Rounded.CameraAlt,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface
                 )
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            // 메시지 입력 필드
+            BasicTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 44.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.inverseOnSurface),
+                value = message,
+                onValueChange = { message = it },
+                textStyle = TextStyle(
+                    fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                ),
+                maxLines = 5,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        //placeholder 역할
+                        if (message.isEmpty()) {
+                            Text(
+                                text = "메시지 보내기",
+                                color = Color.Gray,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+
+                        innerTextField()
+                    }
+
+                }
+            )
+
+            //메시지 전송 버튼
+            if (message.isNotEmpty()) {
+                Spacer(Modifier.width(8.dp))
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.inversePrimary)
+                        .clickable {
+                            //메시지 전송
+                            onSendMessage(user, message.toString())
+
+                            //메시지 초기화
+                            message = ""
+
+                            //키보드 숨기기
+                            keyboardController?.hide()
+                        }
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(10.dp),
+                        imageVector = Icons.AutoMirrored.Rounded.Send,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }

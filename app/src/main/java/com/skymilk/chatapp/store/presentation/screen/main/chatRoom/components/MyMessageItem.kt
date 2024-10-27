@@ -31,9 +31,10 @@ import com.skymilk.chatapp.ui.theme.Black
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun MyMessageItem(
+    userName: String,
     messageContents: List<MessageContent>,
     timestamp: Long,
-    onNavigateToImagePager: (List<String>, Int) -> Unit
+    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -82,7 +83,9 @@ fun MyMessageItem(
                             .clip(RoundedCornerShape(12.dp)),
                         messageContents = messageContents,
                         maxColumnCount = 3,
-                        onNavigateToImagePager = onNavigateToImagePager
+                        onNavigateToImagePager = { imageUrls, initialPage ->
+                            onNavigateToImagePager(imageUrls, initialPage, userName, timestamp)
+                        }
                     )
                 }
 

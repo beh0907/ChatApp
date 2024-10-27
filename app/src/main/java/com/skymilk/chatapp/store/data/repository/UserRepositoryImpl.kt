@@ -188,6 +188,8 @@ class UserRepositoryImpl @Inject constructor(
             // otherUserId를 친구 목록에서 제거
             query.update("friendList", FieldValue.arrayRemove(otherUserId))
         }
+
+        FieldValue.serverTimestamp()
     }
 
     override suspend fun searchUser(query: String): Result<List<User>> =

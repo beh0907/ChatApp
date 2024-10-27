@@ -1,18 +1,26 @@
 package com.skymilk.chatapp
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
+import android.os.PowerManager
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.store.presentation.navigation.graph.AppNavigation
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.EventBus.events
@@ -33,11 +41,25 @@ class MainActivity : ComponentActivity() {
 //        enableEdgeToEdge()
 
         setContent {
-            ChatAppTheme {
-                //권한 요청
+            val mainViewModel: MainViewModel = hiltViewModel()
+
+            ChatAppTheme(viewModel = mainViewModel) {
+                val ignoringOptimizationState by mainViewModel.ignoringOptimizationState.collectAsStateWithLifecycle()
+
+                println("ignoringOptimizationState : $ignoringOptimizationState")
+
                 LaunchedEffect(Unit) {
+                    //권한 요청
                     PermissionUtil.requestAllPermissions()
                 }
+
+                //배터리 최적화 비활성화 요청
+                RequestIgnoringOptimization(
+                    ignoringOptimizationState = ignoringOptimizationState,
+                    onRefuseIgnoringOptimization = {
+                        mainViewModel.onEvent(MainEvent.SetRefuseIgnoringOptimization)
+                    }
+                )
 
                 //메시지 수집 및 처리
                 SetObserveMessage()
@@ -49,21 +71,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-//    fun getKeyHash() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//            val packageInfo = applicationContext.packageManager.getPackageInfo(applicationContext.packageName, PackageManager.GET_SIGNING_CERTIFICATES)
-//            for (signature in packageInfo.signingInfo!!.apkContentsSigners) {
-//                try {
-//                    val md = MessageDigest.getInstance("SHA")
-//                    md.update(signature.toByteArray())
-//                    Log.d("getKeyHash", "key hash: ${Base64.encodeToString(md.digest(), Base64.NO_WRAP)}")
-//                } catch (e: NoSuchAlgorithmException) {
-//                    Log.w("getKeyHash", "Unable to get MessageDigest. signature=$signature", e)
-//                }
-//            }
-//        }
-//    }
 
     @Composable
     private fun SetObserveMessage() {
@@ -87,6 +94,40 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun RequestIgnoringOptimization(
+        ignoringOptimizationState: Boolean,
+        onRefuseIgnoringOptimization: () -> Unit
+    ) {
+        var visibleRequestDialog by rememberSaveable { mutableStateOf(true) }
+
+        if (visibleRequestDialog && !ignoringOptimizationState) {
+            CustomAlertDialog(
+                title = "권한이 필요합니다",
+                message = "알림 메시지를 정삭적으로 수신하기 위해서 배터리 사용량 최적화 목록에서 제외하는 권한이 필요합니다.\n\n 계속 하시겠습니까?",
+                dismissText = "다시 보지 않기",
+                onConfirm = {
+                    // 1. 배터리 최적화 허용 여부 확인,
+                    val isIgnoringBatteryOptimizations =
+                        (getSystemService(POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(
+                            packageName
+                        )
+
+                    //false면 최적화 기능 사용 중
+                    if (!isIgnoringBatteryOptimizations) {
+                        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                        intent.data = Uri.parse("package:$packageName")
+                        startActivity(intent)
+                    }
+                },
+                onDismiss = {
+                    onRefuseIgnoringOptimization()
+                    visibleRequestDialog = false
+                }
+            )
         }
     }
 }

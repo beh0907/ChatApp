@@ -36,11 +36,12 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.skymilk.chatapp.di.ViewModelFactoryModule
 import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.presentation.navigation.bottom.BottomNavigationItem
 import com.skymilk.chatapp.store.presentation.navigation.CustomNavType
 import com.skymilk.chatapp.store.presentation.navigation.NavigationViewModel
+import com.skymilk.chatapp.store.presentation.navigation.bottom.BottomNavigationItem
 import com.skymilk.chatapp.store.presentation.navigation.bottom.MainBottomBar
 import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
+import com.skymilk.chatapp.store.presentation.screen.main.chatImagePager.ChatImageViewerScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.ChatRoomViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.ChatRoomInviteScreen
@@ -49,7 +50,6 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRooms
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomsViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsScreen
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsViewModel
-import com.skymilk.chatapp.store.presentation.screen.main.chatImagePager.ChatImageViewerScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileScreen
 import com.skymilk.chatapp.store.presentation.screen.main.profile.ProfileViewModel
 import com.skymilk.chatapp.store.presentation.screen.main.profileEdit.ProfileEditScreen
@@ -339,6 +339,7 @@ fun MainNavigation(
                                 // 백그라운드로 갈 때
                                 navigationViewmodel.updateCurrentDestination("", null)
                             }
+
                             Lifecycle.Event.ON_RESUME -> {
                                 // 포그라운드로 돌아올 때
                                 navigationViewmodel.updateCurrentDestination(
@@ -346,6 +347,7 @@ fun MainNavigation(
                                     mapOf("chatRoomId" to args.chatRoomId)
                                 )
                             }
+
                             else -> {} // 다른 이벤트 무시
                         }
                     }
@@ -368,8 +370,15 @@ fun MainNavigation(
                             Routes.ProfileScreen(user = user)
                         )
                     },
-                    onNavigateToImagePager = { imageUrls, startPage  ->
-                        navController.navigate(Routes.ChatImagePagerScreen(imageUrls = imageUrls, initialPage = startPage))
+                    onNavigateToImagePager = { imageUrls, initialPage, senderName, timestamp ->
+                        navController.navigate(
+                            Routes.ChatImagePagerScreen(
+                                imageUrls = imageUrls,
+                                initialPage = initialPage,
+                                senderName = senderName,
+                                timestamp = timestamp
+                            )
+                        )
                     },
                     onNavigateToInviteFriends = { chatRoomId, participants ->
                         navController.navigate(
@@ -389,6 +398,8 @@ fun MainNavigation(
                 ChatImageViewerScreen(
                     imageUrls = args.imageUrls,
                     initialPage = args.initialPage,
+                    senderName = args.senderName,
+                    timestamp = args.timestamp,
                     onNavigateToBack = { navController.popBackStack() }
                 )
             }

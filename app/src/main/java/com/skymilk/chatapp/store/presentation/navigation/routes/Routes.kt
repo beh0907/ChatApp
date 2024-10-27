@@ -53,8 +53,12 @@ sealed interface Routes {
     ) : Routes // 채팅방 대화상대 초대 화면
 
     @Serializable
-    data class ChatImagePagerScreen(val imageUrls: List<String>, val initialPage: Int = 0) :
-        Routes // 채팅 이미지 페이저 화면
+    data class ChatImagePagerScreen(
+        val imageUrls: List<String>,
+        val initialPage: Int = 0,
+        val senderName: String,
+        val timestamp: Long
+    ) : Routes // 채팅 이미지 페이저 화면
 
     @Serializable
     data class ProfileScreen(val user: User) : Routes // 프로필 화면

@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.common
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,10 +32,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -92,9 +89,25 @@ fun CustomConfirmDialog(message: String, onConfirm: () -> Unit) {
 }
 
 @Composable
-fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun CustomAlertDialog(
+    title: String = "",
+    message: String = "",
+    confirmText:String = "확인",
+    dismissText:String = "취소",
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
-        onDismissRequest = {},
+        onDismissRequest = { },
+        title = {
+            if (title.isNotBlank()) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
         text = {
             Text(
                 text = message,
@@ -109,7 +122,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
                 }
             ) {
                 Text(
-                    "확인",
+                    text = confirmText,
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
@@ -119,7 +132,7 @@ fun CustomAlertDialog(message: String, onConfirm: () -> Unit, onDismiss: () -> U
                 onClick = { onDismiss() }
             ) {
                 Text(
-                    "취소",
+                    text = dismissText,
                     style = MaterialTheme.typography.titleMedium,
                 )
             }

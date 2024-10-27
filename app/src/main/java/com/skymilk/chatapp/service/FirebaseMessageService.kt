@@ -156,11 +156,8 @@ class FirebaseMessageService : FirebaseMessagingService() {
                 .setContentText(message)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(pendingIntent)  // 알림 클릭 시 인텐트 실행
                 .build()
 
             notificationManager.notify(notificationId, notification)

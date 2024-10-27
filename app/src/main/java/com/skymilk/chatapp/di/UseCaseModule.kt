@@ -45,7 +45,9 @@ import com.skymilk.chatapp.store.domain.usecase.user.SetFriend
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateFcmToken
 import com.skymilk.chatapp.store.domain.usecase.user.UpdateProfile
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
+import com.skymilk.chatapp.store.domain.usecase.userSetting.GetRefuseIgnoringOptimization
 import com.skymilk.chatapp.store.domain.usecase.userSetting.GetUserDarkModeSetting
+import com.skymilk.chatapp.store.domain.usecase.userSetting.SetRefuseIgnoringOptimization
 import com.skymilk.chatapp.store.domain.usecase.userSetting.ToggleUserDarkModeSetting
 import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
 import dagger.Module
@@ -125,6 +127,9 @@ object UseCaseModule {
 
             GetUserDarkModeSetting(userSettingRepository),
             ToggleUserDarkModeSetting(userSettingRepository),
+
+            GetRefuseIgnoringOptimization(userSettingRepository),
+            SetRefuseIgnoringOptimization(userSettingRepository),
         )
 
     @Provides

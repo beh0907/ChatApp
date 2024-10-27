@@ -13,5 +13,6 @@ data class ChatRoomWithUsers(
     val participants: List<User>,
     val lastMessage: String,
     val lastMessageTimestamp: Long,
-    val createdTimestamp: Long
+    val createdTimestamp: Long,
+    val totalMessagesCount: Long // 채팅 총 메시지 수
 ):Parcelable
