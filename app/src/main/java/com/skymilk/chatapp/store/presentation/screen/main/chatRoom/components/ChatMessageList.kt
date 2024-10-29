@@ -32,9 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.common.collect.Multimaps.index
 import com.skymilk.chatapp.store.domain.model.ChatMessage
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.MessageType
+import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
@@ -46,7 +48,7 @@ import kotlin.random.Random
 @Composable
 fun ChatMessageList(
     modifier: Modifier = Modifier,
-    chatRoom: ChatRoomWithUsers,
+    chatRoom: ChatRoomWithParticipants,
     chatMessages: List<ChatMessage>,
     currentUser: User,
     uploadState: ImageUploadState,
@@ -80,7 +82,7 @@ fun ChatMessageList(
 
                     //유저 이름 저장
                     showNewMessageUserName =
-                        chatRoom.participants.find { it.id == newMessage.senderId }?.username
+                        chatRoom.participants.find { it.user.id == newMessage.senderId }?.user?.username
                             ?: "알 수 없음"
 
                     //메시지 저장
@@ -144,26 +146,32 @@ fun ChatMessageList(
 
                     //채팅 메시지 표시
                     else -> {
+                        // message.senderId와 일치하는 chatRoom.participants user를 찾음
+                        val sender = chatRoom.participants.find { it.user.id == chatMessage.senderId }
+                                ?: Participant()
+
                         //내가 작성한 메시지
                         if (chatMessage.senderId == currentUser.id) {
                             MyMessageItem(
-                                userName = currentUser.username,
+                                participant = sender,
+                                participantsStatus = chatRoom.participants.map { it.participantStatus },
                                 messageContents = chatMessage.messageContents,
                                 timestamp = chatMessage.timestamp,
                                 onNavigateToImagePager = onNavigateToImagePager
                             )
 
                         } else {
-                            // message.senderId와 일치하는 chatRoom.participants 내 user를 찾음
+                            // message.senderId와 일치하는 chatRoom.participants user를 찾음
                             val sender =
-                                chatRoom.participants.find { it.id == chatMessage.senderId }
-                                    ?: User()
+                                chatRoom.participants.find { it.user.id == chatMessage.senderId }
+                                    ?: Participant()
 
                             //다른 사람이 작성한 메시지
                             OtherMessageItem(
+                                sender = sender,
+                                participantsStatus = chatRoom.participants.map { it.participantStatus },
                                 messageContents = chatMessage.messageContents,
                                 timestamp = chatMessage.timestamp,
-                                sender = sender,
                                 onNavigateToProfile = onNavigateToProfile,
                                 onNavigateToImagePager = onNavigateToImagePager
                             )

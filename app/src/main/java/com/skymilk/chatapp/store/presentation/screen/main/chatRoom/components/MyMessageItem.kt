@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
+import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
@@ -31,7 +34,8 @@ import com.skymilk.chatapp.ui.theme.Black
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun MyMessageItem(
-    userName: String,
+    participant: Participant,
+    participantsStatus: List<ParticipantStatus>,
     messageContents: List<MessageContent>,
     timestamp: Long,
     onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
@@ -48,12 +52,26 @@ fun MyMessageItem(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Bottom
         ) {
-            Text(
-                text = DateUtil.getTime(timestamp),
-                style = MaterialTheme.typography.bodySmall,
+            //시간 및 채팅 읽은 수 체크
+            Column(
                 modifier = Modifier.padding(end = 8.dp),
-            )
+                horizontalAlignment = Alignment.End
+            ) {
+                val count = participantsStatus.count { timestamp >= it.lastReadTimestamp }
+                if (count > 0) {
+                    //읽지 않은 유저 수 정보
+                    Text(
+                        text = count.toString(),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
 
+                //시간 정보
+                Text(
+                    text = DateUtil.getTime(timestamp),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
 
             when (messageContents.first().type) {
                 //텍스트 타입
@@ -84,7 +102,12 @@ fun MyMessageItem(
                         messageContents = messageContents,
                         maxColumnCount = 3,
                         onNavigateToImagePager = { imageUrls, initialPage ->
-                            onNavigateToImagePager(imageUrls, initialPage, userName, timestamp)
+                            onNavigateToImagePager(
+                                imageUrls,
+                                initialPage,
+                                participant.user.username,
+                                timestamp
+                            )
                         }
                     )
                 }

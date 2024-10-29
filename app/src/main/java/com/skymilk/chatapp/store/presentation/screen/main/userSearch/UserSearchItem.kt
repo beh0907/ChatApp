@@ -72,9 +72,10 @@ fun UserSearchItem(
                 style = MaterialTheme.typography.bodyLarge,
             )
 
+            Spacer(Modifier.height(5.dp))
+
             //유저 상태 메시지가 있다면
             if (user.statusMessage.isNotBlank()) {
-
                 //유저 이름
                 Text(
                     text = user.statusMessage,

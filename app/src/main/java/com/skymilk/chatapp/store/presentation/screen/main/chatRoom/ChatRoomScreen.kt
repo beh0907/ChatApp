@@ -71,7 +71,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.store.presentation.common.CustomConfirmDialog
@@ -214,7 +214,7 @@ fun ChatRoomScreen(
                     onNavigateToProfile = onNavigateToProfile,
                     onNavigateToInviteFriends = {
                         //채팅방 아이디, 현재 참여자 목록
-                        onNavigateToInviteFriends(chatRoom.id, chatRoom.participants.map { it.id })
+                        onNavigateToInviteFriends(chatRoom.id, chatRoom.participants.map { it.user.id })
                     },
                     onCloseDrawer = {
                         visibleDrawer = false
@@ -242,15 +242,15 @@ fun ChatRoomScreen(
 //상단 타이틀
 @Composable
 fun TopSection(
-    chatRoom: ChatRoomWithUsers,
+    chatRoom: ChatRoomWithParticipants,
     currentUser: User,
     onNavigateToBack: () -> Unit,
     onOpenDrawer: () -> Unit
 ) {
     val title = when (chatRoom.participants.size) {
-        1 -> chatRoom.participants.first().username
-        2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: ""
-        else -> "그룹채팅 ${chatRoom.participants.size}"
+        1 -> currentUser.username // 혼자일 경우 내 이름
+        2 -> chatRoom.participants.find { it.user.id != currentUser.id }?.user?.username ?: "" // 1대1 채팅일떈 상대 이름
+        else -> "그룹채팅 ${chatRoom.participants.size}" // 셋 이상일 땐 그룹표시
     }
 
     Row(
@@ -421,7 +421,7 @@ fun BottomSection(
 fun BoxScope.CustomRightSideDrawer(
     drawerVisibility: Boolean,
     currentUser: User,
-    chatRoom: ChatRoomWithUsers,
+    chatRoom: ChatRoomWithParticipants,
     alarmState: Boolean,
     onVisibleExitDialog: () -> Unit,
     onToggleAlarmState: () -> Unit,

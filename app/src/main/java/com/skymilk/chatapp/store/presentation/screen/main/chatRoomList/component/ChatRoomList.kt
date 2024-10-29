@@ -1,19 +1,24 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.User
 
 @Composable
 fun ChatRoomList(
-    chatRooms: List<ChatRoomWithUsers>,
+    chatRooms: List<ChatRoomWithParticipants>,
     currentUser: User,
     chatRoomAlarmsDisabled: List<String>,
     onNavigateToChatRoom: (String) -> Unit
     ) {
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier.padding(bottom = 10.dp)
+    ) {
         items(chatRooms, key = { chatRoom -> chatRoom.id }) { chatRoom ->
             when (chatRoom.participants.size) {
                 1 -> ChatSoloRoomItem(chatRoom, currentUser, onNavigateToChatRoom) // 나의 채팅방

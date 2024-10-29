@@ -44,11 +44,6 @@ fun UploadMultiImageItem(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Bottom
         ) {
-            Text(
-                text = DateUtil.getTime(),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(end = 8.dp)
-            )
 
             Box(
                 modifier = Modifier

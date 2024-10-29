@@ -10,4 +10,5 @@ data class ChatUseCases(
     val createChatRoom: CreateChatRoom,
     val exitChatRoom: ExitChatRoom,
     val addParticipants: AddParticipants,
+    val updateParticipantsStatus: UpdateParticipantsStatus
 )

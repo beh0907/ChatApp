@@ -37,14 +37,14 @@ sealed interface Routes {
     data object FriendsScreen : Routes // 친구 탭
 
     @Serializable
-    data object ChatsScreen : Routes // 채팅 목록 탭
+    data object ChatRoomsScreen : Routes // 채팅 목록 탭
 
     @Serializable
     data object SettingScreen : Routes // 설정 화면
 
     //하단 바가 없는 화면
     @Serializable
-    data class ChatRoomScreen(val chatRoomId: String) : Routes // 채팅방 화면
+    data class ChatRoomScreen(val chatRoomId: String, val userId: String) : Routes // 채팅방 화면
 
     @Serializable
     data class ChatRoomInviteScreen(

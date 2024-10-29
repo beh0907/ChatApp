@@ -11,10 +11,8 @@ import dagger.hilt.android.components.ActivityComponent
 @InstallIn(ActivityComponent::class)
 interface ViewModelFactoryModule {
 
-    fun chatListViewModelFactory(): ChatRoomsViewModel.Factory
+    fun chatRoomsViewModelFactory(): ChatRoomsViewModel.Factory
 
     fun friendsViewModelFactory(): FriendsViewModel.Factory
-
-    fun chatRoomViewModelFactory(): ChatRoomViewModel.Factory
 
 }

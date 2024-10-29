@@ -50,12 +50,6 @@ fun UploadSingleImageItem(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Bottom
         ) {
-            Text(
-                text = DateUtil.getTime(),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 shadowElevation = 4.dp,

@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material3.Icon
@@ -19,11 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ChatProfileGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
@@ -33,7 +36,7 @@ import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
 fun ChatRoomItem(
-    chatRoom: ChatRoomWithUsers,
+    chatRoom: ChatRoomWithParticipants,
     currentUser: User,
     isAlarmsDisabled: Boolean,
     onChatItemClick: (String) -> Unit
@@ -46,9 +49,13 @@ fun ChatRoomItem(
             }
             .padding(MaterialTheme.dimens.small1),
     ) {
+        //나와 나머지 참여자 분리
+        val currentParticipant = chatRoom.participants.first { it.user.id == currentUser.id }
+        val otherParticipants = chatRoom.participants.filterNot { it.user.id == currentUser.id }
 
-        //나를 제외한 나머지 참여자
-        val otherParticipants = chatRoom.participants.filter { it.id != currentUser.id }
+        //읽지 않은 메시지 수
+        val unreadMessageCount =
+            chatRoom.totalMessagesCount - currentParticipant.participantStatus.lastReadMessageCount
 
         //채팅방 참여 유저 프로필 그리드
         ChatProfileGrid(otherParticipants = otherParticipants.take(4))
@@ -74,8 +81,8 @@ fun ChatRoomItem(
                     Text(
                         modifier = Modifier.weight(weight = 1f, fill = false),
                         text = otherParticipants
-                            .filter { it.id != currentUser.id }
-                            .joinToString(", ") { it.username },
+                            .filter { it.user.id != currentUser.id }
+                            .joinToString(", ") { it.user.username },
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -91,6 +98,17 @@ fun ChatRoomItem(
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Gray,
                     )
+
+                    Spacer(Modifier.width(5.dp))
+
+                    //알람 비활성화 여부 표시
+                    if (isAlarmsDisabled) {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = Icons.Outlined.NotificationsOff,
+                            contentDescription = null
+                        )
+                    }
                 }
 
                 Spacer(Modifier.width(5.dp))
@@ -120,11 +138,21 @@ fun ChatRoomItem(
 
                 Spacer(Modifier.width(5.dp))
 
-                //알람 비활성화 여부 표시
-                if (isAlarmsDisabled) {
-                    Icon(imageVector = Icons.Outlined.NotificationsOff, contentDescription = null)
+                //읽지 않은 메시지 수 표시
+                if (unreadMessageCount > 0) {
+                    Text(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(
+                                MaterialTheme.colorScheme.primary
+                            )
+                            .padding(2.dp),
+                        text = if (unreadMessageCount > 99) " 99+ " else " $unreadMessageCount ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.surface
+                    )
                 }
-
             }
         }
     }

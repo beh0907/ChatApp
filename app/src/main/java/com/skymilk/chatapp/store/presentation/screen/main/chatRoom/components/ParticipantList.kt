@@ -18,13 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 
 @Composable
 fun ParticipantList(
     modifier: Modifier = Modifier,
     currentUser: User,
-    participants: List<User>,
+    participants: List<Participant>,
     onUserItemClick: (User) -> Unit,
     onNavigateToInviteFriends: () -> Unit
 ) {
@@ -69,10 +70,10 @@ fun ParticipantList(
 
 
         //참여자 목록
-        items(participants, key = { participant -> participant.id }) { participant ->
+        items(participants, key = { participant -> participant.user.id }) { participant ->
             ParticipantItem(
                 currentUser = currentUser,
-                participant = participant,
+                participant = participant.user,
                 onUserItemClick = onUserItemClick
             )
         }

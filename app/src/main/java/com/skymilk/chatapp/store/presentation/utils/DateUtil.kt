@@ -1,97 +1,94 @@
 package com.skymilk.chatapp.store.presentation.utils
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoField
 import java.util.Date
 import java.util.Locale
 
 object DateUtil {
+    private val zoneId = ZoneId.systemDefault()
+    private val koreanLocale = Locale.KOREAN
 
+    //날짜 정보 가져오기
     fun getDate(time: Long): String {
-
-        val now = Calendar.getInstance()
-        val date = Calendar.getInstance().apply {
-            timeInMillis = time
-        }
-
-        //오늘 체크
-        val isToday = isToday(now.timeInMillis, date.timeInMillis)
-
-        // 어제 체크
-        val isYesterday = now.apply {
-            add(Calendar.DAY_OF_YEAR, -1)
-        }.get(Calendar.YEAR) == date.get(Calendar.YEAR) &&
-                now.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR)
-
-        //올해 체크
-        val isThisYear = now.get(Calendar.YEAR) == date.get(Calendar.YEAR)
+        val dateTime = Instant.ofEpochMilli(time).atZone(zoneId)
+        val now = ZonedDateTime.now(zoneId)
 
         return when {
-            // 오늘 날짜일 경우 현재 시간을 반환
-            isToday -> getTime(time)
-            // 어제 날짜일 경우 어제 반환
-            isYesterday -> "어제"
-            // 올해지만 오늘 이전 날짜일 경우 (월.일)을 반환
-            isThisYear -> getCurrentDate(time)
-            // 작년 혹은 그 이전 날짜일 경우 (연.월.일)을 반환
+            isToday(now, dateTime) -> getTime(time)
+            isYesterday(now, dateTime) -> "어제"
+            isSameYear(now, dateTime) -> getCurrentDate(time)
             else -> getPrevYearDate(time)
         }
     }
 
-    //이전 해 날짜 정보
-    private fun getPrevYearDate(time: Long = Date().time): String {
-        return formatNormalDate("yyyy년 MM월 dd일", time)
+    //지난 해 날짜
+    private fun getPrevYearDate(time: Long): String {
+        return formatDate(time, "yyyy년 MM월 dd일")
     }
 
-    //올해 날짜 정보
-    private fun getCurrentDate(time: Long = Date().time): String {
-        val date = formatNormalDate("MM월 dd일", time)
-        return date
+    //올해 날짜
+    private fun getCurrentDate(time: Long): String {
+        return formatDate(time, "MM월 dd일")
     }
 
-    //현재 시간 정보
+    //현재 시간
     fun getTime(time: Long = Date().time): String {
-        val isAM = Calendar.getInstance().apply {
-            timeInMillis = time
-        }.get(Calendar.AM_PM) == Calendar.AM
-
-        val pattern = if (isAM) "오전 hh:mm" else "오후 hh:mm"
-        return formatNormalDate(pattern, time)
+        val dateTime = Instant.ofEpochMilli(time).atZone(zoneId)
+        val pattern = if (dateTime.get(ChronoField.AMPM_OF_DAY) == 0) {
+            "오전 hh:mm"
+        } else {
+            "오후 hh:mm"
+        }
+        return formatDate(time, pattern)
     }
 
-    //특정 날짜의 전체 날짜
+    //총 날짜 정보 가져오기
     fun getFullDate(time: Long): String {
-        return formatNormalDate("yyyy년 MM월 dd일 (E)", time)
+        return formatDate(time, "yyyy년 MM월 dd일 (E)")
     }
 
-    //특절 날짜 및 시간
+    // 총 날짜 및 시간 정보 가져오기
     fun getFullDateTime(time: Long): String {
-        val isAM = Calendar.getInstance().apply {
-            timeInMillis = time
-        }.get(Calendar.AM_PM) == Calendar.AM
-
-        val pattern = if (isAM) "yyyy. MM. dd. 오전 hh:mm" else "yyyy. MM. dd. 오후 hh:mm"
-        return formatNormalDate(pattern, time)
+        val dateTime = Instant.ofEpochMilli(time).atZone(zoneId)
+        val pattern = if (dateTime.get(ChronoField.AMPM_OF_DAY) == 0) {
+            "yyyy. MM. dd. 오전 hh:mm"
+        } else {
+            "yyyy. MM. dd. 오후 hh:mm"
+        }
+        return formatDate(time, pattern)
     }
 
+    //오버로딩 오늘 여부 비교 체크
     fun isToday(time: Long, timeCompare: Long): Boolean {
-        val date = Calendar.getInstance().apply {
-            timeInMillis = time
-        }
-        val dateCompare = Calendar.getInstance().apply {
-            timeInMillis = timeCompare
-        }
-
-        //오늘 체크
-        val isToday = date.get(Calendar.YEAR) == dateCompare.get(Calendar.YEAR) &&
-                date.get(Calendar.DAY_OF_YEAR) == dateCompare.get(Calendar.DAY_OF_YEAR)
-
-        return isToday
+        val date1 = Instant.ofEpochMilli(time).atZone(zoneId)
+        val date2 = Instant.ofEpochMilli(timeCompare).atZone(zoneId)
+        return isToday(date1, date2)
     }
 
+    //오늘 여부 비교 체크
+    private fun isToday(now: ZonedDateTime, dateTime: ZonedDateTime): Boolean {
+        return now.toLocalDate() == dateTime.toLocalDate()
+    }
 
-    private fun formatNormalDate(pattern: String, time: Long): String {
-        val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-        return sdf.format(Date(time))
+    //어제 여부 비교 체크
+    private fun isYesterday(now: ZonedDateTime, dateTime: ZonedDateTime): Boolean {
+        return now.toLocalDate().minusDays(1) == dateTime.toLocalDate()
+    }
+
+    //올해 여부 비교 체크
+    private fun isSameYear(now: ZonedDateTime, dateTime: ZonedDateTime): Boolean {
+        return now.year == dateTime.year
+    }
+
+    //타임스탬프 변환
+    private fun formatDate(time: Long, pattern: String): String {
+        val formatter = DateTimeFormatter.ofPattern(pattern, koreanLocale)
+        return Instant.ofEpochMilli(time)
+            .atZone(zoneId)
+            .format(formatter)
     }
 }

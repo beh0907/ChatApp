@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithUsers
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
@@ -33,7 +33,7 @@ import com.skymilk.chatapp.ui.theme.dimens
 
 @Composable
 fun ChatSoloRoomItem(
-    chatRoom: ChatRoomWithUsers,
+    chatRoom: ChatRoomWithParticipants,
     currentUser: User,
     onChatItemClick: (String) -> Unit
 ) {
@@ -45,9 +45,6 @@ fun ChatSoloRoomItem(
             }
             .padding(MaterialTheme.dimens.small1),
     ) {
-        //나의 이미지 적용
-        val image = chatRoom.participants.first().profileImageUrl
-
         //이미지 정보
         AsyncImage(
             modifier = Modifier
@@ -57,8 +54,8 @@ fun ChatSoloRoomItem(
                 LocalContext.current
             )
                 .data(
-                    if (image.isBlank()) R.drawable.bg_default_profile
-                    else image
+                    if (currentUser.profileImageUrl.isBlank()) R.drawable.bg_default_profile
+                    else currentUser.profileImageUrl
                 )
                 .crossfade(true)
                 .build(),

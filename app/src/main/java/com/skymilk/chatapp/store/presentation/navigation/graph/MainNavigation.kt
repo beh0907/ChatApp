@@ -81,7 +81,7 @@ fun MainNavigation(
                 icon = Icons.AutoMirrored.Outlined.Chat,
                 selectedIcon = Icons.AutoMirrored.Rounded.Chat,
                 title = "채팅",
-                route = Routes.ChatsScreen
+                route = Routes.ChatRoomsScreen
             ),
             BottomNavigationItem(
                 icon = Icons.Outlined.Settings,
@@ -167,10 +167,10 @@ fun MainNavigation(
             }
 
             //채팅방 목록 화면
-            composable<Routes.ChatsScreen> {
+            composable<Routes.ChatRoomsScreen> {
                 val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
                     factory = ChatRoomsViewModel.provideFactory(
-                        viewModelFactoryProvider.chatListViewModelFactory(),
+                        viewModelFactoryProvider.chatRoomsViewModelFactory(),
                         currentUser.id
                     )
                 )
@@ -180,7 +180,7 @@ fun MainNavigation(
                     onEvent = chatRoomsViewModel::onEvent,
                     currentUser = currentUser,
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId, userId = currentUser.id)) {
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
@@ -223,7 +223,7 @@ fun MainNavigation(
                     existingChatRoomId = args.existingChatRoomId,
                     existingParticipants = args.existingParticipants,
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId, userId = currentUser.id)) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
                                 inclusive = false
                             }
@@ -276,7 +276,7 @@ fun MainNavigation(
                         }
                     },
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId)) {
+                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId, userId = currentUser.id)) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
                                 inclusive = false
                             }
@@ -322,14 +322,7 @@ fun MainNavigation(
                 )
             ) {
                 val args = it.toRoute<Routes.ChatRoomScreen>()
-
-                val chatRoomViewModel: ChatRoomViewModel = viewModel(
-                    factory = ChatRoomViewModel.provideFactory(
-                        viewModelFactoryProvider.chatRoomViewModelFactory(),
-                        args.chatRoomId
-                    )
-                )
-
+                val chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
 
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(lifecycleOwner) {

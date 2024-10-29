@@ -2,24 +2,25 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.google.firebase.messaging.FirebaseMessaging
 import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.model.MessageType
+import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
+import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,29 +30,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class ChatRoomViewModel @AssistedInject constructor(
-    @Assisted private val chatRoomId: String,
+@HiltViewModel
+class ChatRoomViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
     private val storageUseCases: StorageUseCases,
-    private val chatRoomSettingUseCases: ChatRoomSettingUseCases
+    private val chatRoomSettingUseCases: ChatRoomSettingUseCases,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    @AssistedFactory
-    interface Factory {
-        fun create(chatRoomId: String): ChatRoomViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: Factory,
-            chatRoom: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(chatRoom) as T
-            }
-        }
-    }
+    private val chatRoomId: String = savedStateHandle.toRoute<Routes.ChatRoomScreen>().chatRoomId
+    private val userId: String = savedStateHandle.toRoute<Routes.ChatRoomScreen>().userId
 
     //채팅방
     private val _chatRoomState = MutableStateFlow<ChatRoomState>(ChatRoomState.Initial)
@@ -146,7 +135,29 @@ class ChatRoomViewModel @AssistedInject constructor(
                     _chatMessagesState.value = ChatMessagesState.Error
                 }
                 .collect { messages ->
+                    //메시지 목록 적용
                     _chatMessagesState.value = ChatMessagesState.Success(messages)
+
+                    Log.d("viewmodel", "나야~ 들기름")
+
+                    //업데이트
+                    if (chatRoomState.value is ChatRoomState.Success) {
+                        val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
+                        val originParticipantStatus =
+                            chatRoom.participants.first { it.participantStatus.userId == userId }.participantStatus
+                        val updateParticipantStatus = originParticipantStatus.copy(
+                            lastReadTimestamp = System.currentTimeMillis(),
+                            lastReadMessageCount = chatRoom.totalMessagesCount + 1
+                        )
+
+                        //유저 상태정보 갱신
+                        chatUseCases.updateParticipantsStatus(
+                            chatRoomId,
+                            userId,
+                            originParticipantStatus,
+                            updateParticipantStatus,
+                        )
+                    }
                 }
         }
     }
@@ -155,7 +166,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     private fun sendMessage(
         sender: User,
         content: String,
-        participants: List<User>,
+        participants: List<Participant>,
         type: MessageType
     ) {
         viewModelScope.launch {
@@ -168,7 +179,11 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //이미지 메시지 전송
-    private fun sendImageMessage(sender: User, imageUris: List<Uri>, participants: List<User>) {
+    private fun sendImageMessage(
+        sender: User,
+        imageUris: List<Uri>,
+        participants: List<Participant>
+    ) {
         //이미지 업로드 결과
         uploadImage(chatRoomId, imageUris) { urls ->
             if (urls.isEmpty()) {
@@ -212,7 +227,8 @@ class ChatRoomViewModel @AssistedInject constructor(
                     //업로드 완료 여부 확인
                     _uploadState.update {
                         if (completedOrFailedImages == imageUris.size) {
-                            val successfulUploads = imageUploadInfoList.filter { it.downloadUrl != null }
+                            val successfulUploads =
+                                imageUploadInfoList.filter { it.downloadUrl != null }
                             val failedUploads = imageUploadInfoList.filter { it.error != null }
 
                             //업로드가 완료된 이미지 경로 전달
@@ -240,7 +256,10 @@ class ChatRoomViewModel @AssistedInject constructor(
     //채팅방 나가기
     private fun exitChatRoom(user: User, onNavigateToBack: () -> Unit) {
         viewModelScope.launch {
-            val result = chatUseCases.exitChatRoom(chatRoomId, user)
+                val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
+                val participantStatus = chatRoom.participants.first { it.participantStatus.userId == userId }.participantStatus
+
+            val result = chatUseCases.exitChatRoom(chatRoomId, userId, participantStatus)
 
             when {
                 result.isSuccess -> {

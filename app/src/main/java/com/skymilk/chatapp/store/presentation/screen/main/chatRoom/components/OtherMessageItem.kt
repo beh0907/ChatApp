@@ -31,8 +31,10 @@ import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
+import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
@@ -43,9 +45,10 @@ import com.skymilk.chatapp.ui.theme.Black
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun OtherMessageItem(
+    sender: Participant,
+    participantsStatus: List<ParticipantStatus>,
     messageContents: List<MessageContent>,
     timestamp: Long,
-    sender: User,
     onNavigateToProfile: (User) -> Unit,
     onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
 ) {
@@ -63,8 +66,8 @@ fun OtherMessageItem(
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(
-                        if (sender.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                        else sender.profileImageUrl
+                        if (sender.user.profileImageUrl.isBlank()) R.drawable.bg_default_profile
+                        else sender.user.profileImageUrl
                     )
                     .decoderFactory(SvgDecoder.Factory())
                     .build(),
@@ -74,8 +77,8 @@ fun OtherMessageItem(
                     .squircleClip()
                     .align(Alignment.Top)
                     .clickable {
-                        if (sender.id.isNotBlank())
-                            onNavigateToProfile(sender)
+                        if (sender.user.id.isNotBlank())
+                            onNavigateToProfile(sender.user)
                     },
                 contentScale = ContentScale.Crop
             )
@@ -83,8 +86,10 @@ fun OtherMessageItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             Column {
+
+                //같은 시간대가 아닐때만 유저 정보 표시
                 Text(
-                    text = sender.username.ifBlank { "퇴장한 유저입니다." },
+                    text = sender.user.username.ifBlank { "퇴장한 유저입니다." },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -121,7 +126,12 @@ fun OtherMessageItem(
                                 messageContents = messageContents,
                                 maxColumnCount = 3,
                                 onNavigateToImagePager = { imageUrls, initialPage ->
-                                    onNavigateToImagePager(imageUrls, initialPage, sender.username, timestamp)
+                                    onNavigateToImagePager(
+                                        imageUrls,
+                                        initialPage,
+                                        sender.user.username,
+                                        timestamp
+                                    )
                                 }
                             )
                         }
@@ -129,14 +139,27 @@ fun OtherMessageItem(
                         else -> Unit
                     }
 
-
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Text(
-                        text = DateUtil.getTime(timestamp),
-                        style = MaterialTheme.typography.bodySmall,
+                    //시간 및 채팅 읽은 수 체크
+                    Column(
                         modifier = Modifier.align(Alignment.Bottom)
-                    )
+                    ) {
+                        val count = participantsStatus.count { timestamp >= it.lastReadTimestamp }
+                        if (count > 0) {
+                            //읽지 않은 유저 수 정보
+                            Text(
+                                text = count.toString(),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+
+                        //시간 정보
+                        Text(
+                            text = DateUtil.getTime(timestamp),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 }
             }
         }

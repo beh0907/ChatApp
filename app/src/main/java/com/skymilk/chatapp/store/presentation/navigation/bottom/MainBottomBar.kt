@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.navigation.bottom
 
-import android.R.attr.fontStyle
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon

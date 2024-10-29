@@ -24,6 +24,7 @@ import com.skymilk.chatapp.store.domain.usecase.chat.GetRealtimeMessages
 import com.skymilk.chatapp.store.domain.usecase.chat.GetOrCreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.SendImageMessage
 import com.skymilk.chatapp.store.domain.usecase.chat.SendMessage
+import com.skymilk.chatapp.store.domain.usecase.chat.UpdateParticipantsStatus
 import com.skymilk.chatapp.store.domain.usecase.navigation.GetCurrentDestination
 import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
 import com.skymilk.chatapp.store.domain.usecase.navigation.SaveCurrentDestination
@@ -85,6 +86,7 @@ object UseCaseModule {
             CreateChatRoom(chatRepository),
             ExitChatRoom(chatRepository),
             AddParticipants(chatRepository),
+            UpdateParticipantsStatus(chatRepository),
         )
 
     @Provides
