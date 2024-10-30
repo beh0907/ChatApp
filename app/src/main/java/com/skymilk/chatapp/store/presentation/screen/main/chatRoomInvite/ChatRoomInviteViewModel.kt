@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
@@ -100,7 +101,9 @@ class ChatRoomInviteViewModel @Inject constructor(
                     currentUser,
                     content,
                     emptyList(),
-                    MessageType.SYSTEM
+                    MessageType.SYSTEM,
+                    ParticipantStatus(), //
+                    ParticipantStatus() //
                 )
 
                 //채팅방으로 이동한다

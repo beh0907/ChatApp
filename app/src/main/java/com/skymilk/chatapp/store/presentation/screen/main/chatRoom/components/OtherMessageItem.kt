@@ -145,7 +145,7 @@ fun OtherMessageItem(
                     Column(
                         modifier = Modifier.align(Alignment.Bottom)
                     ) {
-                        val count = participantsStatus.count { timestamp >= it.lastReadTimestamp }
+                        val count = participantsStatus.count { timestamp > it.lastReadTimestamp }
                         if (count > 0) {
                             //읽지 않은 유저 수 정보
                             Text(

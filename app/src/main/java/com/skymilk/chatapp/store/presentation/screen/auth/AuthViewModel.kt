@@ -76,9 +76,7 @@ class AuthViewModel @Inject constructor(
                 }
                 .collectLatest { user ->
                     //유저 정보 갱신
-                    _authState.update {
-                        AuthState.Authenticated(user)
-                    }
+                    _authState.value = AuthState.Authenticated(user)
                 }
         }
     }
@@ -94,13 +92,11 @@ class AuthViewModel @Inject constructor(
 
             authUseCases.signInWithGoogle(googleIdTokenCredential)
                 .catch { exception ->
-                    _authState.update {
-                        val message = exception.message ?: "Unknown error"
-                        //토스트 메시지 전달
-                        sendEvent(Event.Toast(message))
+                    val message = exception.message ?: "Unknown error"
+                    //토스트 메시지 전달
+                    sendEvent(Event.Toast(message))
 
-                        AuthState.Error(message)
-                    }
+                    _authState.value = AuthState.Error(message)
                 }
                 .collectLatest { user ->
                     checkSignInResult(user)
@@ -120,13 +116,11 @@ class AuthViewModel @Inject constructor(
 
             authUseCases.signInWithKakao(kakaoToken)
                 .catch { exception ->
-                    _authState.update {
-                        val message = exception.message ?: "Unknown error"
-                        //토스트 메시지 전달
-                        sendEvent(Event.Toast(message))
+                    val message = exception.message ?: "Unknown error"
+                    //토스트 메시지 전달
+                    sendEvent(Event.Toast(message))
 
-                        AuthState.Error(message)
-                    }
+                    _authState.value = AuthState.Error(message)
                 }
                 .collectLatest { user ->
                     checkSignInResult(user)
@@ -151,13 +145,11 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             authUseCases.signInWithEmailAndPassword(email, password)
                 .catch { exception ->
-                    _authState.update {
-                        val message = exception.message ?: "Unknown error"
-                        //토스트 메시지 전달
-                        sendEvent(Event.Toast(message))
+                    val message = exception.message ?: "Unknown error"
+                    //토스트 메시지 전달
+                    sendEvent(Event.Toast(message))
 
-                        AuthState.Error(message)
-                    }
+                    _authState.value = AuthState.Error(message)
                 }
                 .collectLatest { user ->
                     checkSignInResult(user)
@@ -200,13 +192,11 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             authUseCases.signUpWithEmailAndPassword(name, email, password)
                 .catch { exception ->
-                    _authState.update {
-                        val message = exception.message ?: "Unknown error"
-                        //토스트 메시지 전달
-                        sendEvent(Event.Toast(message))
+                    val message = exception.message ?: "Unknown error"
+                    //토스트 메시지 전달
+                    sendEvent(Event.Toast(message))
 
-                        AuthState.Error(message)
-                    }
+                    _authState.value = AuthState.Error(message)
                 }
                 .collectLatest { user ->
                     checkSignInResult(user)
@@ -217,8 +207,10 @@ class AuthViewModel @Inject constructor(
     //로그아웃
     private fun signOut() {
         viewModelScope.launch {
+            //로그아웃
             authUseCases.signOut()
-            _authState.update { AuthState.Unauthenticated }
+
+            _authState.value = AuthState.Unauthenticated
 
             //토스트 메시지 전달
             sendEvent(Event.Toast("로그아웃 되었습니다."))
@@ -233,8 +225,6 @@ class AuthViewModel @Inject constructor(
         }
 
         //유저 정보 갱신
-        _authState.update {
-            AuthState.Authenticated(user)
-        }
+        _authState.value = AuthState.Authenticated(user)
     }
 }

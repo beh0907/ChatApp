@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.Participant
@@ -21,6 +22,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUp
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,10 +61,11 @@ class ChatRoomViewModel @Inject constructor(
     val alarmState = chatRoomSettingUseCases.getAlarmSetting(chatRoomId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
+    // 채팅 메시지 구독을 위한 Job
+    private var messageSubscriptionJob: Job? = null
+
     init {
         onEvent(ChatRoomEvent.LoadChatRoom)
-
-        onEvent(ChatRoomEvent.LoadChatMessages)
 
         onEvent(ChatRoomEvent.UnsubscribeForNotification)
     }
@@ -97,6 +100,7 @@ class ChatRoomViewModel @Inject constructor(
                 )
             }
 
+            is ChatRoomEvent.UpdateParticipantsStatus -> updateParticipantsStatus()
             is ChatRoomEvent.ToggleAlarmState -> toggleAlarmState()
             is ChatRoomEvent.SubscribeForNotification -> subscribeForNotification()
             is ChatRoomEvent.UnsubscribeForNotification -> unsubscribeForNotification()
@@ -117,6 +121,9 @@ class ChatRoomViewModel @Inject constructor(
                 }
                 .collect { chatRoom ->
                     _chatRoomState.value = ChatRoomState.Success(chatRoom)
+
+                    //채팅방 정보를 먼저 가져왔다면 채팅 메시지 목록을 불러온다.
+                    onEvent(ChatRoomEvent.LoadChatMessages)
                 }
 
         }
@@ -124,9 +131,19 @@ class ChatRoomViewModel @Inject constructor(
 
     //채팅 메시지 목록 불러오기
     private fun loadChatMessages() {
-        viewModelScope.launch {
-            chatUseCases.getRealtimeMessages(chatRoomId)
+        //이미 불러오는 job이 있다면 새로 초기화 하지 않는다
+        if (messageSubscriptionJob != null) return
+
+        messageSubscriptionJob = viewModelScope.launch {
+            //채팅방에 참여한 시간부터 메시지를 불러온다
+            val joinTimestamp =
+                (chatRoomState.value as ChatRoomState.Success).chatRoom.participants
+                    .find { it.participantStatus.userId == userId }?.participantStatus?.joinTimestamp
+                    ?: 0
+
+            chatUseCases.getRealtimeMessages(chatRoomId, joinTimestamp)
                 .onStart {
+                    //최초 로딩
                     _chatMessagesState.value = ChatMessagesState.Loading
                 }
                 .catch { exception ->
@@ -134,31 +151,73 @@ class ChatRoomViewModel @Inject constructor(
 
                     _chatMessagesState.value = ChatMessagesState.Error
                 }
-                .collect { messages ->
-                    //메시지 목록 적용
-                    _chatMessagesState.value = ChatMessagesState.Success(messages)
-
-                    Log.d("viewmodel", "나야~ 들기름")
-
-                    //업데이트
-                    if (chatRoomState.value is ChatRoomState.Success) {
-                        val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
-                        val originParticipantStatus =
-                            chatRoom.participants.first { it.participantStatus.userId == userId }.participantStatus
-                        val updateParticipantStatus = originParticipantStatus.copy(
-                            lastReadTimestamp = System.currentTimeMillis(),
-                            lastReadMessageCount = chatRoom.totalMessagesCount + 1
-                        )
-
-                        //유저 상태정보 갱신
-                        chatUseCases.updateParticipantsStatus(
-                            chatRoomId,
-                            userId,
-                            originParticipantStatus,
-                            updateParticipantStatus,
-                        )
+                .collect { event ->
+                    val currentMessages = when (val currentState = _chatMessagesState.value) {
+                        is ChatMessagesState.Success -> currentState.chatMessages.toMutableList()
+                        else -> mutableListOf()
                     }
+
+                    //넘어온 메시지 이벤트에 따라 처리
+                    _chatMessagesState.value = ChatMessagesState.Success(
+                        when (event) {
+                            is MessageEvent.Initial -> {
+                                onEvent(ChatRoomEvent.UpdateParticipantsStatus)
+
+//                                Log.d("collect", "Initial : ${event.messages}")
+                                event.messages
+
+                            }
+
+                            is MessageEvent.Added -> {
+                                //내가 보낸 메시지는 이미 읽음 처리 했으므로 필요X
+                                if (event.message.senderId != userId) onEvent(ChatRoomEvent.UpdateParticipantsStatus)
+
+//                                Log.d("collect", "Added : ${event.message}")
+                                listOf(event.message) + currentMessages
+                            }
+
+                            is MessageEvent.Modified -> {
+//                                Log.d("collect", "Modified : ${event.message}")
+                                val index =
+                                    currentMessages.indexOfFirst { it.id == event.message.id }
+                                if (index != -1) currentMessages[index] = event.message
+
+                                currentMessages
+                            }
+
+                            is MessageEvent.Removed -> {
+//                                Log.d("collect", "Removed : ${event.messageId}")
+                                currentMessages.filter { it.id != event.messageId }
+                            }
+                        }
+                    )
                 }
+        }
+    }
+
+    private fun getParticipantStatus(): Pair<ParticipantStatus, ParticipantStatus> {
+        val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
+        val originParticipantStatus =
+            chatRoom.participants.first { it.participantStatus.userId == userId }.participantStatus
+        val updateParticipantStatus = originParticipantStatus.copy(
+            lastReadTimestamp = System.currentTimeMillis(),
+            lastReadMessageCount = chatRoom.totalMessagesCount
+        )
+
+        return (originParticipantStatus to updateParticipantStatus)
+    }
+
+    private fun updateParticipantsStatus() {
+        viewModelScope.launch {
+            val (originParticipantStatus, updateParticipantStatus) = getParticipantStatus()
+
+            //유저 상태정보 갱신
+            chatUseCases.updateParticipantsStatus(
+                chatRoomId,
+                userId,
+                originParticipantStatus,
+                updateParticipantStatus,
+            )
         }
     }
 
@@ -171,7 +230,16 @@ class ChatRoomViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                chatUseCases.sendMessage(chatRoomId, sender, content, participants, type)
+                val (originParticipantStatus, updateParticipantStatus) = getParticipantStatus()
+                chatUseCases.sendMessage(
+                    chatRoomId = chatRoomId,
+                    sender = sender,
+                    content = content,
+                    participants = participants,
+                    type= type,
+                    originParticipantStatus = originParticipantStatus,
+                    updateParticipantStatus = updateParticipantStatus
+                )
             } catch (e: Exception) {
                 //에러 처리
             }
@@ -193,7 +261,15 @@ class ChatRoomViewModel @Inject constructor(
 
             viewModelScope.launch {
                 try {
-                    chatUseCases.sendImageMessage(chatRoomId, sender, urls, participants)
+                    val (originParticipantStatus, updateParticipantStatus) = getParticipantStatus()
+                    chatUseCases.sendImageMessage(
+                        chatRoomId = chatRoomId,
+                        sender = sender,
+                        imageUrls = urls,
+                        participants = participants,
+                        originParticipantStatus = originParticipantStatus,
+                        updateParticipantStatus = updateParticipantStatus
+                    )
                 } catch (e: Exception) {
                     _uploadState.value =
                         ImageUploadState.Error("Failed to send image message: ${e.message}")
@@ -256,21 +332,16 @@ class ChatRoomViewModel @Inject constructor(
     //채팅방 나가기
     private fun exitChatRoom(user: User, onNavigateToBack: () -> Unit) {
         viewModelScope.launch {
-                val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
-                val participantStatus = chatRoom.participants.first { it.participantStatus.userId == userId }.participantStatus
+            val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
+            val participantStatus =
+                chatRoom.participants.first { it.participantStatus.userId == userId }.participantStatus
 
             val result = chatUseCases.exitChatRoom(chatRoomId, userId, participantStatus)
 
             when {
                 result.isSuccess -> {
-                    //퇴장 시스템 메시지 전송
-                    //시스템 메시지는 알림을 표시하지 않기 위해 emptyList 전송
-                    sendMessage(
-                        user,
-                        "${user.username}님이 퇴장하셨습니다.",
-                        emptyList(),
-                        MessageType.SYSTEM
-                    )
+                    //채팅 메시지 가져오기 작업 종료
+                    messageSubscriptionJob?.cancel()
 
                     //알림 토픽 구독 제거
                     onEvent(ChatRoomEvent.UnsubscribeForNotification)
@@ -280,6 +351,17 @@ class ChatRoomViewModel @Inject constructor(
 
                     //화면 이동
                     onNavigateToBack()
+
+                    //퇴장 시스템 메시지 전송
+                    //시스템 메시지는 알림을 표시하지 않기 위해 emptyList 전송
+                    onEvent(
+                        ChatRoomEvent.SendMessage(
+                            user,
+                            "${user.username}님이 퇴장하셨습니다.",
+                            emptyList(),
+                            MessageType.SYSTEM
+                        )
+                    )
                 }
 
                 result.isFailure -> {

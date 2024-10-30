@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.navigation.graph
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -75,13 +76,13 @@ fun MainNavigation(
                 icon = Icons.Outlined.People,
                 selectedIcon = Icons.Filled.People,
                 title = "친구",
-                route = Routes.FriendsScreen
+                route = Routes.FriendsScreen(currentUser.id)
             ),
             BottomNavigationItem(
                 icon = Icons.AutoMirrored.Outlined.Chat,
                 selectedIcon = Icons.AutoMirrored.Rounded.Chat,
                 title = "채팅",
-                route = Routes.ChatRoomsScreen
+                route = Routes.ChatRoomsScreen(currentUser.id)
             ),
             BottomNavigationItem(
                 icon = Icons.Outlined.Settings,
@@ -93,16 +94,24 @@ fun MainNavigation(
     }
 
     val navController = rememberNavController()
-    val backStackState by navController.currentBackStackEntryAsState()
-    val selectedItem = remember(key1 = backStackState) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val selectedItem = remember(key1 = navBackStackEntry) {
         val selectedIndex =
-            bottomNavigationItems.indexOfFirst { it.route::class.qualifiedName == backStackState?.destination?.route }
+            bottomNavigationItems.indexOfFirst {
+                navBackStackEntry?.destination?.route?.startsWith(
+                    prefix = it.route::class.qualifiedName.toString()
+                ) == true
+            }
         if (selectedIndex != -1) selectedIndex else 0
     }
 
     //하단 바에 표시된 탭 메뉴 화면이 아닐 시 하단 바가 보이지 않게 하기 위해 설정
-    val isBottomBarVisible = remember(key1 = backStackState) {
-        bottomNavigationItems.find { it.route::class.qualifiedName == backStackState?.destination?.route } != null
+    val isBottomBarVisible = remember(key1 = navBackStackEntry) {
+        bottomNavigationItems.find {
+            navBackStackEntry?.destination?.route?.startsWith(
+                prefix = it.route::class.qualifiedName.toString()
+            ) == true
+        } != null
     }
 
     //뷰모델 프로바이더
@@ -143,11 +152,10 @@ fun MainNavigation(
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDestination = Routes.FriendsScreen
+            startDestination = bottomNavigationItems[0].route
         ) {
             //친구 목록 화면
             composable<Routes.FriendsScreen> {
-
                 FriendsScreen(
                     viewModel = friendsViewModel,
                     onEvent = friendsViewModel::onEvent,
@@ -168,19 +176,19 @@ fun MainNavigation(
 
             //채팅방 목록 화면
             composable<Routes.ChatRoomsScreen> {
-                val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
-                    factory = ChatRoomsViewModel.provideFactory(
-                        viewModelFactoryProvider.chatRoomsViewModelFactory(),
-                        currentUser.id
-                    )
-                )
+                val chatRoomsViewModel: ChatRoomsViewModel = hiltViewModel()
 
                 ChatRoomsScreen(
                     viewModel = chatRoomsViewModel,
                     onEvent = chatRoomsViewModel::onEvent,
                     currentUser = currentUser,
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId, userId = currentUser.id)) {
+                        navController.navigate(
+                            Routes.ChatRoomScreen(
+                                chatRoomId = chatRoomId,
+                                userId = currentUser.id
+                            )
+                        ) {
                             // 채팅방 화면으로 이동하기 전에 데이터를 설정합니다.
                             launchSingleTop = true
                         }
@@ -223,7 +231,12 @@ fun MainNavigation(
                     existingChatRoomId = args.existingChatRoomId,
                     existingParticipants = args.existingParticipants,
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId, userId = currentUser.id)) {
+                        navController.navigate(
+                            Routes.ChatRoomScreen(
+                                chatRoomId = chatRoomId,
+                                userId = currentUser.id
+                            )
+                        ) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
                                 inclusive = false
                             }
@@ -276,7 +289,12 @@ fun MainNavigation(
                         }
                     },
                     onNavigateToChatRoom = { chatRoomId ->
-                        navController.navigate(Routes.ChatRoomScreen(chatRoomId = chatRoomId, userId = currentUser.id)) {
+                        navController.navigate(
+                            Routes.ChatRoomScreen(
+                                chatRoomId = chatRoomId,
+                                userId = currentUser.id
+                            )
+                        ) {
                             popUpTo(bottomNavigationItems[selectedItem].route) {
                                 inclusive = false
                             }
@@ -316,9 +334,9 @@ fun MainNavigation(
             //채팅방 화면
             composable<Routes.ChatRoomScreen>(
                 deepLinks = listOf(
-                    navDeepLink<Routes.ChatRoomScreen>(
-                        basePath = "chatapp://chatrooms"
-                    )
+                    navDeepLink {
+                        uriPattern = "chatapp://chatrooms/{chatRoomId}?userId={userId}"
+                    }
                 )
             ) {
                 val args = it.toRoute<Routes.ChatRoomScreen>()

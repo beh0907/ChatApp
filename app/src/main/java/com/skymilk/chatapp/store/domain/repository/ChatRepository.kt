@@ -6,6 +6,7 @@ import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.MessageType
 import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.MessageEvent
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
@@ -27,21 +28,25 @@ interface ChatRepository {
         updateParticipantStatus: ParticipantStatus
     )
 
-    fun getRealtimeMessages(chatRoomId: String): Flow<List<ChatMessage>>
+    fun getRealtimeMessages(chatRoomId: String, joinTimestamp: Long): Flow<MessageEvent>
 
     suspend fun sendMessage(
         chatRoomId: String,
         sender: User,
         content: String,
         participants: List<Participant>,
-        type: MessageType
+        type: MessageType,
+        originParticipantStatus: ParticipantStatus,
+        updateParticipantStatus: ParticipantStatus
     ): Result<Unit>
 
     suspend fun sendImageMessage(
         chatRoomId: String,
         sender: User,
         imageUrls: List<String>,
-        participants: List<Participant>
+        participants: List<Participant>,
+        originParticipantStatus: ParticipantStatus,
+        updateParticipantStatus: ParticipantStatus
     ): Result<Unit>
 
     suspend fun exitChatRoom(chatRoomId: String, userId: String, participantStatus: ParticipantStatus): Result<Unit>

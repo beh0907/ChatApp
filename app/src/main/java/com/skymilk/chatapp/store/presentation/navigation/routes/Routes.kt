@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.presentation.navigation.routes
 
 import com.skymilk.chatapp.store.domain.model.User
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
 sealed interface Routes {
@@ -34,10 +35,10 @@ sealed interface Routes {
 
     //하단 바 메뉴
     @Serializable
-    data object FriendsScreen : Routes // 친구 탭
+    data class FriendsScreen(val userId: String) : Routes // 친구 탭
 
     @Serializable
-    data object ChatRoomsScreen : Routes // 채팅 목록 탭
+    data class ChatRoomsScreen(val userId: String) : Routes // 채팅 목록 탭
 
     @Serializable
     data object SettingScreen : Routes // 설정 화면

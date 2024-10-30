@@ -19,26 +19,21 @@ import com.skymilk.chatapp.store.presentation.screen.splash.SplashScreen
 
 @Composable
 fun AppNavigation(
-    isDeepLink: Boolean
+    isDeepLink: Boolean,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     //계정 처리 뷰모델 및 계정 상태
-    val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     //화면 네비게이션 설정
     val navController = rememberNavController()
 
-    val startDestination =
-        if (authState is AuthState.Authenticated) Routes.MainGraph else Routes.AuthGraph
-
     //앱 시작 시 화면
-    val appStartGraphDestination =
-        if (isDeepLink) startDestination else Routes.StartGraph // 딥링크 정보가 있다면 로딩화면 스킵
-
+    val startGraph = if (isDeepLink) Routes.MainGraph else Routes.StartGraph // 딥링크 정보가 있다면 로딩화면 스킵
 
     NavHost(
         navController = navController,
-        startDestination = appStartGraphDestination
+        startDestination = startGraph
     ) {
         //시작 네비게이션
         navigation<Routes.StartGraph>(
@@ -47,7 +42,11 @@ fun AppNavigation(
             composable<Routes.SplashScreen> {
                 SplashScreen(
                     onAnimationFinished = {
-                        navController.navigate(startDestination) {
+                        //로딩 후 이동 화면
+                        val destination =
+                            if (authState is AuthState.Authenticated) Routes.MainGraph else Routes.AuthGraph
+
+                        navController.navigate(destination) {
                             popUpTo(Routes.StartGraph) { inclusive = true }
                         }
                     }
@@ -93,8 +92,8 @@ fun AppNavigation(
         //메인 네비게이션
         composable<Routes.MainGraph> {
             val currentUser = (authState as? AuthState.Authenticated)?.user
-            if (currentUser != null) {
 
+            if (currentUser != null) {
                 MainNavigation(
                     currentUser = currentUser,
                     onSignOut = {
@@ -105,7 +104,7 @@ fun AppNavigation(
                         //로그아웃 처리
                         authViewModel.onEvent(AuthEvent.SignOut)
                     },
-                    parentNavController = navController
+                    parentNavController = navController,
                 )
             } else {
                 // 로그인된 정보가 없다면 로그인 화면으로 강제 이동

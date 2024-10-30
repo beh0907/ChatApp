@@ -24,6 +24,8 @@ sealed interface ChatRoomEvent {
         val participants: List<Participant>,
     ) : ChatRoomEvent
 
+    data object UpdateParticipantsStatus : ChatRoomEvent
+
     data class ExitChatRoom(val user: User, val onNavigateToBack: () -> Unit) : ChatRoomEvent
 
     data object ToggleAlarmState : ChatRoomEvent

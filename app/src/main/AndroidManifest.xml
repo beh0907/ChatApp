@@ -41,7 +41,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.ChatApp"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -59,6 +59,9 @@
 
                 <data android:scheme="chatapp" />
                 <data android:host="chatrooms" />
+
+                <!-- pathPattern을 사용하여 동적 세그먼트와 쿼리 파라미터 허용 -->
+<!--                <data android:pathPattern="/{chatRoomId}?userId={userId}" />-->
             </intent-filter>
         </activity>
 

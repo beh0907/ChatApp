@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,12 +45,17 @@ class MainActivity : ComponentActivity() {
             val mainViewModel: MainViewModel = hiltViewModel()
 
             ChatAppTheme(viewModel = mainViewModel) {
+                //배터리 최적화 알림 무시 여부 체크
                 val ignoringOptimizationState by mainViewModel.ignoringOptimizationState.collectAsStateWithLifecycle()
 
-                println("ignoringOptimizationState : $ignoringOptimizationState")
+                // 딥링크 데이터 상태 관리
+                var deepLinkData by remember { mutableStateOf(intent.data) }
 
+                //메시지 수집 및 처리
+                SetObserveMessage()
+
+                //권한 요청
                 LaunchedEffect(Unit) {
-                    //권한 요청
                     PermissionUtil.requestAllPermissions()
                 }
 
@@ -61,12 +67,9 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                //메시지 수집 및 처리
-                SetObserveMessage()
-
                 //네비게이션 화면
                 AppNavigation(
-                    isDeepLink = intent.data != null
+                    isDeepLink = deepLinkData != null
                 )
             }
         }

@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.PowerManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
@@ -126,7 +127,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
         if (chatRoomSettingUseCases.getAlarmSetting(chatRoomId).first()) return
 
         //현재 화면이 알람이 발생한 채팅방과 동일한 채팅방인지 체크
-        val navigationState = navigationUseCases.getCurrentDestination().first()
+        val navigationState = navigationUseCases.getCurrentDestination()
         if (navigationState.destination == Routes.ChatRoomScreen.javaClass.toString()
             && navigationState.params["chatRoomId"] == chatRoomId
         ) return
@@ -141,13 +142,12 @@ class FirebaseMessageService : FirebaseMessagingService() {
             //딥링크 전송
             val activityIntent =
                 Intent(this@FirebaseMessageService, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    this.data = "chatapp://chatrooms/$chatRoomId".toUri()
+                    this.data = "chatapp://chatrooms/$chatRoomId?userId=${firebaseAuth.currentUser?.uid}".toUri()
                 }
 
             val pendingIntent = TaskStackBuilder.create(this@FirebaseMessageService).run {
                 addNextIntentWithParentStack(activityIntent)
-                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
+                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
             }
 
             val notificationId = Random.nextInt(1000)
@@ -155,8 +155,11 @@ class FirebaseMessageService : FirebaseMessagingService() {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                //.setOngoing(true) // [사용자가 알림 못지우게 설정 >> 클릭해야 메시지 읽음 상태]
+                .setWhen(System.currentTimeMillis()) // [알림 표시 시간 설정]
+                .setShowWhen(true) // [푸시 알림 받은 시간 커스텀 설정 표시]
+                .setAutoCancel(true)// [알림 클릭 시 삭제 여부]
                 .setContentIntent(pendingIntent)  // 알림 클릭 시 인텐트 실행
                 .build()
 

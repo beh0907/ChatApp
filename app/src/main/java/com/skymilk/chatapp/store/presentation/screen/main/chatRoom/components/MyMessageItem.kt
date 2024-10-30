@@ -57,8 +57,8 @@ fun MyMessageItem(
                 modifier = Modifier.padding(end = 8.dp),
                 horizontalAlignment = Alignment.End
             ) {
-                val count = participantsStatus.count { timestamp >= it.lastReadTimestamp }
-                if (count > 0) {
+                val count = participantsStatus.count { timestamp > it.lastReadTimestamp }
+                if (count > 0 && participantsStatus.size > 1) {
                     //읽지 않은 유저 수 정보
                     Text(
                         text = count.toString(),

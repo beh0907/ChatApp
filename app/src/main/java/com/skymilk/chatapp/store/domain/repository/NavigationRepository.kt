@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface NavigationRepository {
     suspend fun saveCurrentDestination(navigationState: NavigationState)
 
-    fun getCurrentDestination(): Flow<NavigationState>
+    fun getCurrentDestination(): NavigationState
 }

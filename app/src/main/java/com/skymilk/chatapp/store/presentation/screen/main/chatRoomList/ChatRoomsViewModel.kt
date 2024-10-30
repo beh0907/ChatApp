@@ -1,15 +1,15 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
+import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,29 +18,17 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class ChatRoomsViewModel @AssistedInject constructor(
-    @Assisted private val userId: String,
+@HiltViewModel
+class ChatRoomsViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
-    private val chatRoomSettingUseCases: ChatRoomSettingUseCases
+    private val chatRoomSettingUseCases: ChatRoomSettingUseCases,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface Factory {
-        fun create(userId: String): ChatRoomsViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: Factory,
-            userId: String
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(userId) as T
-            }
-        }
-    }
+    private val userId: String = savedStateHandle.toRoute<Routes.ChatRoomsScreen>().userId
 
     private val _chatRoomsState = MutableStateFlow<ChatRoomsState>(ChatRoomsState.Initial)
     val chatRoomsState: StateFlow<ChatRoomsState> = _chatRoomsState.asStateFlow()
@@ -55,7 +43,7 @@ class ChatRoomsViewModel @AssistedInject constructor(
     }
 
     fun onEvent(event: ChatRoomsEvent) {
-        when(event) {
+        when (event) {
             is ChatRoomsEvent.LoadChatRooms -> loadChatRooms()
 
             is ChatRoomsEvent.LoadChatRoomSetting -> loadChatRoomSetting()

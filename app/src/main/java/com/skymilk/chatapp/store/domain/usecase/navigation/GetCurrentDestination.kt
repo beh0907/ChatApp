@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetCurrentDestination(
     private val navigationRepository: NavigationRepository
 ) {
-    operator fun invoke() : Flow<NavigationState> {
+    operator fun invoke() : NavigationState {
         return navigationRepository.getCurrentDestination()
     }
 }

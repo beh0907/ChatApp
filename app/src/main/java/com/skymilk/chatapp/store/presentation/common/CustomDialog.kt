@@ -117,8 +117,8 @@ fun CustomAlertDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirm()
                     onDismiss()
+                    onConfirm()
                 }
             ) {
                 Text(

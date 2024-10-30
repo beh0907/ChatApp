@@ -86,7 +86,7 @@ fun SignUpScreen(
 
             SignUpSection(
                 onSignUpWithEmailAndPassword = { name, email, password, passwordConfirm ->
-                    viewModel.onEvent(
+                    onEvent(
                         AuthEvent.SignUpWithEmailAndPassword(
                             name = name,
                             email = email,
