@@ -12,9 +12,11 @@ import com.skymilk.chatapp.store.presentation.utils.ValidationUtil
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,16 +28,11 @@ class AuthViewModel @Inject constructor(
 
     //로그인 상태 정보
     private val _authState = MutableStateFlow<AuthState>(AuthState.Initial)
-    val authState = _authState.asStateFlow()
-
-    init {
-        onEvent(AuthEvent.CheckCurrentUser)
-    }
+    val authState = _authState.onStart { checkCurrentUser() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), AuthState.Initial)
 
     fun onEvent(event: AuthEvent) {
         when (event) {
-            is AuthEvent.CheckCurrentUser -> checkCurrentUser()
-
             is AuthEvent.SignInWithGoogle -> {
                 signInWithGoogle(event.googleIdTokenCredential)
             }

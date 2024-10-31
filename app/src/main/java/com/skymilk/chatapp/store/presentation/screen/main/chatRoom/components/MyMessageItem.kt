@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.Participant
+import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
@@ -34,11 +34,12 @@ import com.skymilk.chatapp.ui.theme.Black
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun MyMessageItem(
-    participant: Participant,
+    currentUser: User,
     participantsStatus: List<ParticipantStatus>,
     messageContents: List<MessageContent>,
     timestamp: Long,
-    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
+    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit,
+    showTimestamp: Boolean = true // 시간 표시 여부
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -67,10 +68,13 @@ fun MyMessageItem(
                 }
 
                 //시간 정보
-                Text(
-                    text = DateUtil.getTime(timestamp),
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                //연속된 메시지에 대한 시간 정보 출력 설정
+                if (showTimestamp) {
+                    Text(
+                        text = DateUtil.getTime(timestamp),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
 
             when (messageContents.first().type) {
@@ -105,7 +109,7 @@ fun MyMessageItem(
                             onNavigateToImagePager(
                                 imageUrls,
                                 initialPage,
-                                participant.user.username,
+                                currentUser.username,
                                 timestamp
                             )
                         }

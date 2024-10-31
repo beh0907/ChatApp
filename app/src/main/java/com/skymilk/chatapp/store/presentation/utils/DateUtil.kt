@@ -5,6 +5,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
@@ -90,5 +91,20 @@ object DateUtil {
         return Instant.ofEpochMilli(time)
             .atZone(zoneId)
             .format(formatter)
+    }
+
+    //분단위까지 동일한 시간대인지 체크
+    fun isSameTimeMinute(time: Long, timeCompare: Long): Boolean {
+        val dateTime1 = Instant.ofEpochMilli(time)
+            .atZone(zoneId)
+            .toLocalDateTime()
+            .truncatedTo(ChronoUnit.MINUTES)
+
+        val dateTime2 = Instant.ofEpochMilli(timeCompare)
+            .atZone(zoneId)
+            .toLocalDateTime()
+            .truncatedTo(ChronoUnit.MINUTES)
+
+        return dateTime1 == dateTime2
     }
 }

@@ -27,12 +27,12 @@ import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.domain.model.MessageContent
-import com.skymilk.chatapp.store.domain.model.Participant
+import com.skymilk.chatapp.store.domain.model.User
 
 //채팅방 목록 프로필 이미지 그리드
 @Composable
 fun ChatProfileGrid(
-    otherParticipants: List<Participant>,
+    otherParticipants: List<User>,
 ) {
     val boxSize = 50.dp
 
@@ -62,8 +62,8 @@ fun ChatProfileGrid(
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(
-                        if (participant.user.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                        else participant.user.profileImageUrl
+                        if (participant.profileImageUrl.isBlank()) R.drawable.bg_default_profile
+                        else participant.profileImageUrl
                     )
                     .crossfade(true)
                     .build(),

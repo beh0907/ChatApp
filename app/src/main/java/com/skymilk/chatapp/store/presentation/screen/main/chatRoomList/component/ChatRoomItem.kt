@@ -33,6 +33,7 @@ import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
 import com.skymilk.chatapp.ui.theme.dimens
+import kotlin.random.Random
 
 @Composable
 fun ChatRoomItem(
@@ -50,12 +51,12 @@ fun ChatRoomItem(
             .padding(MaterialTheme.dimens.small1),
     ) {
         //나와 나머지 참여자 분리
-        val currentParticipant = chatRoom.participants.first { it.user.id == currentUser.id }
-        val otherParticipants = chatRoom.participants.filterNot { it.user.id == currentUser.id }
+//        val currentParticipant = chatRoom.participants.first { it.id == currentUser.id }
+        val otherParticipants = chatRoom.participants.filterNot { it.id == currentUser.id }
 
         //읽지 않은 메시지 수
-        val unreadMessageCount =
-            chatRoom.totalMessagesCount - currentParticipant.participantStatus.lastReadMessageCount
+//        val unreadMessageCount =
+//            chatRoom.totalMessagesCount - currentParticipant.participantStatus.lastReadMessageCount
 
         //채팅방 참여 유저 프로필 그리드
         ChatProfileGrid(otherParticipants = otherParticipants.take(4))
@@ -81,8 +82,8 @@ fun ChatRoomItem(
                     Text(
                         modifier = Modifier.weight(weight = 1f, fill = false),
                         text = otherParticipants
-                            .filter { it.user.id != currentUser.id }
-                            .joinToString(", ") { it.user.username },
+                            .filter { it.id != currentUser.id }
+                            .joinToString(", ") { it.username },
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -138,21 +139,21 @@ fun ChatRoomItem(
 
                 Spacer(Modifier.width(5.dp))
 
-                //읽지 않은 메시지 수 표시
-                if (unreadMessageCount > 0) {
-                    Text(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(
-                                MaterialTheme.colorScheme.primary
-                            )
-                            .padding(2.dp),
-                        text = if (unreadMessageCount > 99) " 99+ " else " $unreadMessageCount ",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
+//                읽지 않은 메시지 수 표시
+//                if (unreadMessageCount > 0) {
+//                    Text(
+//                        modifier = Modifier
+//                            .clip(CircleShape)
+//                            .background(
+//                                MaterialTheme.colorScheme.primary
+//                            )
+//                            .padding(3.dp),
+//                        text = if (unreadMessageCount > 300) " 300+ " else " $unreadMessageCount ",
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        fontWeight = FontWeight.SemiBold,
+//                        color = MaterialTheme.colorScheme.surface
+//                    )
+//                }
             }
         }
     }

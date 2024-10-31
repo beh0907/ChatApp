@@ -1,7 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profileEdit
 
-import androidx.compose.ui.graphics.ImageBitmap
-
 sealed interface ProfileEditEvent {
 
     data class UpdateUserProfile(

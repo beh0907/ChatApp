@@ -3,7 +3,7 @@ package com.skymilk.chatapp.store.domain.model
 data class ChatRoomWithParticipants(
     val id: String,
     val name: String,
-    val participants: List<Participant>,
+    val participants: List<User>,
     val lastMessage: String,
     val lastMessageTimestamp: Long,
     val createdTimestamp: Long,

@@ -34,7 +34,7 @@ fun ChatRoomsScreen(
     onNavigateToChatRoom: (String) -> Unit,
     onNavigateToChatRoomInvite: () -> Unit
 ) {
-    val chatListState by viewModel.chatRoomsState.collectAsStateWithLifecycle()
+    val chatRoomsState by viewModel.chatRoomsState.collectAsStateWithLifecycle()
     val chatRoomAlarmsDisabled by viewModel.chatRoomAlarmsDisabled.collectAsStateWithLifecycle()
 
     Column(
@@ -44,7 +44,7 @@ fun ChatRoomsScreen(
             onNavigateToChatRoomInvite = onNavigateToChatRoomInvite
         )
 
-        when (chatListState) {
+        when (chatRoomsState) {
             is ChatRoomsState.Initial -> {}
 
             is ChatRoomsState.Loading -> {
@@ -54,7 +54,7 @@ fun ChatRoomsScreen(
 
             is ChatRoomsState.Success -> {
                 //로딩이 완료 됐을 때 표시
-                val chatRooms = (chatListState as ChatRoomsState.Success).chatRooms
+                val chatRooms = (chatRoomsState as ChatRoomsState.Success).chatRooms
 
                 if (chatRooms.isEmpty()) {
                     EmptyScreen("등록된 채팅방이 없습니다.")
@@ -71,7 +71,7 @@ fun ChatRoomsScreen(
 
             is ChatRoomsState.Error -> {
                 // 에러 발생 시 표시
-                val message = (chatListState as ChatRoomsState.Error).message
+                val message = (chatRoomsState as ChatRoomsState.Error).message
 
                 ErrorScreen(message = message, retry = { onEvent(ChatRoomsEvent.LoadChatRooms) })
             }

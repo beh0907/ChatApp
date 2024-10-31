@@ -20,9 +20,9 @@ import com.skymilk.chatapp.store.presentation.screen.splash.SplashScreen
 @Composable
 fun AppNavigation(
     isDeepLink: Boolean,
-    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     //계정 처리 뷰모델 및 계정 상태
+    val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     //화면 네비게이션 설정

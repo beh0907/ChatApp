@@ -1,10 +1,8 @@
 package com.skymilk.chatapp.store.domain.repository
 
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
-import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.MessageEvent
 import kotlinx.coroutines.flow.Flow
@@ -21,33 +19,32 @@ interface ChatRepository {
 
     suspend fun addParticipants(chatRoomId: String, newParticipants: List<String>): Result<String>
 
+    fun getParticipantsStatus(chatRoomId: String): Flow<List<ParticipantStatus>>
+
     suspend fun updateParticipantsStatus(
         chatRoomId: String,
         userId: String,
-        originParticipantStatus: ParticipantStatus,
-        updateParticipantStatus: ParticipantStatus
+        participantStatus: ParticipantStatus
     )
 
-    fun getRealtimeMessages(chatRoomId: String, joinTimestamp: Long): Flow<MessageEvent>
+    fun getChatMessages(chatRoomId: String, joinTimestamp: Long): Flow<MessageEvent>
 
     suspend fun sendMessage(
         chatRoomId: String,
         sender: User,
         content: String,
-        participants: List<Participant>,
+        participants: List<User>,
         type: MessageType,
-        originParticipantStatus: ParticipantStatus,
-        updateParticipantStatus: ParticipantStatus
+        participantStatus: ParticipantStatus
     ): Result<Unit>
 
     suspend fun sendImageMessage(
         chatRoomId: String,
         sender: User,
         imageUrls: List<String>,
-        participants: List<Participant>,
-        originParticipantStatus: ParticipantStatus,
-        updateParticipantStatus: ParticipantStatus
+        participants: List<User>,
+        participantStatus: ParticipantStatus
     ): Result<Unit>
 
-    suspend fun exitChatRoom(chatRoomId: String, userId: String, participantStatus: ParticipantStatus): Result<Unit>
+    suspend fun exitChatRoom(chatRoomId: String, userId: String): Result<Unit>
 }

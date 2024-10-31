@@ -5,8 +5,6 @@ import com.kakao.sdk.auth.model.OAuthToken
 
 sealed interface AuthEvent {
 
-    data object CheckCurrentUser : AuthEvent
-
     data class SignInWithGoogle(val googleIdTokenCredential: GoogleIdTokenCredential?) : AuthEvent
 
     data class SignInWithKakao(val kakaoToken: OAuthToken?) : AuthEvent

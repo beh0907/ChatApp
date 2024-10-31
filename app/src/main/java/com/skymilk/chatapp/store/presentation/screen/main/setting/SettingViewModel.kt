@@ -7,8 +7,10 @@ import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,17 +21,11 @@ class SettingViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _settingState = MutableStateFlow(SettingState())
-    val settingState = _settingState.asStateFlow()
-
-    init {
-        onEvent(SettingEvent.LoadSetting)
-    }
+    val settingState = _settingState.onStart { loadSetting() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), SettingState())
 
     fun onEvent(event: SettingEvent) {
         when (event) {
-            is SettingEvent.LoadSetting -> {
-                loadSetting()
-            }
 
             is SettingEvent.ToggleAlarmSetting -> {
                 toggleAlarmSetting()

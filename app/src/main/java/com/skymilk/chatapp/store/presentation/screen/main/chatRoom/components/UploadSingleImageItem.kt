@@ -36,8 +36,6 @@ import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 fun UploadSingleImageItem(
     imageUploadInfo: ImageUploadInfo
 ) {
-    Log.d("UploadSingleImageItem", "imageUploadInfo: $imageUploadInfo")
-
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()

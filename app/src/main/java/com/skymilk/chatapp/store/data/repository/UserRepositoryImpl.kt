@@ -105,7 +105,6 @@ class UserRepositoryImpl @Inject constructor(
 
         val friendListener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                Log.d("getFriends error", error.message.toString())
                 close()
                 return@addSnapshotListener
             }
@@ -121,7 +120,6 @@ class UserRepositoryImpl @Inject constructor(
                     userListener = usersCollection.whereIn(FieldPath.documentId(), friendIds)
                         .addSnapshotListener { usersSnapshot, usersError ->
                             if (usersError != null) {
-                                Log.d("getFriends users error", usersError.message.toString())
                                 close()
                                 return@addSnapshotListener
                             }
@@ -218,8 +216,6 @@ class UserRepositoryImpl @Inject constructor(
                 val users = combinedResults.mapNotNull { document ->
                     document.toObject(User::class.java)
                 }
-
-                Log.d("searchUser", "users : $users")
 
                 Result.success(users)
             } catch (e: Exception) {

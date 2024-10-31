@@ -1,10 +1,11 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -28,15 +29,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.common.collect.Multimaps.index
+import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.ScrollToEndCallback
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
@@ -49,6 +50,7 @@ import kotlin.random.Random
 fun ChatMessageList(
     modifier: Modifier = Modifier,
     chatRoom: ChatRoomWithParticipants,
+    participantsStatus: List<ParticipantStatus>,
     chatMessages: List<ChatMessage>,
     currentUser: User,
     uploadState: ImageUploadState,
@@ -57,6 +59,7 @@ fun ChatMessageList(
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     var previousMessagesSize by remember { mutableIntStateOf(chatMessages.size) }
     var showNewMessage by remember { mutableStateOf("") }
@@ -66,7 +69,11 @@ fun ChatMessageList(
     //메시지가 새로 들어올때마다 이벤트 처리
     LaunchedEffect(chatMessages.size) {
         if (chatMessages.size > previousMessagesSize) {
+            previousMessagesSize = chatMessages.size
             val newMessage = chatMessages.first()
+
+            //시스템 메시지는 표시하지 않는다
+            if (newMessage.messageContents.first().type == MessageType.SYSTEM) return@LaunchedEffect
 
             if (newMessage.senderId == currentUser.id) {
                 // 새 메시지가 사용자가 작성한 메시지인 경우
@@ -82,7 +89,7 @@ fun ChatMessageList(
 
                     //유저 이름 저장
                     showNewMessageUserName =
-                        chatRoom.participants.find { it.user.id == newMessage.senderId }?.user?.username
+                        chatRoom.participants.find { it.id == newMessage.senderId }?.username
                             ?: "알 수 없음"
 
                     //메시지 저장
@@ -95,7 +102,6 @@ fun ChatMessageList(
                 }
             }
         }
-        previousMessagesSize = chatMessages.size
     }
 
     //스크롤이 최하단에 위치할 경우
@@ -108,12 +114,18 @@ fun ChatMessageList(
 
     Box(modifier = modifier) {
         LazyColumn(
-            modifier = modifier,
+            modifier = modifier.pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        //키보드 숨기기
+                        keyboardController?.hide()
+                    })
+            },
             reverseLayout = true, //반대로
             state = listState,
             verticalArrangement = Arrangement.Top,
+            contentPadding = PaddingValues(bottom = 8.dp)
         ) {
-
             //내가 전송중인 이미지 정보
             //이미지가 전송중일때만 정보를 표시
             when (uploadState) {
@@ -136,6 +148,25 @@ fun ChatMessageList(
                 val chatMessage = chatMessages[index]
                 val messageContent = chatMessage.messageContents.first()
 
+
+                // 이전 메시지 정보 (더 오래된 메시지)
+                val previousMessage =
+                    if (index < chatMessages.size - 1) chatMessages[index + 1] else null
+
+                // 다음 메시지 정보 (더 최근 메시지)
+                val nextMessage = if (index > 0) chatMessages[index - 1] else null
+
+                // 연속된 메시지인지 확인
+                val isConsecutiveMessage = previousMessage?.let { prev ->
+                    prev.senderId == chatMessage.senderId &&
+                            DateUtil.isSameTimeMinute(prev.timestamp, chatMessage.timestamp)
+                } == true
+
+                val showTimestamp = nextMessage?.let { next ->
+                    !(next.senderId == chatMessage.senderId &&
+                            DateUtil.isSameTimeMinute(next.timestamp, chatMessage.timestamp))
+                } != false
+
                 when (messageContent.type) {
                     //시스템 메시지는 별도 표시
                     MessageType.SYSTEM -> {
@@ -146,34 +177,36 @@ fun ChatMessageList(
 
                     //채팅 메시지 표시
                     else -> {
+                        println()
                         // message.senderId와 일치하는 chatRoom.participants user를 찾음
-                        val sender = chatRoom.participants.find { it.user.id == chatMessage.senderId }
-                                ?: Participant()
+                        val sender = chatRoom.participants.find {
+                            it.id == chatMessage.senderId
+                        }?: User()
 
                         //내가 작성한 메시지
                         if (chatMessage.senderId == currentUser.id) {
                             MyMessageItem(
-                                participant = sender,
-                                participantsStatus = chatRoom.participants.map { it.participantStatus },
+                                currentUser = sender,
+                                participantsStatus = participantsStatus,
                                 messageContents = chatMessage.messageContents,
                                 timestamp = chatMessage.timestamp,
-                                onNavigateToImagePager = onNavigateToImagePager
+                                onNavigateToImagePager = onNavigateToImagePager,
+                                showTimestamp = showTimestamp
                             )
 
                         } else {
                             // message.senderId와 일치하는 chatRoom.participants user를 찾음
-                            val sender =
-                                chatRoom.participants.find { it.user.id == chatMessage.senderId }
-                                    ?: Participant()
 
                             //다른 사람이 작성한 메시지
                             OtherMessageItem(
                                 sender = sender,
-                                participantsStatus = chatRoom.participants.map { it.participantStatus },
+                                participantsStatus = participantsStatus,
                                 messageContents = chatMessage.messageContents,
                                 timestamp = chatMessage.timestamp,
                                 onNavigateToProfile = onNavigateToProfile,
-                                onNavigateToImagePager = onNavigateToImagePager
+                                onNavigateToImagePager = onNavigateToImagePager,
+                                showProfile = !isConsecutiveMessage,
+                                showTimestamp = showTimestamp
                             )
                         }
                     }
@@ -264,44 +297,6 @@ fun ChatMessageListShimmer(
             if (isMyMessage) MyMessageItemShimmer() // 사용자 메시지 로딩 아이템
             else OtherMessageItemShimmer() // 상대방 메시지 로딩 아이템
 
-        }
-    }
-}
-
-
-@Composable
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_TYPE_NORMAL, showBackground = true)
-fun Preview() {
-
-    Surface(
-        modifier = Modifier
-            .padding(bottom = 10.dp)
-            .padding(5.dp),
-        color = MaterialTheme.colorScheme.background,
-        shape = RoundedCornerShape(10.dp),
-        shadowElevation = 5.dp,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 5.dp)
-                .background(MaterialTheme.colorScheme.surface),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "showNewMessage",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            Icon(
-                imageVector = Icons.Rounded.KeyboardArrowDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
-            )
         }
     }
 }

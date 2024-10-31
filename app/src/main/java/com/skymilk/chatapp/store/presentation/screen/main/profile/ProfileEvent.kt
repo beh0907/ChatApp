@@ -1,7 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.profile
 
-import androidx.compose.ui.graphics.ImageBitmap
-
 sealed interface ProfileEvent {
 
     data class GetChatRoomId(val participants: List<String>) : ProfileEvent

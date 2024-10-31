@@ -34,7 +34,6 @@ import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.MessageContent
 import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
@@ -45,12 +44,14 @@ import com.skymilk.chatapp.ui.theme.Black
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun OtherMessageItem(
-    sender: Participant,
+    sender: User,
     participantsStatus: List<ParticipantStatus>,
     messageContents: List<MessageContent>,
     timestamp: Long,
     onNavigateToProfile: (User) -> Unit,
-    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit
+    onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit,
+    showProfile: Boolean = true,  // 프로필 표시 여부
+    showTimestamp: Boolean = true // 시간 표시 여부
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -63,38 +64,48 @@ fun OtherMessageItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(
-                        if (sender.user.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                        else sender.user.profileImageUrl
-                    )
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build(),
-                contentDescription = "Profile Image",
-                modifier = Modifier
-                    .size(50.dp)
-                    .squircleClip()
-                    .align(Alignment.Top)
-                    .clickable {
-                        if (sender.user.id.isNotBlank())
-                            onNavigateToProfile(sender.user)
-                    },
-                contentScale = ContentScale.Crop
-            )
+            if (showProfile) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(
+                            if (sender.profileImageUrl.isBlank()) R.drawable.bg_default_profile
+                            else sender.profileImageUrl
+                        )
+                        .decoderFactory(SvgDecoder.Factory())
+                        .build(),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .squircleClip()
+                        .align(Alignment.Top)
+                        .clickable {
+                            if (sender.id.isNotBlank())
+                                onNavigateToProfile(sender)
+                        },
+                    contentScale = ContentScale.Crop
+                )
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+            } else {
+                // 프로필 이미지 공간만큼 여백 추가
+                Spacer(modifier = Modifier.width(58.dp))
+            }
+
+
 
             Column {
 
                 //같은 시간대가 아닐때만 유저 정보 표시
-                Text(
-                    text = sender.user.username.ifBlank { "퇴장한 유저입니다." },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                //연속된 메시지에 대한 프로필 정보 출력 설정
+                if (showProfile) {
+                    Text(
+                        text = sender.username.ifBlank { "퇴장한 유저입니다." },
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
 
                 Row {
                     when (messageContents.first().type) {
@@ -129,7 +140,7 @@ fun OtherMessageItem(
                                     onNavigateToImagePager(
                                         imageUrls,
                                         initialPage,
-                                        sender.user.username,
+                                        sender.username,
                                         timestamp
                                     )
                                 }
@@ -155,10 +166,13 @@ fun OtherMessageItem(
                         }
 
                         //시간 정보
-                        Text(
-                            text = DateUtil.getTime(timestamp),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
+                        //연속된 메시지에 대한 시간 정보 출력 설정
+                        if (showTimestamp) {
+                            Text(
+                                text = DateUtil.getTime(timestamp),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                 }
             }

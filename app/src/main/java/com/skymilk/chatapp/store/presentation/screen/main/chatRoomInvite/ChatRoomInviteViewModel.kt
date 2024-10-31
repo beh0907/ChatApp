@@ -39,7 +39,6 @@ class ChatRoomInviteViewModel @Inject constructor(
         }
     }
 
-
     //파라미터와 일치한 참여자가 있는 채팅방 찾기
     private fun getChatRoomId(
         currentUser: User,
@@ -98,12 +97,11 @@ class ChatRoomInviteViewModel @Inject constructor(
                 //초대 시스템 메시지 추가
                 chatUseCases.sendMessage(
                     chatRoomId,
-                    currentUser,
+                    User(),
                     content,
                     emptyList(),
                     MessageType.SYSTEM,
                     ParticipantStatus(), //
-                    ParticipantStatus() //
                 )
 
                 //채팅방으로 이동한다

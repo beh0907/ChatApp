@@ -101,6 +101,7 @@ fun ChatRoomScreen(
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
 
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
+    val participantsStatusState by viewModel.participantsStatusState.collectAsStateWithLifecycle()
 
     val uploadState by viewModel.uploadState.collectAsStateWithLifecycle()
     val alarmState by viewModel.alarmState.collectAsStateWithLifecycle()
@@ -162,6 +163,7 @@ fun ChatRoomScreen(
                                     .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
                                     .fillMaxWidth(),
                                 chatRoom = chatRoom,
+                                participantsStatus = participantsStatusState,
                                 chatMessages = chatMessages,
                                 currentUser = currentUser,
                                 uploadState = uploadState,
@@ -205,7 +207,8 @@ fun ChatRoomScreen(
                 }
 
                 //우측 드로어 메뉴
-                CustomRightSideDrawer(drawerVisibility = visibleDrawer,
+                CustomRightSideDrawer(
+                    drawerVisibility = visibleDrawer,
                     currentUser = currentUser,
                     chatRoom = chatRoom,
                     alarmState = alarmState,
@@ -214,7 +217,7 @@ fun ChatRoomScreen(
                     onNavigateToProfile = onNavigateToProfile,
                     onNavigateToInviteFriends = {
                         //채팅방 아이디, 현재 참여자 목록
-                        onNavigateToInviteFriends(chatRoom.id, chatRoom.participants.map { it.user.id })
+                        onNavigateToInviteFriends(chatRoom.id, chatRoom.participants.map { it.id })
                     },
                     onCloseDrawer = {
                         visibleDrawer = false
@@ -249,7 +252,7 @@ fun TopSection(
 ) {
     val title = when (chatRoom.participants.size) {
         1 -> currentUser.username // 혼자일 경우 내 이름
-        2 -> chatRoom.participants.find { it.user.id != currentUser.id }?.user?.username ?: "" // 1대1 채팅일떈 상대 이름
+        2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: "" // 1대1 채팅일떈 상대 이름
         else -> "그룹채팅 ${chatRoom.participants.size}" // 셋 이상일 땐 그룹표시
     }
 
@@ -301,8 +304,7 @@ fun BottomSection(
     var message by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
+    rememberCoroutineScope()
 
     Box(
         modifier = modifier
@@ -324,13 +326,18 @@ fun BottomSection(
                             .with(context)
                             .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
                             .startMultiImage { uris ->
-                                scope.launch {
-                                    //이미지 파일 리사이징 처리
-                                    onSendImageMessage(
-                                        user,
-                                        FileSizeUtil.resizeAndCompressImages(context, uris)
-                                    )
-                                }
+                                onSendImageMessage(
+                                    user,
+                                    uris
+                                )
+
+//                                scope.launch {
+//                                    //이미지 파일 리사이징 처리
+//                                    onSendImageMessage(
+//                                        user,
+//                                        FileSizeUtil.resizeAndCompressImages(context, uris)
+//                                    )
+//                                }
                             }
                     }
             ) {
@@ -396,9 +403,6 @@ fun BottomSection(
 
                             //메시지 초기화
                             message = ""
-
-                            //키보드 숨기기
-                            keyboardController?.hide()
                         }
                 ) {
                     Icon(
@@ -429,6 +433,8 @@ fun BoxScope.CustomRightSideDrawer(
     onNavigateToInviteFriends: () -> Unit,
     onCloseDrawer: () -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     val ratio = 0.8f
     val density = LocalDensity.current
     val drawerWidth = with(density) { (LocalConfiguration.current.screenWidthDp * ratio).dp.toPx() }
@@ -452,7 +458,12 @@ fun BoxScope.CustomRightSideDrawer(
 
     //드로어 상태 애니메이션 표현
     LaunchedEffect(drawerVisibility) {
-        val value = if (drawerVisibility) DrawerValue.Open else DrawerValue.Closed
+        val value = if (drawerVisibility) {
+            //드로어가 열릴 때 키보드를 닫는다
+            keyboardController?.hide()
+
+            DrawerValue.Open
+        } else DrawerValue.Closed
         draggableState.animateTo(value)
     }
 
@@ -483,6 +494,7 @@ fun BoxScope.CustomRightSideDrawer(
         exit = slideOutHorizontally(targetOffsetX = { it }),
         modifier = Modifier.align(Alignment.CenterEnd)
     ) {
+
         Box(modifier = Modifier
             .offset {
                 IntOffset(

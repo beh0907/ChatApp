@@ -9,9 +9,8 @@ class UpdateParticipantsStatus(
     suspend operator fun invoke(
         chatRoomId: String,
         userId: String,
-        originParticipantStatus: ParticipantStatus,
-        updateParticipantStatus: ParticipantStatus
+        participantStatus: ParticipantStatus
     ) {
-        chatRepository.updateParticipantsStatus(chatRoomId, userId, originParticipantStatus, updateParticipantStatus)
+        chatRepository.updateParticipantsStatus(chatRoomId, userId, participantStatus)
     }
 }

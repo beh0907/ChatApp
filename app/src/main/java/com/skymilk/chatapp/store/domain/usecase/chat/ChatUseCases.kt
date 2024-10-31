@@ -4,11 +4,12 @@ data class ChatUseCases(
     val getChatRoom: GetChatRoom,
     val getChatRooms: GetChatRooms,
     val getOrCreateChatRoom: GetOrCreateChatRoom,
-    val getRealtimeMessages: GetRealtimeMessages,
+    val getChatMessages: GetChatMessages,
     val sendMessage: SendMessage,
     val sendImageMessage: SendImageMessage,
     val createChatRoom: CreateChatRoom,
     val exitChatRoom: ExitChatRoom,
     val addParticipants: AddParticipants,
+    val getParticipantsStatus: GetParticipantsStatus,
     val updateParticipantsStatus: UpdateParticipantsStatus
 )

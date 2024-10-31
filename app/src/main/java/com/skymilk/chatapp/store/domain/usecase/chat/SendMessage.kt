@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.domain.usecase.chat
 
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.Participant
 import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
 import javax.inject.Inject
@@ -14,10 +13,9 @@ class SendMessage(
         chatRoomId: String,
         sender: User,
         content: String,
-        participants: List<Participant>,
+        participants: List<User>,
         type: MessageType,
-        originParticipantStatus: ParticipantStatus,
-        updateParticipantStatus: ParticipantStatus
+        participantStatus: ParticipantStatus
     ): Result<Unit> {
         return chatRepository.sendMessage(
             chatRoomId,
@@ -25,8 +23,7 @@ class SendMessage(
             content,
             participants,
             type,
-            originParticipantStatus,
-            updateParticipantStatus
+            participantStatus
         )
     }
 
