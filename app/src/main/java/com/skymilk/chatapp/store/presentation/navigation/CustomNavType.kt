@@ -4,7 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.navigation.NavType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

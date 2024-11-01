@@ -1,8 +1,7 @@
 package com.skymilk.chatapp.store.presentation.navigation.routes
 
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
 sealed interface Routes {

@@ -46,9 +46,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
-import coil.util.CoilUtils.result
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.ImageCropper
@@ -56,7 +53,7 @@ import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.store.presentation.common.squircleClip
@@ -253,14 +250,10 @@ private fun EditProfileSection(
                         .size(120.dp)
                         .squircleClip()
                         .shadow(4.dp),
-                    model = ImageRequest.Builder(context)
-                        .data(
-                            //이미지 url 정보가 없거나 기본 이미지 상태라면 기본 이미지 표시
-                            if (profileImageUrl.isNullOrBlank() || selectedImage is ProfileImage.Default) R.drawable.bg_default_profile
-                            else profileImageUrl
-                        )
-                        .decoderFactory(SvgDecoder.Factory())
-                        .build(),
+
+                    //이미지 url 정보가 없거나 기본 이미지 상태라면 기본 이미지 표시
+                    model = if (profileImageUrl.isNullOrBlank() || selectedImage is ProfileImage.Default) R.drawable.bg_default_profile
+                    else profileImageUrl,
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
@@ -310,7 +303,13 @@ private fun EditProfileSection(
                                     when (result) {
                                         is CropResult.Success -> {
                                             //이미지 리사이징 후 전달
-                                            onSelectedImage(ProfileImage.Custom(FileSizeUtil.resizeImageBitmap(result.bitmap)))
+                                            onSelectedImage(
+                                                ProfileImage.Custom(
+                                                    FileSizeUtil.resizeImageBitmap(
+                                                        result.bitmap
+                                                    )
+                                                )
+                                            )
                                         }
 
                                         else -> {}

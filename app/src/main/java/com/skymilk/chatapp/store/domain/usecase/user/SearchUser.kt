@@ -1,9 +1,7 @@
 package com.skymilk.chatapp.store.domain.usecase.user
 
-import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.domain.repository.AuthRepository
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
-import javax.inject.Inject
 
 class SearchUser(
     private val userRepository: UserRepository

@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.domain.model
 
 import android.os.Parcelable
-import com.skymilk.chatapp.store.domain.model.User
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 

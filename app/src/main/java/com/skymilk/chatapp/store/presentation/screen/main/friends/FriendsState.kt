@@ -1,6 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.friends
 
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 
 sealed interface FriendsState {
     

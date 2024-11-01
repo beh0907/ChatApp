@@ -1,10 +1,9 @@
 package com.skymilk.chatapp.store.domain.usecase.chat
 
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
-import javax.inject.Inject
 
 class SendMessage(
     private val chatRepository: ChatRepository

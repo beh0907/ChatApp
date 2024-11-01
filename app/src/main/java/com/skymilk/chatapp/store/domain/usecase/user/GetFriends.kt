@@ -1,10 +1,8 @@
 package com.skymilk.chatapp.store.domain.usecase.user
 
-import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.domain.repository.AuthRepository
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 class GetFriends(
     private val userRepository: UserRepository

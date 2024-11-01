@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.domain.model
+package com.skymilk.chatapp.store.data.dto
 
 data class ChatMessage(
     val id: String,

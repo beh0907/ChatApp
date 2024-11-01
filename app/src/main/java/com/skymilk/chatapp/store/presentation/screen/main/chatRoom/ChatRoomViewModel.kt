@@ -6,12 +6,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import coil.util.CoilUtils.result
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skymilk.chatapp.store.data.dto.MessageType
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.data.utils.Constants
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
@@ -47,13 +46,11 @@ class ChatRoomViewModel @Inject constructor(
 
     //채팅방
     private val _chatRoomState = MutableStateFlow<ChatRoomState>(ChatRoomState.Initial)
-    val chatRoomState = _chatRoomState.onStart { loadChatRoom() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), ChatRoomState.Initial)
+    val chatRoomState = _chatRoomState.asStateFlow()
 
     //채팅 참여자 상태 목록
     private val _participantsStatusState = MutableStateFlow<List<ParticipantStatus>>(emptyList())
-    val participantsStatusState = _participantsStatusState.onStart { loadParticipantsStatus() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), emptyList())
+    val participantsStatusState = _participantsStatusState.asStateFlow()
 
     //채팅 목록
     private val _chatMessagesState = MutableStateFlow<ChatMessagesState>(ChatMessagesState.Initial)
@@ -82,6 +79,10 @@ class ChatRoomViewModel @Inject constructor(
     private var participantsStatusSubscriptionJob: Job? = null
 
     init {
+        loadChatRoom()
+
+        loadParticipantsStatus()
+
         subscribeForNotification()
 
         // 채팅방정보, 참여자 상태 정보가 모두 준비되면 메시지 로딩 시작
@@ -129,7 +130,8 @@ class ChatRoomViewModel @Inject constructor(
     //채팅방 정보 불러오기
     private fun loadChatRoom() {
         viewModelScope.launch {
-            chatUseCases.getChatRoom(chatRoomId).onStart {
+            chatUseCases.getChatRoom(chatRoomId)
+                .onStart {
                     _chatRoomState.value = ChatRoomState.Loading
                 }.catch { exception ->
                     sendEvent(Event.Toast(exception.message ?: "Unknown error"))
@@ -145,7 +147,8 @@ class ChatRoomViewModel @Inject constructor(
     //채팅 참여자 정보 불러오기
     private fun loadParticipantsStatus() {
         participantsStatusSubscriptionJob = viewModelScope.launch {
-            chatUseCases.getParticipantsStatus(chatRoomId).catch { exception ->
+            chatUseCases.getParticipantsStatus(chatRoomId)
+                .catch { exception ->
                     sendEvent(Event.Toast(exception.message ?: "Unknown error"))
                 }.collect {
                     _participantsStatusState.value = it
@@ -163,7 +166,8 @@ class ChatRoomViewModel @Inject constructor(
             val joinTimestamp =
                 participantsStatusState.value.find { it.userId == userId }?.joinTimestamp ?: 0
 
-            chatUseCases.getChatMessages(chatRoomId, joinTimestamp).onStart {
+            chatUseCases.getChatMessages(chatRoomId, joinTimestamp)
+                .onStart {
                     //최초 로딩
                     _chatMessagesState.value = ChatMessagesState.Loading
                 }.catch { exception ->
@@ -181,7 +185,7 @@ class ChatRoomViewModel @Inject constructor(
                         is MessageEvent.Initial -> {
                             updateParticipantsStatus()
 
-                                Log.d("collect", "Initial : ${event.messages}")
+                            Log.d("collect", "Initial : ${event.messages}")
                             event.messages
 
                         }
@@ -192,12 +196,12 @@ class ChatRoomViewModel @Inject constructor(
                             if (event.message.senderId != userId && event.message.messageContents.first().type != MessageType.SYSTEM)
                                 updateParticipantsStatus()
 
-                                Log.d("collect", "Added : ${event.message}")
+                            Log.d("collect", "Added : ${event.message}")
                             listOf(event.message) + currentMessages
                         }
 
                         is MessageEvent.Modified -> {
-                                Log.d("collect", "Modified : ${event.message}")
+                            Log.d("collect", "Modified : ${event.message}")
                             val index = currentMessages.indexOfFirst { it.id == event.message.id }
                             if (index != -1) currentMessages[index] = event.message
 
@@ -205,7 +209,7 @@ class ChatRoomViewModel @Inject constructor(
                         }
 
                         is MessageEvent.Removed -> {
-                                Log.d("collect", "Removed : ${event.messageId}")
+                            Log.d("collect", "Removed : ${event.messageId}")
                             currentMessages.filter { it.id != event.messageId }
                         }
                     })
@@ -217,11 +221,7 @@ class ChatRoomViewModel @Inject constructor(
     private fun getParticipantStatus(): ParticipantStatus {
         val chatRoom = (chatRoomState.value as ChatRoomState.Success).chatRoom
 
-        Log.d("getParticipantStatus", "participantsStatusState.value : ${participantsStatusState.value}")
-        Log.d("getParticipantStatus", "userId : $userId")
-
         return participantsStatusState.value.find { it.userId == userId }?.copy(
-            lastReadTimestamp = System.currentTimeMillis(),
             lastReadMessageCount = chatRoom.totalMessagesCount
         )!!
     }
@@ -295,39 +295,39 @@ class ChatRoomViewModel @Inject constructor(
         viewModelScope.launch {
             //스토리지 업로드 작업
             storageUseCases.saveChatMessageImage(chatRoomId, imageUris).catch { e ->
-                    _uploadState.update {
-                        ImageUploadState.Error(
-                            e.message ?: "Unknown error occurred"
+                _uploadState.update {
+                    ImageUploadState.Error(
+                        e.message ?: "Unknown error occurred"
+                    )
+                }
+            }.collect { imageUploadInfoList ->
+                //이미지 업로드 성공 or 실패 처리 완료된 이미지 수 확인
+                val completedOrFailedImages =
+                    imageUploadInfoList.count { it.downloadUrl != null || it.error != null }
+
+                //업로드 완료 여부 확인
+                _uploadState.update {
+                    if (completedOrFailedImages == imageUris.size) {
+                        val successfulUploads =
+                            imageUploadInfoList.filter { it.downloadUrl != null }
+                        val failedUploads = imageUploadInfoList.filter { it.error != null }
+
+                        //업로드가 완료된 이미지 경로 전달
+                        onCompleted(successfulUploads.mapNotNull { it.downloadUrl })
+
+                        //완료 되었다면 완료된 이미지 url로 업데이트
+                        ImageUploadState.Completed(
+                            successfulUploads = successfulUploads, failedUploads = failedUploads
+                        )
+                    } else {
+                        //현재 업로드중인 상태 저장
+                        ImageUploadState.Progress(
+                            imageUploadInfoList = imageUploadInfoList.toList(), // 새 인스턴스 생성하여 방출 처리
+                            completedOrFailedImages = completedOrFailedImages
                         )
                     }
-                }.collect { imageUploadInfoList ->
-                    //이미지 업로드 성공 or 실패 처리 완료된 이미지 수 확인
-                    val completedOrFailedImages =
-                        imageUploadInfoList.count { it.downloadUrl != null || it.error != null }
-
-                    //업로드 완료 여부 확인
-                    _uploadState.update {
-                        if (completedOrFailedImages == imageUris.size) {
-                            val successfulUploads =
-                                imageUploadInfoList.filter { it.downloadUrl != null }
-                            val failedUploads = imageUploadInfoList.filter { it.error != null }
-
-                            //업로드가 완료된 이미지 경로 전달
-                            onCompleted(successfulUploads.mapNotNull { it.downloadUrl })
-
-                            //완료 되었다면 완료된 이미지 url로 업데이트
-                            ImageUploadState.Completed(
-                                successfulUploads = successfulUploads, failedUploads = failedUploads
-                            )
-                        } else {
-                            //현재 업로드중인 상태 저장
-                            ImageUploadState.Progress(
-                                imageUploadInfoList = imageUploadInfoList.toList(), // 새 인스턴스 생성하여 방출 처리
-                                completedOrFailedImages = completedOrFailedImages
-                            )
-                        }
-                    }
                 }
+            }
         }
     }
 

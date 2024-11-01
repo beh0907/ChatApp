@@ -11,6 +11,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
@@ -39,9 +40,11 @@ class FriendsViewModel @AssistedInject constructor(
     }
 
     private val _friendsState = MutableStateFlow<FriendsState>(FriendsState.Initial)
-    val friendsState = _friendsState.onStart { loadFriends() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), FriendsState.Initial)
+    val friendsState = _friendsState.asStateFlow()
 
+    init {
+        loadFriends()
+    }
 
     fun onEvent(event: FriendsEvent) {
         when (event) {

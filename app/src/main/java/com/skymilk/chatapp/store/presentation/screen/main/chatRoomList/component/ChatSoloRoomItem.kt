@@ -26,7 +26,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
 import com.skymilk.chatapp.ui.theme.dimens
@@ -50,15 +50,7 @@ fun ChatSoloRoomItem(
             modifier = Modifier
                 .size(50.dp)
                 .squircleClip(),
-            model = ImageRequest.Builder(
-                LocalContext.current
-            )
-                .data(
-                    if (currentUser.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                    else currentUser.profileImageUrl
-                )
-                .crossfade(true)
-                .build(),
+            model = currentUser.profileImageUrl.ifBlank { R.drawable.bg_default_profile },
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

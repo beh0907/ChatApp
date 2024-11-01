@@ -23,9 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
-import com.skymilk.chatapp.store.domain.model.MessageContent
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageContent
+import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
@@ -64,6 +64,7 @@ fun MyMessageItem(
                     Text(
                         text = count.toString(),
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -72,7 +73,7 @@ fun MyMessageItem(
                 if (showTimestamp) {
                     Text(
                         text = DateUtil.getTime(timestamp),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }

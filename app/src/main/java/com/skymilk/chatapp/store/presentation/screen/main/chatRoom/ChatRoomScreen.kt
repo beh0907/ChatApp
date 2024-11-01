@@ -71,8 +71,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
-import com.skymilk.chatapp.store.domain.model.User
 import com.skymilk.chatapp.store.presentation.common.CustomAlertDialog
 import com.skymilk.chatapp.store.presentation.common.CustomConfirmDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
@@ -82,9 +82,7 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
-import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 import gun0912.tedimagepicker.builder.TedImagePicker
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -140,43 +138,45 @@ fun ChatRoomScreen(
                     )
 
                     //채팅 목록 영역
-                    when (chatMessagesState) {
-                        is ChatMessagesState.Initial -> {}
+                    Box(
+                        modifier = Modifier
+                            .weight (1f)
+                            .fillMaxWidth()
+                    ) {
+                        when (chatMessagesState) {
+                            is ChatMessagesState.Initial -> {}
 
-                        is ChatMessagesState.Loading -> {
-                            // 로딩 중 UI 표시
-                            ChatMessageListShimmer(
-                                modifier = Modifier
-                                    .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
-                                    .fillMaxWidth()
-                            )
-                        }
+                            is ChatMessagesState.Loading -> {
+                                // 로딩 중 UI 표시
+                                ChatMessageListShimmer(
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
 
-                        is ChatMessagesState.Success -> {
-                            //로딩이 완료 됐을 때 표시
-                            val chatMessages =
-                                (chatMessagesState as ChatMessagesState.Success).chatMessages
+                            is ChatMessagesState.Success -> {
+                                //로딩이 완료 됐을 때 표시
+                                val chatMessages =
+                                    (chatMessagesState as ChatMessagesState.Success).chatMessages
 
-                            //채팅 메시지 목록
-                            ChatMessageList(
-                                modifier = Modifier
-                                    .weight(1f) // 키보드가 올라오면 이 영역이 줄어듬
-                                    .fillMaxWidth(),
-                                chatRoom = chatRoom,
-                                participantsStatus = participantsStatusState,
-                                chatMessages = chatMessages,
-                                currentUser = currentUser,
-                                uploadState = uploadState,
-                                onNavigateToProfile = onNavigateToProfile,
-                                onNavigateToImagePager = onNavigateToImagePager
-                            )
-                        }
+                                //채팅 메시지 목록
+                                ChatMessageList(
+                                    modifier = Modifier.fillMaxSize(),
+                                    chatRoom = chatRoom,
+                                    participantsStatus = participantsStatusState,
+                                    chatMessages = chatMessages,
+                                    currentUser = currentUser,
+                                    uploadState = uploadState,
+                                    onNavigateToProfile = onNavigateToProfile,
+                                    onNavigateToImagePager = onNavigateToImagePager
+                                )
+                            }
 
-                        is ChatMessagesState.Error -> {
-                            ErrorScreen(
-                                message = "메시지를 불러오지 못했습니다.",
-                                retry = { onEvent(ChatRoomEvent.LoadChatMessages) }
-                            )
+                            is ChatMessagesState.Error -> {
+                                ErrorScreen(
+                                    message = "메시지를 불러오지 못했습니다.",
+                                    retry = { onEvent(ChatRoomEvent.LoadChatMessages) }
+                                )
+                            }
                         }
                     }
 
@@ -252,7 +252,8 @@ fun TopSection(
 ) {
     val title = when (chatRoom.participants.size) {
         1 -> currentUser.username // 혼자일 경우 내 이름
-        2 -> chatRoom.participants.find { it.id != currentUser.id }?.username ?: "" // 1대1 채팅일떈 상대 이름
+        2 -> chatRoom.participants.find { it.id != currentUser.id }?.username
+            ?: "" // 1대1 채팅일떈 상대 이름
         else -> "그룹채팅 ${chatRoom.participants.size}" // 셋 이상일 땐 그룹표시
     }
 

@@ -1,5 +1,7 @@
 package com.skymilk.chatapp.store.domain.model
 
+import com.skymilk.chatapp.store.data.dto.User
+
 data class ChatRoomWithParticipants(
     val id: String,
     val name: String,

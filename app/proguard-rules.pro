@@ -28,10 +28,8 @@
 
 
 # API 관련 클래스 보존
-#-keep class com.skymilk.chatapp.** { *; }
-
 -keep class com.skymilk.chatapp.store.data.dto.** { *; }
--keep class com.skymilk.chatapp.store.domain.model.** { *; }
+#-keep class com.skymilk.chatapp.store.domain.model.** { *; }
 -keep class com.skymilk.chatapp.store.presentation.navigation.** { *; }
 
 # Java Management 관련 경고 무시

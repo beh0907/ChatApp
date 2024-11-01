@@ -40,13 +40,7 @@ fun ProfileImageViewerScreen(
                 .zoomable(
                     zoomState = rememberZoomState(),
                 ),
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(
-                    if (imageUrl.isBlank()) R.drawable.bg_default_profile
-                    else imageUrl
-                )
-                .decoderFactory(SvgDecoder.Factory())
-                .build(),
+            model = imageUrl.ifBlank { R.drawable.bg_default_profile },
             loading = {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

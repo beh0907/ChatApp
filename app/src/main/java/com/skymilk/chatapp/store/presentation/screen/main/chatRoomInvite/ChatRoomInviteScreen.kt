@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState

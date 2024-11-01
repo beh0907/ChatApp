@@ -1,6 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state
 
-import com.skymilk.chatapp.store.domain.model.ChatMessage
+import com.skymilk.chatapp.store.data.dto.ChatMessage
 
 
 sealed interface ChatMessagesState {

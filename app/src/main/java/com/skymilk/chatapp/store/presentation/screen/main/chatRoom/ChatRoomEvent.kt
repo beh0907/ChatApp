@@ -1,8 +1,8 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
 import android.net.Uri
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.User
 
 sealed interface ChatRoomEvent {
     data object LoadChatMessages : ChatRoomEvent

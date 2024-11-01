@@ -26,8 +26,8 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
-import com.skymilk.chatapp.store.domain.model.MessageContent
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageContent
+import com.skymilk.chatapp.store.data.dto.User
 
 //채팅방 목록 프로필 이미지 그리드
 @Composable
@@ -60,13 +60,7 @@ fun ChatProfileGrid(
             }
 
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(
-                        if (participant.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                        else participant.profileImageUrl
-                    )
-                    .crossfade(true)
-                    .build(),
+                model = participant.profileImageUrl.ifBlank { R.drawable.bg_default_profile },
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -117,7 +111,7 @@ fun FixedSizeImageMessageGrid(
     maxColumnCount: Int = 3,
     onNavigateToImagePager: (List<String>, Int) -> Unit
 ) {
-    val context = LocalContext.current
+    LocalContext.current
     val grid = messageContents.redistributeLastRows(maxColumnCount)
 
     Column(
@@ -141,10 +135,7 @@ fun FixedSizeImageMessageGrid(
                                     messageContents.indexOf(image)
                                 )
                             },
-                        model = ImageRequest.Builder(context)
-                            .data(image.content)
-                            .crossfade(true)
-                            .build(),
+                        model = image.content,
                         contentDescription = null,
                         loading = {
                             Box(

@@ -20,11 +20,11 @@ import com.skymilk.chatapp.store.data.dto.Message
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.data.remote.FcmApi
 import com.skymilk.chatapp.store.data.utils.FirebaseUtil
-import com.skymilk.chatapp.store.domain.model.ChatMessage
+import com.skymilk.chatapp.store.data.dto.ChatMessage
 import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
-import com.skymilk.chatapp.store.domain.model.MessageContent
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageContent
+import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.MessageEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -89,17 +89,22 @@ class ChatRepositoryImpl @Inject constructor(
             .whereArrayContains("participantIds", userId)
             .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshots, error ->
+                Log.d("getChatRooms", "1")
+
                 if (error != null) {
+                    Log.d("getChatRooms", "2")
                     close()
                     return@addSnapshotListener
                 }
+                Log.d("getChatRooms", "3")
 
-                // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보를 비동기적으로 가져오기
+                // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보 가져오기
                 launch {
                     val chatRooms = snapshots?.documents?.mapNotNull { doc ->
                         doc.toObject(ChatRoom::class.java)
-                    }.orEmpty()
+                    } ?: emptyList()
 
+                    Log.d("getChatRooms", "4")
                     // participants를 기반으로 User 정보를 가져오기
                     val chatRoomWithParticipantsList = chatRooms.map { chatRoom ->
                         getUsersForParticipants(chatRoom.participantIds).map { users ->
@@ -114,6 +119,7 @@ class ChatRepositoryImpl @Inject constructor(
                             )
                         }
                     }
+                    Log.d("getChatRooms", chatRooms.toString())
 
                     // 빈 목록일 경우 빈 리스트 반환
                     if (chatRoomWithParticipantsList.isEmpty()) {
@@ -124,6 +130,7 @@ class ChatRepositoryImpl @Inject constructor(
                             trySend(it)
                         }
                     }
+                    Log.d("getChatRooms", "6")
                 }
             }
 
@@ -260,6 +267,7 @@ class ChatRepositoryImpl @Inject constructor(
     override fun getParticipantsStatus(chatRoomId: String): Flow<List<ParticipantStatus>> =
         callbackFlow {
             val query = firebaseDatabase.getReference(chatRoomId).child("chatStatus")
+            query.keepSynced(true)
 
             val listener = query.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -296,6 +304,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .orderByChild("timestamp")
                 .startAt(joinTimestamp.toDouble())
                 .limitToLast(300)  // 최신 300개만 가져옴
+            query.keepSynced(true)
 
             var initialDataLoaded = false
             val processedMessageIds = mutableSetOf<String>() // 초기 데이터 중복 방지용
@@ -511,6 +520,10 @@ class ChatRepositoryImpl @Inject constructor(
         userId: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
+            //오프라인 동기화 제거
+            firebaseDatabase.getReference(chatRoomId).child("messages").keepSynced(false)
+            firebaseDatabase.getReference(chatRoomId).child("chatStatus").keepSynced(false)
+
             //참여자 정보 제거
             firebaseFireStore.collection("chatRooms").document(chatRoomId)
                 .update(

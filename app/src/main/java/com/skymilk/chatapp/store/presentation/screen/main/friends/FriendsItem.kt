@@ -10,13 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -27,7 +24,7 @@ import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
@@ -51,13 +48,7 @@ fun FriendsItem(
             modifier = Modifier
                 .size(profileSize)
                 .squircleClip(),
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(
-                    if (user.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                    else user.profileImageUrl
-                )
-                .decoderFactory(SvgDecoder.Factory())
-                .build(),
+            model = user.profileImageUrl.ifBlank { R.drawable.bg_default_profile },
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

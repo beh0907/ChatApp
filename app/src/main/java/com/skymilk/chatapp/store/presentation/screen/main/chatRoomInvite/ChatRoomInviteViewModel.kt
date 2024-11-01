@@ -3,10 +3,9 @@ package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.ChatRoomsEvent
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel

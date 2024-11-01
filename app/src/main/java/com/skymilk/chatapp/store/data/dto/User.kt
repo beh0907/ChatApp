@@ -1,4 +1,4 @@
-package com.skymilk.chatapp.store.domain.model
+package com.skymilk.chatapp.store.data.dto
 
 import android.os.Parcelable
 import com.google.firebase.auth.FirebaseUser

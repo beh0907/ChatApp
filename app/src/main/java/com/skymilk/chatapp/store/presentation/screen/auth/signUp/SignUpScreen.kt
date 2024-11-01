@@ -1,6 +1,7 @@
 package com.skymilk.chatapp.store.presentation.screen.auth.signUp
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -65,7 +66,8 @@ fun SignUpScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center
     ) {
 
@@ -163,7 +165,8 @@ private fun SignUpSection(onSignUpWithEmailAndPassword: (String, String, String,
             onSignUpWithEmailAndPassword(name, email, password, passwordConfirm)
         },
         colors = ButtonDefaults.buttonColors(
-            contentColor = Color.White
+            contentColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.inversePrimary
         ),
         shape = RoundedCornerShape(size = 4.dp)
     ) {

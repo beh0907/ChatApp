@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 
@@ -134,10 +134,11 @@ private fun UserSearchSection(
         value = searchQuery,
         onValueChange = { searchQuery = it },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onDone = {
-            searchUser(searchQuery)
-            keyboardController?.hide()
-        }),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                searchUser(searchQuery)
+                keyboardController?.hide()
+            }),
         singleLine = true,
         placeholder = {
             Text(

@@ -1,15 +1,11 @@
 package com.skymilk.chatapp.store.data.repository
 
-import android.net.Uri
-import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.store.data.utils.FirebaseUtil
 import kotlinx.coroutines.CoroutineScope

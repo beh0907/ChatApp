@@ -32,9 +32,9 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
-import com.skymilk.chatapp.store.domain.model.MessageContent
-import com.skymilk.chatapp.store.domain.model.MessageType
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.MessageContent
+import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.FixedSizeImageMessageGrid
 import com.skymilk.chatapp.store.presentation.common.shimmerEffect
 import com.skymilk.chatapp.store.presentation.common.squircleClip
@@ -66,13 +66,7 @@ fun OtherMessageItem(
         ) {
             if (showProfile) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(
-                            if (sender.profileImageUrl.isBlank()) R.drawable.bg_default_profile
-                            else sender.profileImageUrl
-                        )
-                        .decoderFactory(SvgDecoder.Factory())
-                        .build(),
+                    model = sender.profileImageUrl.ifBlank { R.drawable.bg_default_profile },
                     contentDescription = "Profile Image",
                     modifier = Modifier
                         .size(50.dp)
@@ -91,10 +85,7 @@ fun OtherMessageItem(
                 Spacer(modifier = Modifier.width(58.dp))
             }
 
-
-
             Column {
-
                 //같은 시간대가 아닐때만 유저 정보 표시
                 //연속된 메시지에 대한 프로필 정보 출력 설정
                 if (showProfile) {
@@ -162,6 +153,7 @@ fun OtherMessageItem(
                             Text(
                                 text = count.toString(),
                                 style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -170,7 +162,7 @@ fun OtherMessageItem(
                         if (showTimestamp) {
                             Text(
                                 text = DateUtil.getTime(timestamp),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }

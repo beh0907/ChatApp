@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomList

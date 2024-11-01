@@ -32,12 +32,16 @@ class ChatRoomsViewModel @Inject constructor(
     private val userId: String = savedStateHandle.toRoute<Routes.ChatRoomsScreen>().userId
 
     private val _chatRoomsState = MutableStateFlow<ChatRoomsState>(ChatRoomsState.Initial)
-    val chatRoomsState = _chatRoomsState.onStart { loadChatRooms() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), ChatRoomsState.Initial)
+    val chatRoomsState = _chatRoomsState.asStateFlow()
 
-    private val _chatRoomAlarmsDisabled = MutableStateFlow<List<String>>(listOf())
-    val chatRoomAlarmsDisabled = _chatRoomAlarmsDisabled.onStart { loadChatRoomSetting() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), listOf())
+    private val _chatRoomAlarmsDisabled = MutableStateFlow<List<String>>(emptyList())
+    val chatRoomAlarmsDisabled = _chatRoomAlarmsDisabled.asStateFlow()
+
+    init {
+        loadChatRooms()
+
+        loadChatRoomSetting()
+    }
 
     fun onEvent(event: ChatRoomsEvent) {
         when (event) {

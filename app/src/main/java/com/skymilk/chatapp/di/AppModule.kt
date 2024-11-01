@@ -69,7 +69,13 @@ object AppModule {
     //파이어베이스 메시지 초기화
     @Provides
     @Singleton
-    fun provideFirebaseMessaging() = FirebaseMessaging.getInstance()
+    fun provideFirebaseMessaging(): FirebaseMessaging {
+        val messaging = FirebaseMessaging.getInstance().apply {
+            isNotificationDelegationEnabled = true
+        }
+
+        return messaging
+    }
 
     // Retrofit 객체 생성
     @Singleton

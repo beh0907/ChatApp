@@ -15,7 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.ui.theme.dimens
 
@@ -37,7 +37,7 @@ fun SelectionUserItem(
             modifier = Modifier
                 .size(50.dp)
                 .squircleClip(),
-            model = if (user.profileImageUrl.isBlank()) R.drawable.bg_default_profile else user.profileImageUrl,
+            model = user.profileImageUrl.ifBlank { R.drawable.bg_default_profile },
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )

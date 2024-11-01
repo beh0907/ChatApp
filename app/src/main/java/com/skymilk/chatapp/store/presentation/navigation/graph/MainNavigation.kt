@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.navigation.graph
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -36,7 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.skymilk.chatapp.di.ViewModelFactoryModule
-import com.skymilk.chatapp.store.domain.model.User
+import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.navigation.CustomNavType
 import com.skymilk.chatapp.store.presentation.navigation.NavigationViewModel
 import com.skymilk.chatapp.store.presentation.navigation.bottom.BottomNavigationItem

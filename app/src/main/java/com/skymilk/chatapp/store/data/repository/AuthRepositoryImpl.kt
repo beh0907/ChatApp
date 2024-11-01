@@ -7,8 +7,8 @@ import com.google.firebase.auth.oAuthCredential
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.messaging.FirebaseMessaging
-import com.skymilk.chatapp.store.domain.model.User
-import com.skymilk.chatapp.store.domain.model.toUser
+import com.skymilk.chatapp.store.data.dto.User
+import com.skymilk.chatapp.store.data.dto.toUser
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
