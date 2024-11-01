@@ -7,24 +7,24 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.toObject
+import com.skymilk.chatapp.store.data.dto.ChatMessage
 import com.skymilk.chatapp.store.data.dto.ChatRoom
 import com.skymilk.chatapp.store.data.dto.FcmAndroidSetting
 import com.skymilk.chatapp.store.data.dto.FcmMessage
 import com.skymilk.chatapp.store.data.dto.Message
-import com.skymilk.chatapp.store.data.dto.ParticipantStatus
-import com.skymilk.chatapp.store.data.remote.FcmApi
-import com.skymilk.chatapp.store.data.utils.FirebaseUtil
-import com.skymilk.chatapp.store.data.dto.ChatMessage
-import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
-import com.skymilk.chatapp.store.data.dto.MessageContent
 import com.skymilk.chatapp.store.data.dto.MessageType
+import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.data.dto.User
+import com.skymilk.chatapp.store.data.remote.FcmApi
+import com.skymilk.chatapp.store.data.utils.Constants
+import com.skymilk.chatapp.store.data.utils.FirebaseUtil
+import com.skymilk.chatapp.store.domain.model.ChatRoomWithParticipants
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.MessageEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -55,84 +55,94 @@ class ChatRepositoryImpl @Inject constructor(
 
     //채팅방 아이디로 채팅방 정보 불러오기
     override fun getChatRoom(chatRoomId: String): Flow<ChatRoomWithParticipants> = callbackFlow {
-        val listener = firebaseFireStore.collection("chatRooms").document(chatRoomId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    close(e)
-                    return@addSnapshotListener
-                }
-                if (snapshot != null && snapshot.exists()) {
-                    val chatRoom = snapshot.toObject<ChatRoom>()!!
-                    launch {
-                        getUsersForParticipants(chatRoom.participantIds).collect { users ->
-                            val chatRoomWithParticipants = ChatRoomWithParticipants(
-                                id = chatRoom.id,
-                                name = chatRoom.name,
-                                participants = users,
-                                lastMessage = chatRoom.lastMessage,
-                                lastMessageTimestamp = chatRoom.lastMessageTimestamp,
-                                createdTimestamp = chatRoom.createdTimestamp,
-                                totalMessagesCount = chatRoom.totalMessagesCount
-                            )
+        val query =
+            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(chatRoomId)
 
-                            trySend(chatRoomWithParticipants)
-                        }
+        val listener = query.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                close(e)
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                val chatRoom = snapshot.toObject(ChatRoom::class.java)!!
+                launch {
+                    getUsersForParticipants(chatRoom.participantIds).collect { users ->
+                        // timestamp가 null일 수 있으므로 안전하게 처리
+                        val lastMessageTime = chatRoom.lastMessageTimestamp?.toDate()?.time
+                            ?: System.currentTimeMillis()
+                        val createdTime = chatRoom.createdTimestamp?.toDate()?.time
+                            ?: System.currentTimeMillis()
+
+                        val chatRoomWithParticipants = ChatRoomWithParticipants(
+                            id = chatRoom.id,
+                            name = chatRoom.name,
+                            participants = users,
+                            lastMessage = chatRoom.lastMessage,
+                            lastMessageTimestamp = lastMessageTime,
+                            createdTimestamp = createdTime,
+                            totalMessagesCount = chatRoom.totalMessagesCount
+                        )
+
+                        trySend(chatRoomWithParticipants)
                     }
                 }
             }
+        }
         awaitClose { listener.remove() }
     }
 
     // 나의 채팅방 목록 실시간으로 가져오기
     override fun getChatRooms(userId: String): Flow<List<ChatRoomWithParticipants>> = callbackFlow {
-        val listener = firebaseFireStore.collection("chatRooms")
+        val query = firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM)
             .whereArrayContains("participantIds", userId)
             .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshots, error ->
-                Log.d("getChatRooms", "1")
 
-                if (error != null) {
-                    Log.d("getChatRooms", "2")
-                    close()
-                    return@addSnapshotListener
+
+        val listener = query.addSnapshotListener { snapshots, error ->
+            if (error != null) {
+                close()
+                return@addSnapshotListener
+            }
+
+            // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보를 비동기적으로 가져오기
+            launch {
+                val chatRooms = snapshots?.documents?.mapNotNull { doc ->
+                    doc.toObject(ChatRoom::class.java)
+                }.orEmpty()
+
+                // participants를 기반으로 User 정보를 가져오기
+                val chatRoomWithParticipantsList = chatRooms.map { chatRoom ->
+                    // timestamp가 null일 수 있으므로 안전하게 처리
+                    val lastMessageTime = chatRoom.lastMessageTimestamp?.toDate()?.time
+                        ?: System.currentTimeMillis()
+                    val createdTime = chatRoom.createdTimestamp?.toDate()?.time
+                        ?: System.currentTimeMillis()
+
+
+                    getUsersForParticipants(chatRoom.participantIds).map { users ->
+                        ChatRoomWithParticipants(
+                            id = chatRoom.id,
+                            name = chatRoom.name,
+                            participants = users,
+                            lastMessage = chatRoom.lastMessage,
+                            lastMessageTimestamp = lastMessageTime,
+                            createdTimestamp = createdTime,
+                            totalMessagesCount = chatRoom.totalMessagesCount
+                        )
+                    }
                 }
-                Log.d("getChatRooms", "3")
 
-                // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보 가져오기
-                launch {
-                    val chatRooms = snapshots?.documents?.mapNotNull { doc ->
-                        doc.toObject(ChatRoom::class.java)
-                    } ?: emptyList()
-
-                    Log.d("getChatRooms", "4")
-                    // participants를 기반으로 User 정보를 가져오기
-                    val chatRoomWithParticipantsList = chatRooms.map { chatRoom ->
-                        getUsersForParticipants(chatRoom.participantIds).map { users ->
-                            ChatRoomWithParticipants(
-                                id = chatRoom.id,
-                                name = chatRoom.name,
-                                participants = users,
-                                lastMessage = chatRoom.lastMessage,
-                                lastMessageTimestamp = chatRoom.lastMessageTimestamp,
-                                createdTimestamp = chatRoom.createdTimestamp,
-                                totalMessagesCount = chatRoom.totalMessagesCount
-                            )
-                        }
+                // 빈 목록일 경우 빈 리스트 반환
+                if (chatRoomWithParticipantsList.isEmpty()) {
+                    trySend(emptyList())
+                } else {
+                    // 채팅방 정보들 결합 후 리턴
+                    combine(chatRoomWithParticipantsList) { it.toList() }.collect {
+                        trySend(it)
                     }
-                    Log.d("getChatRooms", chatRooms.toString())
-
-                    // 빈 목록일 경우 빈 리스트 반환
-                    if (chatRoomWithParticipantsList.isEmpty()) {
-                        trySend(emptyList())
-                    } else {
-                        // 채팅방 정보들 결합 후 리턴
-                        combine(chatRoomWithParticipantsList) { it.toList() }.collect {
-                            trySend(it)
-                        }
-                    }
-                    Log.d("getChatRooms", "6")
                 }
             }
+        }
 
         awaitClose { listener.remove() }
     }
@@ -145,12 +155,13 @@ class ChatRepositoryImpl @Inject constructor(
                 val sortedParticipants = participants.sorted()
 
                 // 기존 채팅방 검색
-                val existingChatRoom = firebaseFireStore.collection("chatRooms")
-                    .whereEqualTo("participantIds", sortedParticipants)
-                    .get()
-                    .await()
-                    .documents
-                    .firstOrNull()
+                val existingChatRoom =
+                    firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM)
+                        .whereEqualTo("participantIds", sortedParticipants)
+                        .get()
+                        .await()
+                        .documents
+                        .firstOrNull()
 
                 if (existingChatRoom != null) {
                     // 기존 채팅방이 있으면 해당 ID 반환
@@ -175,43 +186,45 @@ class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    // 채팅방 생성 (Firestore)
+    // 채팅방 생성
     override suspend fun createChatRoom(
         name: String,
         participants: List<String>
     ): Result<String> = withContext(Dispatchers.IO) {
-        val key = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
-        val timestamp = System.currentTimeMillis()
-        val participantsStatus = participants.map {
-            ParticipantStatus(userId = it, joinTimestamp = timestamp, lastReadTimestamp = timestamp)
-        }
-
-        val updates = hashMapOf<String, Any>()
-        participantsStatus.forEach { status ->
-            // "채팅방ID/chatStatus/유저ID" 형태로 경로 설정
-            val path = "$key/chatStatus/${status.userId}"
-            updates[path] = status
-        }
-
-        val chatRoom = ChatRoom(
-            id = key,
-            name = name,
-            participantIds = participants,
-            lastMessage = "",
-            lastMessageTimestamp = timestamp,
-            createdTimestamp = timestamp,
-            totalMessagesCount = 0
-        )
         try {
+            val key = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
+
+            // Firestore용 채팅방 데이터
+            val chatRoom = hashMapOf(
+                "id" to key,
+                "name" to name,
+                "participantIds" to participants,
+                "lastMessage" to "",
+                "lastMessageTimestamp" to FieldValue.serverTimestamp(), // 서버 시간 사용
+                "createdTimestamp" to FieldValue.serverTimestamp(),     // 서버 시간 사용
+                "totalMessagesCount" to 0
+            )
+
+            // RTDB용 참가자 상태 데이터
+            val updates = hashMapOf<String, Any>()
+            participants.forEach { userId ->
+                val status = hashMapOf(
+                    "userId" to userId,
+                    "joinTimestamp" to ServerValue.TIMESTAMP,     // RTDB 서버 시간 사용
+                    "lastReadTimestamp" to ServerValue.TIMESTAMP, // RTDB 서버 시간 사용
+                    "lastReadMessageCount" to 0
+                )
+                updates["$key/${Constants.FirebaseReferences.CHAT_STATUS}/$userId"] = status
+            }
             //채팅방 생성
-            firebaseFireStore.collection("chatRooms").document(key).set(chatRoom).await()
+            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(key).set(chatRoom).await()
 
             //참가자 상태 저장
             firebaseDatabase.reference
                 .updateChildren(updates)
                 .await()
 
-            Result.success(chatRoom.id)
+            Result.success(key)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -224,36 +237,32 @@ class ChatRepositoryImpl @Inject constructor(
     ): Result<String> =
         withContext(Dispatchers.IO) {
             try {
-                val query = firebaseFireStore.collection("chatRooms").document(chatRoomId)
+                val query = firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM)
+                    .document(chatRoomId)
                 val snapshot = query.get().await()
 
                 //채팅방의 마지막 메시지 카운트 가져오기
                 val lastReadMessageCount = snapshot.getLong("totalMessagesCount") ?: 0
 
-                //새 참가자의 상태 정보 생성
-                val timestamp = System.currentTimeMillis()
-                val participantsStatus = newParticipants.map {
-                    ParticipantStatus(
-                        userId = it,
-                        joinTimestamp = timestamp,
-                        lastReadTimestamp = timestamp,
-                        lastReadMessageCount = lastReadMessageCount
+                // RTDB에 참가자 상태 저장
+                val updates = hashMapOf<String, Any>()
+                newParticipants.forEach { userId ->
+                    val status = hashMapOf(
+                        "userId" to userId,
+                        "joinTimestamp" to ServerValue.TIMESTAMP,     // RTDB 서버 시간
+                        "lastReadTimestamp" to ServerValue.TIMESTAMP, // RTDB 서버 시간
+                        "lastReadMessageCount" to lastReadMessageCount
                     )
+                    updates["$chatRoomId/${Constants.FirebaseReferences.CHAT_STATUS}/$userId"] = status
                 }
 
-                // FieldValue.arrayUnion()을 사용하여 새 참가자를 추가합니다.
+                // 참가자 ID 추가 (Firestore)
                 query.update(
                     "participantIds",
                     FieldValue.arrayUnion(*newParticipants.toTypedArray())
                 ).await()
 
-                // 한번에 모든 참가자 상태 업데이트
-                val updates = hashMapOf<String, Any>()
-                participantsStatus.forEach { status ->
-                    // "채팅방ID/chatStatus/유저ID" 형태로 경로 설정
-                    val path = "$chatRoomId/chatStatus/${status.userId}"
-                    updates[path] = status
-                }
+                // RTDB 업데이트
                 firebaseDatabase.reference
                     .updateChildren(updates)
                     .await()
@@ -266,7 +275,8 @@ class ChatRepositoryImpl @Inject constructor(
 
     override fun getParticipantsStatus(chatRoomId: String): Flow<List<ParticipantStatus>> =
         callbackFlow {
-            val query = firebaseDatabase.getReference(chatRoomId).child("chatStatus")
+            val query = firebaseDatabase.getReference(chatRoomId)
+                .child(Constants.FirebaseReferences.CHAT_STATUS)
             query.keepSynced(true)
 
             val listener = query.addValueEventListener(object : ValueEventListener {
@@ -290,17 +300,26 @@ class ChatRepositoryImpl @Inject constructor(
         userId: String,
         participantStatus: ParticipantStatus
     ) {
+        // HashMap으로 변환하여 서버 시간 사용
+        val status = hashMapOf(
+            "userId" to participantStatus.userId,
+            "joinTimestamp" to participantStatus.joinTimestamp,  // 기존 joinTimestamp 유지
+            "lastReadTimestamp" to ServerValue.TIMESTAMP,        // 현재 서버 시간으로 업데이트
+            "lastReadMessageCount" to participantStatus.lastReadMessageCount
+        )
+
         firebaseDatabase.getReference(chatRoomId)
-            .child("chatStatus")
+            .child(Constants.FirebaseReferences.CHAT_STATUS)
             .child(userId)
-            .setValue(participantStatus)
+            .setValue(status)
             .await()
     }
 
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)
     override fun getChatMessages(chatRoomId: String, joinTimestamp: Long): Flow<MessageEvent> =
         callbackFlow {
-            val query = firebaseDatabase.getReference(chatRoomId).child("messages")
+            val query = firebaseDatabase.getReference(chatRoomId)
+                .child(Constants.FirebaseReferences.MESSAGES)
                 .orderByChild("timestamp")
                 .startAt(joinTimestamp.toDouble())
                 .limitToLast(300)  // 최신 300개만 가져옴
@@ -377,39 +396,49 @@ class ChatRepositoryImpl @Inject constructor(
         participantStatus: ParticipantStatus
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val timestamp = participantStatus.lastReadTimestamp
-            val chatMessage = ChatMessage(
-                id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
-                senderId = sender.id,
-                timestamp = timestamp,
-                messageContents = listOf(
-                    MessageContent(content = content, type = type)
+            val messageId = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
+
+            // 메시지 생성 시 서버 시간 사용
+            val chatMessage = hashMapOf(
+                "id" to messageId,
+                "senderId" to sender.id,
+                "timestamp" to ServerValue.TIMESTAMP,
+                "messageContents" to listOf(
+                    mapOf(
+                        "content" to content,
+                        "type" to type.name
+                    )
                 )
             )
 
-            //Realtime Database에 메시지, 유저별 상태 정보 설정
+            // Realtime Database 업데이트
             val updates = hashMapOf<String, Any>(
-                "${chatRoomId}/messages/${chatMessage.id}" to chatMessage
+                "${chatRoomId}/${Constants.FirebaseReferences.MESSAGES}/$messageId" to chatMessage
             )
             if (type != MessageType.SYSTEM) {
-                //시스템 메시지가 아닐때 송신자의 상태 정보 갱신
-                updates.put("${chatRoomId}/chatStatus/${sender.id}", participantStatus)
+                updates["${chatRoomId}/${Constants.FirebaseReferences.CHAT_STATUS}/${sender.id}"] = hashMapOf(
+                    "userId" to participantStatus.userId,
+                    "joinTimestamp" to participantStatus.joinTimestamp,  // 기존 joinTimestamp 유지
+                    "lastReadTimestamp" to ServerValue.TIMESTAMP,        // 현재 서버 시간으로 업데이트
+                    "lastReadMessageCount" to participantStatus.lastReadMessageCount
+                )
             }
-            //채팅 관련 정보 업데이트
+
             firebaseDatabase.reference
                 .updateChildren(updates)
                 .await()
 
-            // 2. 시스템 메시지가 아닐 경우에만 추가 처리
+            // 시스템 메시지가 아닐 경우 Firestore 업데이트
             if (type != MessageType.SYSTEM) {
-                //채팅방 최신 상태 정보 저장
-                firebaseFireStore.collection("chatRooms").document(chatRoomId).update(
-                    mapOf(
-                        "lastMessage" to content,
-                        "lastMessageTimestamp" to timestamp,
-                        "totalMessagesCount" to FieldValue.increment(1),
-                    )
-                ).await()
+                firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM)
+                    .document(chatRoomId)
+                    .update(
+                        mapOf(
+                            "lastMessage" to content,
+                            "lastMessageTimestamp" to FieldValue.serverTimestamp(),
+                            "totalMessagesCount" to FieldValue.increment(1)
+                        )
+                    ).await()
 
                 // FCM 메시지 전송
                 sendFcmMessage(
@@ -438,50 +467,60 @@ class ChatRepositoryImpl @Inject constructor(
         participantStatus: ParticipantStatus
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val timestamp = participantStatus.lastReadTimestamp
+            val messageId = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString()
             val content = "사진 ${imageUrls.size}장을 보냈습니다."
-            val chatMessage = ChatMessage(
-                id = firebaseDatabase.reference.push().key ?: UUID.randomUUID().toString(),
-                senderId = sender.id,
-                timestamp = timestamp,
-                messageContents = imageUrls.map { imageUrl ->
-                    MessageContent(
-                        content = imageUrl,
-                        type = MessageType.IMAGE
+
+            // 메시지 생성 시 서버 시간 사용
+            val chatMessage = hashMapOf(
+                "id" to messageId,
+                "senderId" to sender.id,
+                "timestamp" to ServerValue.TIMESTAMP,
+                "messageContents" to imageUrls.map { imageUrl ->
+                    mapOf(
+                        "content" to imageUrl,
+                        "type" to MessageType.IMAGE.name
                     )
                 }
             )
 
-            // 메시지를 Realtime Database에 저장
+            // 상태 정보에도 서버 시간 사용
+            val updatedStatus = hashMapOf(
+                "userId" to participantStatus.userId,
+                "joinTimestamp" to participantStatus.joinTimestamp,  // 기존 joinTimestamp 유지
+                "lastReadTimestamp" to ServerValue.TIMESTAMP,        // 현재 서버 시간으로 업데이트
+                "lastReadMessageCount" to participantStatus.lastReadMessageCount
+            )
+
+            // Realtime Database 업데이트
             firebaseDatabase.reference
                 .updateChildren(
                     mapOf(
-                        "${chatRoomId}/messages/${chatMessage.id}" to chatMessage,
-                        "${chatRoomId}/chatStatus/${sender.id}" to participantStatus
+                        "${chatRoomId}/${Constants.FirebaseReferences.MESSAGES}/$messageId" to chatMessage,
+                        "${chatRoomId}/${Constants.FirebaseReferences.CHAT_STATUS}/${sender.id}" to updatedStatus
                     )
                 )
                 .await()
 
-            //채팅방 최신 상태 정보 저장
-            //채팅방 최신 상태 정보 저장
-            firebaseFireStore.collection("chatRooms").document(chatRoomId).update(
-                mapOf(
-                    "lastMessage" to content,
-                    "lastMessageTimestamp" to timestamp,
-                    "totalMessagesCount" to FieldValue.increment(1),
-                )
-            ).await()
+            // Firestore 업데이트
+            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(chatRoomId)
+                .update(
+                    mapOf(
+                        "lastMessage" to content,
+                        "lastMessageTimestamp" to FieldValue.serverTimestamp(),
+                        "totalMessagesCount" to FieldValue.increment(1)
+                    )
+                ).await()
 
-            //메시지가 업데이트 되었다면 토픽 그룹으로 알림 전달
+            // FCM 메시지 전송
             sendFcmMessage(
                 chatRoomId = chatRoomId,
                 sender = sender,
                 body = content,
-
-                // 현재 유저를 제외한 참가자들의 FCM 토큰을 가져옵니다.
-                // 한 계정에 복수의 로그인 이력이 있을 수 있으니 중복 제거
-                tokens = participants.map { it.fcmToken }.filter { sender.fcmToken != it }
-                    .fastDistinctBy { it })
+                tokens = participants
+                    .map { it.fcmToken }
+                    .filter { sender.fcmToken != it }
+                    .fastDistinctBy { it }
+            )
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -489,10 +528,11 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+
     // 참가자 아이디를 사용하여 User 정보를 가져오는 함수
     fun getUsersForParticipants(participants: List<String>): Flow<List<User>> = callbackFlow {
         if (participants.isNotEmpty()) {
-            val usersRef = firebaseFireStore.collection("users")
+            val usersRef = firebaseFireStore.collection(Constants.FirebaseReferences.USERS)
             val listener = usersRef
                 .whereIn(FieldPath.documentId(), participants)
                 .addSnapshotListener { snapshot, error ->
@@ -521,11 +561,13 @@ class ChatRepositoryImpl @Inject constructor(
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             //오프라인 동기화 제거
-            firebaseDatabase.getReference(chatRoomId).child("messages").keepSynced(false)
-            firebaseDatabase.getReference(chatRoomId).child("chatStatus").keepSynced(false)
+            firebaseDatabase.getReference(chatRoomId).child(Constants.FirebaseReferences.MESSAGES)
+                .keepSynced(false)
+            firebaseDatabase.getReference(chatRoomId).child(Constants.FirebaseReferences.CHAT_STATUS)
+                .keepSynced(false)
 
             //참여자 정보 제거
-            firebaseFireStore.collection("chatRooms").document(chatRoomId)
+            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(chatRoomId)
                 .update(
                     mapOf(
                         "participantIds" to FieldValue.arrayRemove(userId),
@@ -533,7 +575,8 @@ class ChatRepositoryImpl @Inject constructor(
                 ).await()
 
             //참여자 상태 정보 제거
-            firebaseDatabase.getReference(chatRoomId).child("chatStatus").child(userId)
+            firebaseDatabase.getReference(chatRoomId).child(Constants.FirebaseReferences.CHAT_STATUS)
+                .child(userId)
                 .removeValue().await()
 
             Result.success(Unit)
@@ -591,7 +634,7 @@ class ChatRepositoryImpl @Inject constructor(
                 "title" to sender.username,
                 "body" to body
             ),
-            android = FcmAndroidSetting(directBootOk = true)
+            android = FcmAndroidSetting(priority = "high")
         )
 
         val accessToken = "Bearer ${FirebaseUtil.getAccessToken(context)}"

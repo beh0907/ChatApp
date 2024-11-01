@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.skymilk.chatapp.store.data.dto.User
+import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.repository.UserRepository
 import com.skymilk.chatapp.store.data.utils.FirebaseUtil
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(
         imageUrl: String?
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val userRef = firebaseFireStore.collection("users").document(userId)
+            val userRef = firebaseFireStore.collection(Constants.FirebaseReferences.USERS).document(userId)
 
             // Firestore 업데이트
             val updates = hashMapOf<String, Any>(
@@ -63,7 +64,7 @@ class UserRepositoryImpl @Inject constructor(
     override fun updateFcmToken(userId: String, token: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val userRef = firebaseFireStore.collection("users").document(userId)
+                val userRef = firebaseFireStore.collection(Constants.FirebaseReferences.USERS).document(userId)
 
                 val updates = hashMapOf<String, Any>(
                     "fcmToken" to token
@@ -79,7 +80,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getUser(userId: String): Result<User> = withContext(Dispatchers.IO) {
         try {
-            val document = firebaseFireStore.collection("users").document(userId).get().await()
+            val document = firebaseFireStore.collection(Constants.FirebaseReferences.USERS).document(userId).get().await()
             val user = document.toObject(User::class.java)
 
             if (user != null) {
@@ -94,8 +95,8 @@ class UserRepositoryImpl @Inject constructor(
 
     //친구 목록 가져오기
     override fun getFriends(userId: String): Flow<List<User>> = callbackFlow {
-        val query = firebaseFireStore.collection("friends").document(userId)
-        val usersCollection = firebaseFireStore.collection("users")
+        val query = firebaseFireStore.collection(Constants.FirebaseReferences.FRIENDS).document(userId)
+        val usersCollection = firebaseFireStore.collection(Constants.FirebaseReferences.USERS)
 
         var userListener: ListenerRegistration? = null
 
@@ -141,7 +142,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getIsFriend(myUserId: String, otherUserId: String): Flow<Boolean> = callbackFlow {
-        val query = FirebaseFirestore.getInstance().collection("friends").document(myUserId)
+        val query = FirebaseFirestore.getInstance().collection(Constants.FirebaseReferences.FRIENDS).document(myUserId)
 
         val listener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -166,7 +167,7 @@ class UserRepositoryImpl @Inject constructor(
         otherUserId: String,
         isFriend: Boolean
     ) {
-        val query = firebaseFireStore.collection("friends").document(myUserId)
+        val query = firebaseFireStore.collection(Constants.FirebaseReferences.FRIENDS).document(myUserId)
 
         // 문서가 존재하는지 확인
         val documentSnapshot = query.get().await()
@@ -189,7 +190,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun searchUser(query: String): Result<List<User>> =
         withContext(Dispatchers.IO) {
             try {
-                val usersRef = firebaseFireStore.collection("users")
+                val usersRef = firebaseFireStore.collection(Constants.FirebaseReferences.USERS)
 
                 // ID에 대한 쿼리
                 val idQuery = usersRef

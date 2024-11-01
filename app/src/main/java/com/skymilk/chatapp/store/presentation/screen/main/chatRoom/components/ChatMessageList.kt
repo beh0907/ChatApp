@@ -75,12 +75,6 @@ fun BoxScope.ChatMessageList(
             //시스템 메시지는 표시하지 않는다
             if (newMessage.messageContents.first().type == MessageType.SYSTEM) return@LaunchedEffect
 
-            Log.d(
-                "ChatRoom",
-                "previousMessagesSize: $previousMessagesSize ㅡ chatMessages.size : ${chatMessages.size}"
-            )
-            Log.d("ChatRoom", "listState.firstVisibleItemIndex: ${listState.firstVisibleItemIndex}")
-
             if (newMessage.senderId == currentUser.id) {
                 // 새 메시지가 사용자가 작성한 메시지인 경우
                 listState.scrollToItem(0)

@@ -51,13 +51,10 @@ class MainActivity : ComponentActivity() {
                 // 딥링크 데이터 상태 관리
                 var deepLinkData by remember { mutableStateOf(intent.data) }
 
-                //메시지 수집 및 처리
-                SetObserveMessage()
-
-                //권한 요청
-                LaunchedEffect(Unit) {
-                    PermissionUtil.requestAllPermissions()
-                }
+                //모든 권한 요청
+//                LaunchedEffect(Unit) {
+//                    PermissionUtil.requestAllPermission()
+//                }
 
                 //배터리 최적화 비활성화 요청
                 RequestIgnoringOptimization(
@@ -66,6 +63,9 @@ class MainActivity : ComponentActivity() {
                         mainViewModel.onEvent(MainEvent.SetRefuseIgnoringOptimization)
                     }
                 )
+
+                //메시지 수집 및 처리
+                SetObserveMessage()
 
                 //네비게이션 화면
                 AppNavigation(
@@ -105,9 +105,15 @@ class MainActivity : ComponentActivity() {
         ignoringOptimizationState: Boolean,
         onRefuseIgnoringOptimization: () -> Unit
     ) {
+        var allowNotificationPermission by rememberSaveable { mutableStateOf(false) }
         var visibleRequestDialog by rememberSaveable { mutableStateOf(true) }
 
-        if (visibleRequestDialog && !ignoringOptimizationState) {
+        //알림 권한 요청
+        LaunchedEffect(Unit) {
+            allowNotificationPermission = PermissionUtil.requestNotificationPermission()
+        }
+
+        if (allowNotificationPermission && visibleRequestDialog && !ignoringOptimizationState) {
             CustomAlertDialog(
                 title = "권한이 필요합니다",
                 message = "알림 메시지를 정삭적으로 수신하기 위해서 배터리 사용량 최적화 목록에서 제외하는 권한이 필요합니다.\n\n 계속 하시겠습니까?",

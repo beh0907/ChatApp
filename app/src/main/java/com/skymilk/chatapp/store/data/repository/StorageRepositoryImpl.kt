@@ -1,10 +1,10 @@
 package com.skymilk.chatapp.store.data.repository
 
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.domain.repository.StorageRepository
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +13,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -28,7 +27,7 @@ class StorageRepositoryImpl @Inject constructor(
 
     //프로필 이미지 저장
     override fun saveProfileImage(userid: String, byteArray: ByteArray): Flow<ImageUploadInfo> {
-        return saveImage("profile_images/$userid", byteArray)
+        return saveImage("${Constants.FirebaseReferences.PROFILE_IMAGES}/$userid", byteArray)
     }
 
     //채팅방 이미지 저장
@@ -44,7 +43,7 @@ class StorageRepositoryImpl @Inject constructor(
         //이미지 업로드
         val uploadFlows = uris.mapIndexed { index, uri ->
             saveImage(
-                "chat_images/$chatRoomId/${System.currentTimeMillis()}-${UUID.randomUUID()}",
+                "${Constants.FirebaseReferences.CHAT_IMAGES}/$chatRoomId/${System.currentTimeMillis()}-${UUID.randomUUID()}",
                 uri
             ).map { uploadInfo ->
                 index to uploadInfo

@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FcmAndroidSetting(
-    @SerialName("direct_boot_ok")
-    val directBootOk: Boolean
+    @SerialName("priority")
+    val priority: String = "high"
 )

@@ -9,6 +9,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.messaging.FirebaseMessaging
 import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.data.dto.toUser
+import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -92,7 +93,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     // Firebase Firestore에서 유저 정보를 Flow로 가져오는 함수
     private fun getUserFlow(userId: String): Flow<User> = callbackFlow {
-        authListener = firebaseFireStore.collection("users")
+        authListener = firebaseFireStore.collection(Constants.FirebaseReferences.USERS)
             .document(userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -111,7 +112,7 @@ class AuthRepositoryImpl @Inject constructor(
                             val fcmToken = firebaseMessaging.token.await()
 
                             if (fcmToken != user.fcmToken) {
-                                firebaseFireStore.collection("users")
+                                firebaseFireStore.collection(Constants.FirebaseReferences.USERS)
                                     .document(userId)
                                     .update("fcmToken", fcmToken)
                                     .await()
@@ -138,7 +139,7 @@ class AuthRepositoryImpl @Inject constructor(
     //회원 가입 시 유저 정보 DB 등록
     suspend fun saveUserToDatabase(user: User) {
         // 업데이트된 User 객체를 데이터베이스에 저장
-        firebaseFireStore.collection("users")
+        firebaseFireStore.collection(Constants.FirebaseReferences.USERS)
             .document(user.id)
             .set(user)
             .await()

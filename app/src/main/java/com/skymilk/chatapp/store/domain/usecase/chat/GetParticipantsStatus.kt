@@ -2,7 +2,6 @@ package com.skymilk.chatapp.store.domain.usecase.chat
 
 import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
-import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.MessageEvent
 import kotlinx.coroutines.flow.Flow
 
 class GetParticipantsStatus(

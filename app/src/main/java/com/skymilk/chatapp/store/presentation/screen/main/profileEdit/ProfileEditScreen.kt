@@ -58,6 +58,7 @@ import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
+import com.skymilk.chatapp.store.presentation.utils.PermissionUtil
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -294,6 +295,7 @@ private fun EditProfileSection(
                     text = { Text("앨범 사진/카메라 선택") },
                     onClick = {
                         showDropdownMenu = false
+
                         TedImagePicker
                             .with(context)
                             .start { uri ->

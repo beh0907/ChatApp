@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.data.repository
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -50,12 +51,17 @@ class ChatRoomSettingRepositoryImpl @Inject constructor(
     }
 
     override fun getAlarmSetting(chatRoomId: String): Flow<Boolean> {
+        Log.d("showNotification", "4-2")
         return dataStore.data.map { preferences ->
+
+            Log.d("showNotification", "4-3")
+
             //현재 저장된 목록 가져오기
             val currentList = preferences[PreferencesKeys.DISABLE_ALARM_SETTING_CHATROOM_KEY]?.let {
                 Json.decodeFromString<List<String>>(it)
             } ?: emptyList()
 
+            Log.d("showNotification", "4-4")
             //리스트 내 포함 여부 체크
             chatRoomId in currentList
         }

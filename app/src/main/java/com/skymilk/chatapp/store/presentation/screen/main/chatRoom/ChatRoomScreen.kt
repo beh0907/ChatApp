@@ -82,7 +82,9 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.Ch
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components.ParticipantList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
+import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 import gun0912.tedimagepicker.builder.TedImagePicker
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -305,7 +307,7 @@ fun BottomSection(
     var message by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
-    rememberCoroutineScope()
+    val scope =  rememberCoroutineScope()
 
     Box(
         modifier = modifier
@@ -327,18 +329,17 @@ fun BottomSection(
                             .with(context)
                             .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
                             .startMultiImage { uris ->
-                                onSendImageMessage(
-                                    user,
-                                    uris
-                                )
-
-//                                scope.launch {
-//                                    //이미지 파일 리사이징 처리
-//                                    onSendImageMessage(
-//                                        user,
-//                                        FileSizeUtil.resizeAndCompressImages(context, uris)
-//                                    )
-//                                }
+//                                onSendImageMessage(
+//                                    user,
+//                                    uris
+//                                )
+                                scope.launch {
+                                    //이미지 파일 리사이징 처리
+                                    onSendImageMessage(
+                                        user,
+                                        FileSizeUtil.resizeAndCompressImages(context, uris)
+                                    )
+                                }
                             }
                     }
             ) {
