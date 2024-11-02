@@ -29,7 +29,7 @@ fun AppNavigation(
     val navController = rememberNavController()
 
     //앱 시작 시 화면
-    val startGraph = if (isDeepLink) Routes.MainGraph else Routes.StartGraph // 딥링크 정보가 있다면 로딩화면 스킵
+    val startGraph = if (isDeepLink && authState is AuthState.Authenticated) Routes.MainGraph else Routes.StartGraph // 딥링크 정보가 있다면 로딩화면 스킵
 
     NavHost(
         navController = navController,

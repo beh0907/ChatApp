@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectionUserList
@@ -37,7 +38,6 @@ import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
 @Composable
 fun ChatRoomInviteScreen(
     modifier: Modifier = Modifier,
-    friendsState: FriendsState,
     viewModel: ChatRoomInviteViewModel = hiltViewModel(),
     onEvent: (ChatRoomInviteEvent) -> Unit,
     currentUser: User,
@@ -46,13 +46,15 @@ fun ChatRoomInviteScreen(
     onNavigateToChatRoom: (String) -> Unit,
     onNavigateToBack: () -> Unit
 ) {
+    val friendsState by viewModel.friendsState.collectAsStateWithLifecycle()
+
     var selectedUsers by remember { mutableStateOf(listOf<User>()) }
     var searchQuery by remember { mutableStateOf("") }
 
+
     Column(modifier = modifier.fillMaxSize()) {
         //상단 타이틀 섹션
-        TopSection(
-            selectedUsers = selectedUsers,
+        TopSection(selectedUsers = selectedUsers,
             onNavigateToBack = onNavigateToBack,
             onCreateChatRoom = {
                 if (existingChatRoomId != null)
@@ -74,34 +76,26 @@ fun ChatRoomInviteScreen(
                             onNavigateToChatRoom = onNavigateToChatRoom
                         )
                     )
-            }
-        )
+            })
 
         //선택된 유저 목록
-        SelectedUserList(
-            selectedUsers = selectedUsers,
-            onUserRemove = { user ->
-                selectedUsers = selectedUsers - user
-            }
-        )
+        SelectedUserList(selectedUsers = selectedUsers, onUserRemove = { user ->
+            selectedUsers = selectedUsers - user
+        })
 
         //유저 닉네임 검색 섹션
-        FriendSearchSection(
-            searchQuery = searchQuery,
-            onSearchQueryChange = { searchQuery = it }
-        )
+        FriendSearchSection(searchQuery = searchQuery, onSearchQueryChange = { searchQuery = it })
 
         when (friendsState) {
             is FriendsState.Success -> {
                 //기존 채팅방일 경우 해당 참가자들은 제외하여 표시한다
                 val availableUsers =
-                    if (existingChatRoomId != null) friendsState.friends.filter { it.id !in existingParticipants }
-                    else friendsState.friends
+                    if (existingChatRoomId != null) (friendsState as FriendsState.Success).friends.filter { it.id !in existingParticipants }
+                    else (friendsState as FriendsState.Success).friends
 
 
                 //유저 목록 섹션
-                SelectionUserList(
-                    users = availableUsers,
+                SelectionUserList(users = availableUsers,
                     selectedUsers = selectedUsers,
                     searchQuery = searchQuery,
                     onUserSelect = { user ->
@@ -110,8 +104,7 @@ fun ChatRoomInviteScreen(
                         } else {
                             selectedUsers + user
                         }
-                    }
-                )
+                    })
             }
 
             else -> {}
@@ -124,14 +117,10 @@ fun ChatRoomInviteScreen(
 //상단 타이틀
 @Composable
 fun TopSection(
-    selectedUsers: List<User>,
-    onNavigateToBack: () -> Unit,
-    onCreateChatRoom: () -> Unit
+    selectedUsers: List<User>, onNavigateToBack: () -> Unit, onCreateChatRoom: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
             onNavigateToBack()
@@ -151,10 +140,7 @@ fun TopSection(
             fontWeight = FontWeight.Bold
         )
 
-        IconButton(
-            enabled = selectedUsers.isNotEmpty(),
-            onClick = { onCreateChatRoom() }
-        ) {
+        IconButton(enabled = selectedUsers.isNotEmpty(), onClick = { onCreateChatRoom() }) {
             Icon(Icons.Default.Check, contentDescription = "Confirm")
         }
     }
@@ -162,9 +148,7 @@ fun TopSection(
 
 @Composable
 private fun FriendSearchSection(
-    modifier: Modifier = Modifier,
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit
+    modifier: Modifier = Modifier, searchQuery: String, onSearchQueryChange: (String) -> Unit
 ) {
 
     // 검색어 입력 칸
@@ -187,11 +171,9 @@ private fun FriendSearchSection(
         trailingIcon = {
             // 초기화 버튼
             if (searchQuery.isEmpty()) return@TextField
-            IconButton(
-                onClick = {
-                    onSearchQueryChange("")
-                }
-            ) {
+            IconButton(onClick = {
+                onSearchQueryChange("")
+            }) {
                 Icon(Icons.Default.Cancel, contentDescription = null)
             }
         },

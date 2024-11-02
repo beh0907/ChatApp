@@ -119,7 +119,7 @@ fun ChatRoomScreen(
     ) {
         //채팅방 정보 체크
         when (chatRoomState) {
-            is ChatRoomState.Initial -> {}
+            is ChatRoomState.Initial,
             is ChatRoomState.Loading -> {
                 //로딩 알림
                 CustomProgressDialog("채팅방을 불러오고 있습니다.")

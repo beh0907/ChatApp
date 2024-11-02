@@ -24,7 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -127,9 +126,12 @@ fun MainNavigation(
             currentUser.id
         )
     )
-
-    //네비게이션 화면 상태 저장 viewmodel
-    val navigationViewmodel: NavigationViewModel = hiltViewModel()
+    val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
+        factory = ChatRoomsViewModel.provideFactory(
+            viewModelFactoryProvider.chatRoomsViewModelFactory(),
+            currentUser.id
+        )
+    )
 
     Scaffold(
         bottomBar = {
@@ -175,8 +177,6 @@ fun MainNavigation(
 
             //채팅방 목록 화면
             composable<Routes.ChatRoomsScreen> {
-                val chatRoomsViewModel: ChatRoomsViewModel = hiltViewModel()
-
                 ChatRoomsScreen(
                     viewModel = chatRoomsViewModel,
                     onEvent = chatRoomsViewModel::onEvent,
@@ -217,7 +217,6 @@ fun MainNavigation(
             //채팅방 생성 화면
             composable<Routes.ChatRoomInviteScreen> {
                 val chatRoomInviteViewModel: ChatRoomInviteViewModel = hiltViewModel()
-                val friends by friendsViewModel.friendsState.collectAsStateWithLifecycle()
 
                 //특정 채팅방에서 유저를 추가할 땐 채팅방과 현재 참여자 정보를 가지고 있다
                 val args = it.toRoute<Routes.ChatRoomInviteScreen>()
@@ -225,7 +224,6 @@ fun MainNavigation(
                 ChatRoomInviteScreen(
                     viewModel = chatRoomInviteViewModel,
                     onEvent = chatRoomInviteViewModel::onEvent,
-                    friendsState = friends,
                     currentUser = currentUser,
                     existingChatRoomId = args.existingChatRoomId,
                     existingParticipants = args.existingParticipants,
@@ -339,7 +337,10 @@ fun MainNavigation(
                 )
             ) {
                 val args = it.toRoute<Routes.ChatRoomScreen>()
-                val chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
+
+                //뷰모델
+                val navigationViewmodel: NavigationViewModel = hiltViewModel() // 네비게이션 상태 viewmodel
+                val chatRoomViewModel: ChatRoomViewModel = hiltViewModel() // 채팅방 viewmodel
 
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(lifecycleOwner) {
@@ -437,11 +438,11 @@ fun MainNavigation(
 fun navigationToTab(navController: NavController, route: Routes) {
     navController.navigate(route) {
         navController.graph.startDestinationRoute?.let { screen ->
+            restoreState = true
+            launchSingleTop = true
             popUpTo(screen) {
                 saveState = true
             }
-            restoreState = true
-            launchSingleTop = true
         }
     }
 }

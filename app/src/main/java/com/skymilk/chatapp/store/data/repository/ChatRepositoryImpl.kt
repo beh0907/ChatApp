@@ -60,7 +60,7 @@ class ChatRepositoryImpl @Inject constructor(
 
         val listener = query.addSnapshotListener { snapshot, e ->
             if (e != null) {
-                close(e)
+                close()
                 return@addSnapshotListener
             }
             if (snapshot != null && snapshot.exists()) {
@@ -288,7 +288,7 @@ class ChatRepositoryImpl @Inject constructor(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    close(error.toException())
+                    close()
                 }
             })
 
@@ -358,7 +358,7 @@ class ChatRepositoryImpl @Inject constructor(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    close(error.toException())
+                    close()
                 }
             })
 
@@ -375,7 +375,7 @@ class ChatRepositoryImpl @Inject constructor(
                 trySend(MessageEvent.Initial(initialMessages))
                 initialDataLoaded = true
             } catch (e: Exception) {
-                close(e)
+                close()
                 return@callbackFlow
             }
 
@@ -537,7 +537,7 @@ class ChatRepositoryImpl @Inject constructor(
                 .whereIn(FieldPath.documentId(), participants)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
-                        close(error)
+                        close()
                         return@addSnapshotListener
                     }
 

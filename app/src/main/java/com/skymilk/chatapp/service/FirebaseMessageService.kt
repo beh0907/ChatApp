@@ -3,7 +3,6 @@ package com.skymilk.chatapp.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.PowerManager
 import android.util.Log
@@ -17,7 +16,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.skymilk.chatapp.MainActivity
 import com.skymilk.chatapp.R
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
-import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
+import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
 import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
@@ -25,7 +24,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,7 +43,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
     lateinit var userSettingUseCases: UserSettingUseCases
 
     @Inject
-    lateinit var navigationUseCases: NavigationUseCases
+    lateinit var sharedUseCases: SharedUseCases
 
     @Inject
     lateinit var userUseCases: UserUseCases
@@ -77,24 +75,32 @@ class FirebaseMessageService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        Log.d("onMessageReceived", "1")
+
         //알림 텍스트
         val title = message.notification?.title ?: message.data["title"]
         val body = message.notification?.body ?: message.data["body"]
 
+        Log.d("onMessageReceived", "2")
         // Wake Lock 획득
         acquireWakeLock()
 
+        Log.d("onMessageReceived", "3")
         // 코루틴 스코프에서 실행
         scope.launch {
             try {
+                Log.d("onMessageReceived", "4")
                 showNotification(title, body, message.data)
             } catch (e: Exception) {
+                Log.d("onMessageReceived", "4-1")
                 e.printStackTrace()
             } finally {
                 // Wake Lock 해제
+                Log.d("onMessageReceived", "5")
                 releaseWakeLock()
             }
         }
+        Log.d("onMessageReceived", "6")
     }
 
 
@@ -105,7 +111,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
                 PowerManager.PARTIAL_WAKE_LOCK,
                 "FirebaseMessageService:WakeLock"
             )
-            wakeLock?.acquire(10 * 1000L /*10 초*/)
+            wakeLock?.acquire(20 * 1000L /* 20 초*/)
         }
     }
 
@@ -143,7 +149,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
         Log.d("showNotification", "5")
 
         //현재 화면이 알람이 발생한 채팅방과 동일한 채팅방인지 체크
-        val navigationState = navigationUseCases.getCurrentDestination()
+        val navigationState = sharedUseCases.getCurrentDestination()
         if (navigationState.destination == Routes.ChatRoomScreen.javaClass.toString()
             && navigationState.params["chatRoomId"] == chatRoomId
         ) return

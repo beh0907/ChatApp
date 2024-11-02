@@ -9,7 +9,7 @@ class GetAlarmSetting(
 ) {
     operator fun invoke(chatRoomId: String): Flow<Boolean> {
 
-        Log.d("showNotification", "4-1")
+        Log.d("getAlarmSetting", "4-1")
         return chatRoomSettingRepository.getAlarmSetting(chatRoomId)
     }
 }

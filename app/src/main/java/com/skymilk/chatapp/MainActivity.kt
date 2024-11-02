@@ -51,11 +51,6 @@ class MainActivity : ComponentActivity() {
                 // 딥링크 데이터 상태 관리
                 var deepLinkData by remember { mutableStateOf(intent.data) }
 
-                //모든 권한 요청
-//                LaunchedEffect(Unit) {
-//                    PermissionUtil.requestAllPermission()
-//                }
-
                 //배터리 최적화 비활성화 요청
                 RequestIgnoringOptimization(
                     ignoringOptimizationState = ignoringOptimizationState,

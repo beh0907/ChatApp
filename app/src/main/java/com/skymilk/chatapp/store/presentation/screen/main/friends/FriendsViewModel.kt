@@ -3,6 +3,7 @@ package com.skymilk.chatapp.store.presentation.screen.main.friends
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
@@ -10,17 +11,16 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FriendsViewModel @AssistedInject constructor(
     @Assisted private val userId: String,
-    private val userUseCases: UserUseCases
+    private val userUseCases: UserUseCases,
+    private val sharedUseCases: SharedUseCases,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -65,6 +65,9 @@ class FriendsViewModel @AssistedInject constructor(
                     _friendsState.value = FriendsState.Error(message)
                 }.collectLatest { friends ->
                     _friendsState.value = FriendsState.Success(friends)
+
+                    //친구 목록을 공유 리포지토리에 저장한다
+                    sharedUseCases.setSharedFriends(friends)
                 }
         }
     }

@@ -13,6 +13,7 @@ import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.data.utils.Constants
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
+import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.StorageUseCases
 import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMessagesState
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -39,8 +41,10 @@ class ChatRoomViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
     private val storageUseCases: StorageUseCases,
     private val chatRoomSettingUseCases: ChatRoomSettingUseCases,
+    private val sharedUseCases: SharedUseCases,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
     private val chatRoomId: String = savedStateHandle.toRoute<Routes.ChatRoomScreen>().chatRoomId
     private val userId: String = savedStateHandle.toRoute<Routes.ChatRoomScreen>().userId
 
@@ -130,17 +134,20 @@ class ChatRoomViewModel @Inject constructor(
     //채팅방 정보 불러오기
     private fun loadChatRoom() {
         viewModelScope.launch {
-            chatUseCases.getChatRoom(chatRoomId)
-                .onStart {
-                    _chatRoomState.value = ChatRoomState.Loading
-                }.catch { exception ->
-                    sendEvent(Event.Toast(exception.message ?: "Unknown error"))
+//            chatUseCases.getChatRoom(chatRoomId)
+//                .onStart {
+//                    _chatRoomState.value = ChatRoomState.Loading
+//                }.catch { exception ->
+//                    sendEvent(Event.Toast(exception.message ?: "Unknown error"))
+//
+//                    _chatRoomState.value = ChatRoomState.Error
+//                }.collect { chatRoom ->
+//                    _chatRoomState.value = ChatRoomState.Success(chatRoom)
+//                }
 
-                    _chatRoomState.value = ChatRoomState.Error
-                }.collect { chatRoom ->
-                    _chatRoomState.value = ChatRoomState.Success(chatRoom)
-                }
-
+            sharedUseCases.getSelectedChatRoom(chatRoomId).collectLatest { chatRoom ->
+                if (chatRoom != null) _chatRoomState.value = ChatRoomState.Success(chatRoom)
+            }
         }
     }
 
@@ -368,17 +375,16 @@ class ChatRoomViewModel @Inject constructor(
 
                 result.isFailure -> {
                     // 실패 시 Job 복구
-                    messageSubscriptionJob = tempMessageJob?.also {
-                        // 새로운 코루틴에서 메시지 구독 재시작
-                        if (!it.isActive) {
-                            loadChatMessages()
-                        }
-                    }
-
                     participantsStatusSubscriptionJob = tempParticipantsJob?.also {
                         // 새로운 코루틴에서 참여자 상태 구독 재시작
                         if (!it.isActive) {
                             loadParticipantsStatus()
+                        }
+                    }
+                    messageSubscriptionJob = tempMessageJob?.also {
+                        // 새로운 코루틴에서 메시지 구독 재시작
+                        if (!it.isActive) {
+                            loadChatMessages()
                         }
                     }
 

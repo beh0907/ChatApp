@@ -45,7 +45,7 @@ fun CustomProgressDialog(message: String) {
             shape = MaterialTheme.shapes.medium
         ) {
             Row(
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp),
+                modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {

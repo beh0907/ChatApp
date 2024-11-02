@@ -1,35 +1,46 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
 import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingUseCases
-import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
+import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-
-@HiltViewModel
-class ChatRoomsViewModel @Inject constructor(
+class ChatRoomsViewModel @AssistedInject constructor(
+    @Assisted private val userId: String,
     private val chatUseCases: ChatUseCases,
     private val chatRoomSettingUseCases: ChatRoomSettingUseCases,
-    savedStateHandle: SavedStateHandle
+    private val sharedUseCases: SharedUseCases,
 ) : ViewModel() {
 
-    private val userId: String = savedStateHandle.toRoute<Routes.ChatRoomsScreen>().userId
+    @AssistedFactory
+    interface Factory {
+        fun create(userId: String): ChatRoomsViewModel
+    }
+
+    companion object {
+        fun provideFactory(
+            assistedFactory: Factory,
+            userId: String
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(userId) as T
+            }
+        }
+    }
 
     private val _chatRoomsState = MutableStateFlow<ChatRoomsState>(ChatRoomsState.Initial)
     val chatRoomsState = _chatRoomsState.asStateFlow()
@@ -63,6 +74,9 @@ class ChatRoomsViewModel @Inject constructor(
                 }
                 .collect { chatRooms ->
                     _chatRoomsState.value = ChatRoomsState.Success(chatRooms) // 성공 상태 설정
+
+                    //공유 리포지토리에 채팅방 목록 저장
+                    sharedUseCases.setSharedChatRooms(chatRooms)
                 }
         }
     }

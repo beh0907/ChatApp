@@ -100,6 +100,8 @@ class ProfileEditViewModel @Inject constructor(
                             }
                         }
                 }
+
+                else -> {}
             }
         }
     }

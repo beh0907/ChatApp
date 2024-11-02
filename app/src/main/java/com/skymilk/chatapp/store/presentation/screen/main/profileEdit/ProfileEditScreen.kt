@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CameraAlt
@@ -44,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.mr0xf00.easycrop.CropResult
@@ -58,7 +61,6 @@ import com.skymilk.chatapp.store.presentation.common.CustomFullScreenEditDialog
 import com.skymilk.chatapp.store.presentation.common.CustomProgressDialog
 import com.skymilk.chatapp.store.presentation.common.squircleClip
 import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
-import com.skymilk.chatapp.store.presentation.utils.PermissionUtil
 import gun0912.tedimagepicker.builder.TedImagePicker
 import kotlinx.coroutines.launch
 
@@ -138,34 +140,39 @@ fun ProfileEditScreen(
 
             EditEventSection()
         }
-    }
 
-    //이미지 업데이트 로딩 표시
-    if (profileEditState is ProfileEditState.Loading) {
-        CustomProgressDialog("프로필을 업데이트 하고 있습니다.")
-    }
+        //이미지 업데이트 로딩 표시
+        if (profileEditState is ProfileEditState.Loading) {
+            CustomProgressDialog("프로필을 업데이트 하고 있습니다.")
+        }
 
-    //이미지 크롭 다이얼로그
-    if (cropState != null) {
-        ImageCropperDialog(
-            state = cropState,
-            style = CropperStyle()
-        )
-    }
+        //이미지 크롭 다이얼로그
+        if (cropState != null) {
+            ImageCropperDialog(
+                state = cropState,
+                style = CropperStyle(),
+                dialogProperties = DialogProperties(
+                    usePlatformDefaultWidth = false
+                ),
+                dialogPadding = PaddingValues(0.dp),
+                dialogShape = RoundedCornerShape(0.dp)
+            )
+        }
 
-    //텍스트 편집 다이얼로그
-    if (showEditDialog) {
-        CustomFullScreenEditDialog(
-            initText = if (editingField == "name") editName else editStatusMessage,
-            maxLength = if (editingField == "name") 20 else 60,
-            onDismiss = { showEditDialog = false },
-            onConfirm = { newText ->
-                if (editingField == "name") editName = newText
-                else editStatusMessage = newText
+        //텍스트 편집 다이얼로그
+        if (showEditDialog) {
+            CustomFullScreenEditDialog(
+                initText = if (editingField == "name") editName else editStatusMessage,
+                maxLength = if (editingField == "name") 20 else 60,
+                onDismiss = { showEditDialog = false },
+                onConfirm = { newText ->
+                    if (editingField == "name") editName = newText
+                    else editStatusMessage = newText
 
-                showEditDialog = false
-            }
-        )
+                    showEditDialog = false
+                }
+            )
+        }
     }
 }
 
@@ -295,7 +302,6 @@ private fun EditProfileSection(
                     text = { Text("앨범 사진/카메라 선택") },
                     onClick = {
                         showDropdownMenu = false
-
                         TedImagePicker
                             .with(context)
                             .start { uri ->

@@ -6,16 +6,29 @@ import com.skymilk.chatapp.store.data.dto.ParticipantStatus
 import com.skymilk.chatapp.store.data.dto.MessageType
 import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
+import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
+import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
 import com.skymilk.chatapp.store.presentation.utils.Event
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatRoomInviteViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
+    private val sharedUseCases: SharedUseCases
 ) : ViewModel() {
+
+    private val _friendsState = MutableStateFlow<FriendsState>(FriendsState.Initial)
+    val friendsState = _friendsState.asStateFlow()
+
+    init {
+        loadFriends()
+    }
 
     fun onEvent(event: ChatRoomInviteEvent) {
         when(event) {
@@ -34,6 +47,15 @@ class ChatRoomInviteViewModel @Inject constructor(
                     participants = event.participants,
                     onNavigateToChatRoom = event.onNavigateToChatRoom
                 )
+            }
+        }
+    }
+
+    //공유 리포지토리로부터 친구 목록 로드
+    private fun loadFriends() {
+        viewModelScope.launch {
+            sharedUseCases.getSharedFriends().collectLatest {
+                _friendsState.value = FriendsState.Success(it)
             }
         }
     }

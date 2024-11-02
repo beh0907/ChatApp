@@ -1,11 +1,9 @@
 package com.skymilk.chatapp.store.presentation.navigation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavArgument
 import com.skymilk.chatapp.store.domain.model.NavigationState
-import com.skymilk.chatapp.store.domain.usecase.navigation.NavigationUseCases
+import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
-    private val navigationUseCases: NavigationUseCases
+    private val sharedUseCases: SharedUseCases
 ) : ViewModel() {
 
     private val _navigationState = MutableStateFlow(NavigationState())
@@ -30,7 +28,7 @@ class NavigationViewModel @Inject constructor(
                 map ?: emptyMap()
             )
 
-            navigationUseCases.saveCurrentDestination(
+            sharedUseCases.setCurrentDestination(
                 _navigationState.value
             )
         }
