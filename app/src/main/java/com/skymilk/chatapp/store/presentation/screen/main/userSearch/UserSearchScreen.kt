@@ -143,7 +143,7 @@ private fun UserSearchSection(
         placeholder = {
             Text(
                 text = "아이디 혹은 이름을 검색해주세요.",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = Color.Gray,
             )
         },

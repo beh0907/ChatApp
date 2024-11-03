@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -20,8 +21,10 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatMes
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ChatRoomState
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUploadState
 import com.skymilk.chatapp.store.presentation.utils.Event
+import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 import com.skymilk.chatapp.store.presentation.utils.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,6 +41,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatRoomViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val chatUseCases: ChatUseCases,
     private val storageUseCases: StorageUseCases,
     private val chatRoomSettingUseCases: ChatRoomSettingUseCases,
@@ -265,9 +269,12 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
+
     //이미지 메시지 전송
     private fun sendImageMessage(
-        sender: User, imageUris: List<Uri>, participants: List<User>
+        sender: User,
+        imageUris: List<Uri>,
+        participants: List<User>
     ) {
         //이미지 업로드 결과
         uploadImage(chatRoomId, imageUris) { urls ->
@@ -300,41 +307,46 @@ class ChatRoomViewModel @Inject constructor(
         chatRoomId: String, imageUris: List<Uri>, onCompleted: (List<String>) -> Unit
     ) {
         viewModelScope.launch {
+            //이미지 압축
+            _uploadState.value = ImageUploadState.Compress(imageUris)
+            val compressUris = chatUseCases.compressImagesUseCase(imageUris)
+
             //스토리지 업로드 작업
-            storageUseCases.saveChatMessageImage(chatRoomId, imageUris).catch { e ->
-                _uploadState.update {
-                    ImageUploadState.Error(
-                        e.message ?: "Unknown error occurred"
-                    )
-                }
-            }.collect { imageUploadInfoList ->
-                //이미지 업로드 성공 or 실패 처리 완료된 이미지 수 확인
-                val completedOrFailedImages =
-                    imageUploadInfoList.count { it.downloadUrl != null || it.error != null }
-
-                //업로드 완료 여부 확인
-                _uploadState.update {
-                    if (completedOrFailedImages == imageUris.size) {
-                        val successfulUploads =
-                            imageUploadInfoList.filter { it.downloadUrl != null }
-                        val failedUploads = imageUploadInfoList.filter { it.error != null }
-
-                        //업로드가 완료된 이미지 경로 전달
-                        onCompleted(successfulUploads.mapNotNull { it.downloadUrl })
-
-                        //완료 되었다면 완료된 이미지 url로 업데이트
-                        ImageUploadState.Completed(
-                            successfulUploads = successfulUploads, failedUploads = failedUploads
-                        )
-                    } else {
-                        //현재 업로드중인 상태 저장
-                        ImageUploadState.Progress(
-                            imageUploadInfoList = imageUploadInfoList.toList(), // 새 인스턴스 생성하여 방출 처리
-                            completedOrFailedImages = completedOrFailedImages
+            storageUseCases.saveChatMessageImage(chatRoomId, compressUris)
+                .catch { e ->
+                    _uploadState.update {
+                        ImageUploadState.Error(
+                            e.message ?: "Unknown error occurred"
                         )
                     }
+                }.collect { imageUploadInfoList ->
+                    //이미지 업로드 성공 or 실패 처리 완료된 이미지 수 확인
+                    val completedOrFailedImages =
+                        imageUploadInfoList.count { it.downloadUrl != null || it.error != null }
+
+                    //업로드 완료 여부 확인
+                    _uploadState.update {
+                        if (completedOrFailedImages == imageUris.size) {
+                            val successfulUploads =
+                                imageUploadInfoList.filter { it.downloadUrl != null }
+                            val failedUploads = imageUploadInfoList.filter { it.error != null }
+
+                            //업로드가 완료된 이미지 경로 전달
+                            onCompleted(successfulUploads.mapNotNull { it.downloadUrl })
+
+                            //완료 되었다면 완료된 이미지 url로 업데이트
+                            ImageUploadState.Completed(
+                                successfulUploads = successfulUploads, failedUploads = failedUploads
+                            )
+                        } else {
+                            //현재 업로드중인 상태 저장
+                            ImageUploadState.Progress(
+                                imageUploadInfoList = imageUploadInfoList.toList(), // 새 인스턴스 생성하여 방출 처리
+                                completedOrFailedImages = completedOrFailedImages
+                            )
+                        }
+                    }
                 }
-            }
         }
     }
 

@@ -98,6 +98,9 @@ fun ChatRoomScreen(
     onNavigateToImagePager: (List<String>, Int, String, Long) -> Unit,
     onNavigateToInviteFriends: (String, List<String>) -> Unit,
 ) {
+    LocalContext.current
+    rememberCoroutineScope()
+
     val chatRoomState by viewModel.chatRoomState.collectAsStateWithLifecycle()
 
     val chatMessagesState by viewModel.chatMessagesState.collectAsStateWithLifecycle()
@@ -305,9 +308,7 @@ fun BottomSection(
     user: User,
 ) {
     var message by rememberSaveable { mutableStateOf("") }
-
     val context = LocalContext.current
-    val scope =  rememberCoroutineScope()
 
     Box(
         modifier = modifier
@@ -329,17 +330,10 @@ fun BottomSection(
                             .with(context)
                             .max(10, "최대 10개 이미지만 선택할 수 있습니다.")
                             .startMultiImage { uris ->
-//                                onSendImageMessage(
-//                                    user,
-//                                    uris
-//                                )
-                                scope.launch {
-                                    //이미지 파일 리사이징 처리
-                                    onSendImageMessage(
-                                        user,
-                                        FileSizeUtil.resizeAndCompressImages(context, uris)
-                                    )
-                                }
+                                onSendImageMessage(
+                                    user,
+                                    uris
+                                )
                             }
                     }
             ) {
@@ -363,10 +357,7 @@ fun BottomSection(
                     .background(MaterialTheme.colorScheme.inverseOnSurface),
                 value = message,
                 onValueChange = { message = it },
-                textStyle = TextStyle(
-                    fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
-                    color = MaterialTheme.colorScheme.onSurface,
-                ),
+                textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                 maxLines = 5,
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 decorationBox = { innerTextField ->

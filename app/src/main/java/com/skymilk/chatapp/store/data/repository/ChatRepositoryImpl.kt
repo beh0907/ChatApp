@@ -35,6 +35,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -110,36 +111,33 @@ class ChatRepositoryImpl @Inject constructor(
                     doc.toObject(ChatRoom::class.java)
                 }.orEmpty()
 
-                // participants를 기반으로 User 정보를 가져오기
-                val chatRoomWithParticipantsList = chatRooms.map { chatRoom ->
-                    // timestamp가 null일 수 있으므로 안전하게 처리
-                    val lastMessageTime = chatRoom.lastMessageTimestamp?.toDate()?.time
-                        ?: System.currentTimeMillis()
-                    val createdTime = chatRoom.createdTimestamp?.toDate()?.time
-                        ?: System.currentTimeMillis()
+                //채팅방의 모든 참여자를 중복제거해서 한번에 가져온다
+                val participantIds = chatRooms.flatMap { it.participantIds }.distinct()
+                getUsersForParticipants(participantIds).collect { allUsers ->
 
+                    val allUsersMap = allUsers.associateBy { it.id }
+                    val chatRoomWithParticipantsList = chatRooms.map { chatRoom ->
+                        //전체 유저 중 채팅방에 참여한 유저 필터링
+                        val userList = chatRoom.participantIds.mapNotNull { allUsersMap[it] }
 
-                    getUsersForParticipants(chatRoom.participantIds).map { users ->
+                        // timestamp가 null일 수 있으므로 안전하게 처리
+                        val lastMessageTime = chatRoom.lastMessageTimestamp?.toDate()?.time
+                            ?: System.currentTimeMillis()
+                        val createdTime = chatRoom.createdTimestamp?.toDate()?.time
+                            ?: System.currentTimeMillis()
+
                         ChatRoomWithParticipants(
                             id = chatRoom.id,
                             name = chatRoom.name,
-                            participants = users,
+                            participants = userList,
                             lastMessage = chatRoom.lastMessage,
                             lastMessageTimestamp = lastMessageTime,
                             createdTimestamp = createdTime,
                             totalMessagesCount = chatRoom.totalMessagesCount
                         )
                     }
-                }
 
-                // 빈 목록일 경우 빈 리스트 반환
-                if (chatRoomWithParticipantsList.isEmpty()) {
-                    trySend(emptyList())
-                } else {
-                    // 채팅방 정보들 결합 후 리턴
-                    combine(chatRoomWithParticipantsList) { it.toList() }.collect {
-                        trySend(it)
-                    }
+                    trySend(chatRoomWithParticipantsList)
                 }
             }
         }
@@ -217,7 +215,8 @@ class ChatRepositoryImpl @Inject constructor(
                 updates["$key/${Constants.FirebaseReferences.CHAT_STATUS}/$userId"] = status
             }
             //채팅방 생성
-            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(key).set(chatRoom).await()
+            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(key)
+                .set(chatRoom).await()
 
             //참가자 상태 저장
             firebaseDatabase.reference
@@ -253,7 +252,8 @@ class ChatRepositoryImpl @Inject constructor(
                         "lastReadTimestamp" to ServerValue.TIMESTAMP, // RTDB 서버 시간
                         "lastReadMessageCount" to lastReadMessageCount
                     )
-                    updates["$chatRoomId/${Constants.FirebaseReferences.CHAT_STATUS}/$userId"] = status
+                    updates["$chatRoomId/${Constants.FirebaseReferences.CHAT_STATUS}/$userId"] =
+                        status
                 }
 
                 // 참가자 ID 추가 (Firestore)
@@ -416,12 +416,13 @@ class ChatRepositoryImpl @Inject constructor(
                 "${chatRoomId}/${Constants.FirebaseReferences.MESSAGES}/$messageId" to chatMessage
             )
             if (type != MessageType.SYSTEM) {
-                updates["${chatRoomId}/${Constants.FirebaseReferences.CHAT_STATUS}/${sender.id}"] = hashMapOf(
-                    "userId" to participantStatus.userId,
-                    "joinTimestamp" to participantStatus.joinTimestamp,  // 기존 joinTimestamp 유지
-                    "lastReadTimestamp" to ServerValue.TIMESTAMP,        // 현재 서버 시간으로 업데이트
-                    "lastReadMessageCount" to participantStatus.lastReadMessageCount
-                )
+                updates["${chatRoomId}/${Constants.FirebaseReferences.CHAT_STATUS}/${sender.id}"] =
+                    hashMapOf(
+                        "userId" to participantStatus.userId,
+                        "joinTimestamp" to participantStatus.joinTimestamp,  // 기존 joinTimestamp 유지
+                        "lastReadTimestamp" to ServerValue.TIMESTAMP,        // 현재 서버 시간으로 업데이트
+                        "lastReadMessageCount" to participantStatus.lastReadMessageCount
+                    )
             }
 
             firebaseDatabase.reference
@@ -563,7 +564,8 @@ class ChatRepositoryImpl @Inject constructor(
             //오프라인 동기화 제거
             firebaseDatabase.getReference(chatRoomId).child(Constants.FirebaseReferences.MESSAGES)
                 .keepSynced(false)
-            firebaseDatabase.getReference(chatRoomId).child(Constants.FirebaseReferences.CHAT_STATUS)
+            firebaseDatabase.getReference(chatRoomId)
+                .child(Constants.FirebaseReferences.CHAT_STATUS)
                 .keepSynced(false)
 
             //참여자 정보 제거
@@ -575,7 +577,8 @@ class ChatRepositoryImpl @Inject constructor(
                 ).await()
 
             //참여자 상태 정보 제거
-            firebaseDatabase.getReference(chatRoomId).child(Constants.FirebaseReferences.CHAT_STATUS)
+            firebaseDatabase.getReference(chatRoomId)
+                .child(Constants.FirebaseReferences.CHAT_STATUS)
                 .child(userId)
                 .removeValue().await()
 

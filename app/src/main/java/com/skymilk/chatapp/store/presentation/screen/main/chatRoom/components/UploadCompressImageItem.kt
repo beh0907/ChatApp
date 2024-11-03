@@ -28,8 +28,8 @@ import com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state.ImageUp
 //이미지가 여러개일 땐 처리 완료된 수를 보여준다
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun UploadMultiImageItem(
-    uploadState: ImageUploadState.Progress
+fun UploadCompressImageItem(
+    uploadState: ImageUploadState.Compress
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -42,11 +42,11 @@ fun UploadMultiImageItem(
         Box(
             modifier = Modifier
                 .width(maxWidth)
-                .clip(RoundedCornerShape(12.dp)),
+                .clip(RoundedCornerShape(12.dp))
         ) {
             // 이미지 그리드
             FixedSizeImageUploadGrid(
-                imageUploadUris = uploadState.imageUploadInfoList.mapNotNull { it.imageUri },
+                imageUploadUris = uploadState.imageUris,
                 maxColumnCount = 3
             )
 
@@ -59,7 +59,6 @@ fun UploadMultiImageItem(
                 verticalArrangement = Arrangement.Center
             ) {
                 CircularProgressIndicator(
-                    progress = { uploadState.completedOrFailedImages.toFloat() / uploadState.imageUploadInfoList.size },
                     modifier = Modifier.size(30.dp),
                     color = Color.White,
                 )
@@ -67,7 +66,7 @@ fun UploadMultiImageItem(
                 Spacer(modifier = Modifier.height(5.dp))
 
                 Text(
-                    text = "${uploadState.completedOrFailedImages} / ${uploadState.imageUploadInfoList.size}",
+                    text = "이미지를 압축하고 있습니다",
                     color = Color.White,
                     style = MaterialTheme.typography.bodySmall
                 )

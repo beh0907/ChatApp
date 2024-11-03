@@ -1,7 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +30,8 @@ import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.presentation.utils.DateUtil
 import com.skymilk.chatapp.store.presentation.utils.FileSizeUtil
 
+
+//이미지가 하나일떈 용량 정보를 보여준다
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun UploadSingleImageItem(

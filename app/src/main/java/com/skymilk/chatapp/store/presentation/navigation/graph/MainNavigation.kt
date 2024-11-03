@@ -2,6 +2,7 @@ package com.skymilk.chatapp.store.presentation.navigation.graph
 
 import android.app.Activity
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -176,7 +177,7 @@ fun MainNavigation(
             }
 
             //채팅방 목록 화면
-            composable<Routes.ChatRoomsScreen> {
+            composable<Routes.ChatRoomsScreen>{
                 ChatRoomsScreen(
                     viewModel = chatRoomsViewModel,
                     onEvent = chatRoomsViewModel::onEvent,

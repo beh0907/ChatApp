@@ -1,6 +1,5 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.components
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -132,6 +131,15 @@ fun BoxScope.ChatMessageList(
         //내가 전송중인 이미지 정보
         //이미지가 전송중일때만 정보를 표시
         when (uploadState) {
+
+            is ImageUploadState.Compress -> {
+                item{
+                    UploadCompressImageItem(uploadState)
+                }
+
+                if (chatMessages.isNotEmpty()) scope.launch { listState.scrollToItem(0) }
+            }
+
             is ImageUploadState.Progress -> {
                 item {
                     if (uploadState.imageUploadInfoList.size == 1)

@@ -1,16 +1,18 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoom.state
 
+import android.net.Uri
 import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 
 sealed interface ImageUploadState {
 
     data object Initial : ImageUploadState //초기 상태
 
+    data class Compress(val imageUris:List<Uri>) : ImageUploadState // 이미지 압축
+
     data class Progress(
         val imageUploadInfoList: List<ImageUploadInfo>,
         val completedOrFailedImages: Int
-    ) :
-        ImageUploadState // 이미지 업로드 중
+    ) : ImageUploadState // 이미지 업로드 중
 
     data class Completed(
         val successfulUploads: List<ImageUploadInfo>, // 업로드 성공 이미지

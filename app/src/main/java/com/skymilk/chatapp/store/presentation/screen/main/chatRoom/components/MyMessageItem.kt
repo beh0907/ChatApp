@@ -55,7 +55,7 @@ fun MyMessageItem(
         ) {
             //시간 및 채팅 읽은 수 체크
             Column(
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier.padding(end = 4.dp),
                 horizontalAlignment = Alignment.End
             ) {
                 val count = participantsStatus.count { timestamp > it.lastReadTimestamp }

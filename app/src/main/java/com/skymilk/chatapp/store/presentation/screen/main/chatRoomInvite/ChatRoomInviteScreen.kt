@@ -1,12 +1,17 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite
 
+import android.R.id.message
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
@@ -26,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,6 +41,7 @@ import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectedUserList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomInvite.components.SelectionUserList
 import com.skymilk.chatapp.store.presentation.screen.main.friends.FriendsState
+import kotlin.text.isEmpty
 
 @Composable
 fun ChatRoomInviteScreen(
@@ -148,9 +156,10 @@ fun TopSection(
 
 @Composable
 private fun FriendSearchSection(
-    modifier: Modifier = Modifier, searchQuery: String, onSearchQueryChange: (String) -> Unit
+    modifier: Modifier = Modifier,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit
 ) {
-
     // 검색어 입력 칸
     TextField(
         modifier = modifier
@@ -164,7 +173,7 @@ private fun FriendSearchSection(
         placeholder = {
             Text(
                 text = "이름을 검색해주세요.",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = Color.Gray,
             )
         },

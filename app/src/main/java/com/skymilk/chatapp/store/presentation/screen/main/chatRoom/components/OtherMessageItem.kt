@@ -141,7 +141,7 @@ fun OtherMessageItem(
                         else -> Unit
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     //시간 및 채팅 읽은 수 체크
                     Column(

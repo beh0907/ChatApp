@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.di
 
+import android.content.Context
 import com.skymilk.chatapp.store.domain.repository.AuthRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRepository
 import com.skymilk.chatapp.store.domain.repository.ChatRoomSettingRepository
@@ -16,6 +17,7 @@ import com.skymilk.chatapp.store.domain.usecase.auth.SignOut
 import com.skymilk.chatapp.store.domain.usecase.auth.SignUpWithEmailAndPassword
 import com.skymilk.chatapp.store.domain.usecase.chat.AddParticipants
 import com.skymilk.chatapp.store.domain.usecase.chat.ChatUseCases
+import com.skymilk.chatapp.store.domain.usecase.chat.CompressImagesUseCase
 import com.skymilk.chatapp.store.domain.usecase.chat.CreateChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.ExitChatRoom
 import com.skymilk.chatapp.store.domain.usecase.chat.GetChatMessages
@@ -34,8 +36,8 @@ import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.SaveAlarmSetting
 import com.skymilk.chatapp.store.domain.usecase.shared.GetCurrentDestination
 import com.skymilk.chatapp.store.domain.usecase.shared.GetSelectedChatRoom
 import com.skymilk.chatapp.store.domain.usecase.shared.GetSharedFriends
-import com.skymilk.chatapp.store.domain.usecase.shared.SetSharedChatRooms
 import com.skymilk.chatapp.store.domain.usecase.shared.SetCurrentDestination
+import com.skymilk.chatapp.store.domain.usecase.shared.SetSharedChatRooms
 import com.skymilk.chatapp.store.domain.usecase.shared.SetSharedFriends
 import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import com.skymilk.chatapp.store.domain.usecase.storage.SaveChatMessageImage
@@ -59,6 +61,7 @@ import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -80,7 +83,10 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideChatUseCase(chatRepository: ChatRepository): ChatUseCases =
+    fun provideChatUseCase(
+        @ApplicationContext context: Context,
+        chatRepository: ChatRepository
+    ): ChatUseCases =
         ChatUseCases(
             GetChatRoom(chatRepository),
             GetChatRooms(chatRepository),
@@ -88,6 +94,7 @@ object UseCaseModule {
             GetChatMessages(chatRepository),
             SendMessage(chatRepository),
             SendImageMessage(chatRepository),
+            CompressImagesUseCase(context),
             CreateChatRoom(chatRepository),
             ExitChatRoom(chatRepository),
             AddParticipants(chatRepository),

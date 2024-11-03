@@ -75,6 +75,7 @@ fun ChatRoomsScreen(
 
                 ErrorScreen(message = message, retry = { onEvent(ChatRoomsEvent.LoadChatRooms) })
             }
+            else -> {}
         }
     }
 }

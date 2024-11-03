@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.common
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
 import com.skymilk.chatapp.R
-import com.skymilk.chatapp.store.domain.model.ImageUploadInfo
 import com.skymilk.chatapp.store.data.dto.MessageContent
 import com.skymilk.chatapp.store.data.dto.User
 
@@ -75,10 +74,10 @@ fun ChatProfileGrid(
 //이미지 업로드 메시지 그리드 뷰
 @Composable
 fun FixedSizeImageUploadGrid(
-    imageUploadInfoList: List<ImageUploadInfo>,
+    imageUploadUris: List<Uri>,
     maxColumnCount: Int = 3,
 ) {
-    val grid = imageUploadInfoList.redistributeLastRows(maxColumnCount)
+    val grid = imageUploadUris.redistributeLastRows(maxColumnCount)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -88,9 +87,9 @@ fun FixedSizeImageUploadGrid(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                row.forEach { imageUploadInfo ->
+                row.forEach { uri ->
                     AsyncImage(
-                        model = imageUploadInfo.imageUri,
+                        model = uri,
                         contentDescription = "Upload Image",
                         modifier = Modifier
                             .weight(1f)
