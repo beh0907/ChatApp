@@ -1,7 +1,10 @@
 package com.skymilk.chatapp.store.presentation.navigation.bottom
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -37,11 +40,24 @@ fun MainBottomBar(
                 selected = selected == index,
                 onClick = { onItemClick(index) },
                 icon = {
-                    Icon(
-                        imageVector = if (selected == index) item.selectedIcon else item.icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp)
-                    )
+                    BadgedBox(
+                        badge = {
+                            if (item.badge != 0) {
+                                Badge{ Text(text = item.badge.toString(), style = MaterialTheme.typography.labelMedium) }
+                            }
+                        }
+                    ) {
+
+                        Log.d("TAG", "MainBottomBar: ${item.badge}")
+
+                        Icon(
+                            imageVector = if (selected == index) item.selectedIcon else item.icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+
+
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,

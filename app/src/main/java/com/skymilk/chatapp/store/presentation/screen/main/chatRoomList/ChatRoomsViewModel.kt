@@ -1,5 +1,10 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -42,11 +47,17 @@ class ChatRoomsViewModel @AssistedInject constructor(
         }
     }
 
+    //채팅방 목록
     private val _chatRoomsState = MutableStateFlow<ChatRoomsState>(ChatRoomsState.Initial)
     val chatRoomsState = _chatRoomsState.asStateFlow()
 
+    //채팅방 알림 목록
     private val _chatRoomAlarmsDisabled = MutableStateFlow<List<String>>(emptyList())
     val chatRoomAlarmsDisabled = _chatRoomAlarmsDisabled.asStateFlow()
+
+    //읽지 않은 메시지 수
+    var unreadMessageCount by mutableIntStateOf(0)
+        private set
 
     init {
         loadChatRooms()
@@ -77,6 +88,9 @@ class ChatRoomsViewModel @AssistedInject constructor(
 
                     //공유 리포지토리에 채팅방 목록 저장
                     sharedUseCases.setSharedChatRooms(chatRooms)
+
+                    //읽지 않은 메시지 수 저장
+                    unreadMessageCount = chatRooms.sumOf { it.unreadCount }
                 }
         }
     }

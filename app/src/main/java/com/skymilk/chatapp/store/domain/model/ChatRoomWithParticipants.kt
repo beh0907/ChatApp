@@ -9,5 +9,6 @@ data class ChatRoomWithParticipants(
     val lastMessage: String = "",
     val lastMessageTimestamp: Long = 0,
     val createdTimestamp: Long = 0,
-    val totalMessagesCount: Long = 0// 채팅 총 메시지 수
+    val totalMessagesCount: Long = 0,// 채팅 총 메시지 수
+    val unreadCount: Int // 읽지 않은 메시지 수
 )

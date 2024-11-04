@@ -68,8 +68,29 @@ fun MainNavigation(
     onSignOut: () -> Unit,
     parentNavController: NavHostController
 ) {
+    //뷰모델 프로바이더
+    val context = LocalContext.current
+    val viewModelFactoryProvider = EntryPointAccessors.fromActivity(
+        context as Activity,
+        ViewModelFactoryModule::class.java
+    )
+
+    //친구 viewmodel 공유
+    val friendsViewModel: FriendsViewModel = viewModel(
+        factory = FriendsViewModel.provideFactory(
+            viewModelFactoryProvider.friendsViewModelFactory(),
+            currentUser.id
+        )
+    )
+    val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
+        factory = ChatRoomsViewModel.provideFactory(
+            viewModelFactoryProvider.chatRoomsViewModelFactory(),
+            currentUser.id
+        )
+    )
+
     //하단 탭 메뉴
-    val bottomNavigationItems = remember {
+    val bottomNavigationItems = remember(chatRoomsViewModel.unreadMessageCount) {
         listOf(
             BottomNavigationItem(
                 icon = Icons.Outlined.People,
@@ -81,6 +102,7 @@ fun MainNavigation(
                 icon = Icons.AutoMirrored.Outlined.Chat,
                 selectedIcon = Icons.AutoMirrored.Rounded.Chat,
                 title = "채팅",
+                badge = chatRoomsViewModel.unreadMessageCount,
                 route = Routes.ChatRoomsScreen(currentUser.id)
             ),
             BottomNavigationItem(
@@ -112,27 +134,6 @@ fun MainNavigation(
             ) == true
         } != null
     }
-
-    //뷰모델 프로바이더
-    val context = LocalContext.current
-    val viewModelFactoryProvider = EntryPointAccessors.fromActivity(
-        context as Activity,
-        ViewModelFactoryModule::class.java
-    )
-
-    //친구 viewmodel 공유
-    val friendsViewModel: FriendsViewModel = viewModel(
-        factory = FriendsViewModel.provideFactory(
-            viewModelFactoryProvider.friendsViewModelFactory(),
-            currentUser.id
-        )
-    )
-    val chatRoomsViewModel: ChatRoomsViewModel = viewModel(
-        factory = ChatRoomsViewModel.provideFactory(
-            viewModelFactoryProvider.chatRoomsViewModelFactory(),
-            currentUser.id
-        )
-    )
 
     Scaffold(
         bottomBar = {

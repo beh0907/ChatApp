@@ -10,7 +10,8 @@ data class ChatRoom(
     val lastMessage: String, // 마지막 메시지
     val lastMessageTimestamp: Timestamp, // 마지막 메시지 시간
     val createdTimestamp: Timestamp, // 생성 시간
-    val totalMessagesCount: Long // 채팅 총 메시지 수
+    val totalMessagesCount: Long, // 채팅 총 메시지 수
+    val unreadCounts: Map<String, Int> // userId to unread count
 ) {
     constructor() : this(
         "",
@@ -19,6 +20,7 @@ data class ChatRoom(
         "",
         Timestamp.now(),
         Timestamp.now(),
-        0
+        0,
+        emptyMap()
     )
 }

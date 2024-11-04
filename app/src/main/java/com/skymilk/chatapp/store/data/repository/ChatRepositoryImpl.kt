@@ -35,9 +35,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -81,7 +78,8 @@ class ChatRepositoryImpl @Inject constructor(
                             lastMessage = chatRoom.lastMessage,
                             lastMessageTimestamp = lastMessageTime,
                             createdTimestamp = createdTime,
-                            totalMessagesCount = chatRoom.totalMessagesCount
+                            totalMessagesCount = chatRoom.totalMessagesCount,
+                            unreadCount = 0
                         )
 
                         trySend(chatRoomWithParticipants)
@@ -98,24 +96,26 @@ class ChatRepositoryImpl @Inject constructor(
             .whereArrayContains("participantIds", userId)
             .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
 
-
-        val listener = query.addSnapshotListener { snapshots, error ->
+        val chatRoomListener = query.addSnapshotListener { snapshots, error ->
             if (error != null) {
                 close()
                 return@addSnapshotListener
             }
 
-            // 채팅방 목록을 가져온 후, participants를 기반으로 사용자 정보를 비동기적으로 가져오기
             launch {
+                // 1. 채팅방 목록 가져오기
                 val chatRooms = snapshots?.documents?.mapNotNull { doc ->
                     doc.toObject(ChatRoom::class.java)
                 }.orEmpty()
 
-                //채팅방의 모든 참여자를 중복제거해서 한번에 가져온다
+                // 2. 모든 참여자 ID 수집
                 val participantIds = chatRooms.flatMap { it.participantIds }.distinct()
-                getUsersForParticipants(participantIds).collect { allUsers ->
 
+                // 3. 참여자 정보 가져오기
+                getUsersForParticipants(participantIds).collect { allUsers ->
                     val allUsersMap = allUsers.associateBy { it.id }
+
+                    // 4. 최종 데이터 매핑
                     val chatRoomWithParticipantsList = chatRooms.map { chatRoom ->
                         //전체 유저 중 채팅방에 참여한 유저 필터링
                         val userList = chatRoom.participantIds.mapNotNull { allUsersMap[it] }
@@ -133,7 +133,8 @@ class ChatRepositoryImpl @Inject constructor(
                             lastMessage = chatRoom.lastMessage,
                             lastMessageTimestamp = lastMessageTime,
                             createdTimestamp = createdTime,
-                            totalMessagesCount = chatRoom.totalMessagesCount
+                            totalMessagesCount = chatRoom.totalMessagesCount,
+                            unreadCount = chatRoom.unreadCounts[userId] ?: 0
                         )
                     }
 
@@ -142,7 +143,9 @@ class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-        awaitClose { listener.remove() }
+        awaitClose {
+            chatRoomListener.remove()
+        }
     }
 
     //채팅방 참가자가 일치한 채팅방 아이디 가져오기
@@ -307,12 +310,19 @@ class ChatRepositoryImpl @Inject constructor(
             "lastReadTimestamp" to ServerValue.TIMESTAMP,        // 현재 서버 시간으로 업데이트
             "lastReadMessageCount" to participantStatus.lastReadMessageCount
         )
-
         firebaseDatabase.getReference(chatRoomId)
             .child(Constants.FirebaseReferences.CHAT_STATUS)
             .child(userId)
             .setValue(status)
             .await()
+
+        // Firestore 업데이트
+        firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(chatRoomId)
+            .update(
+                mapOf(
+                    "unreadCounts.${userId}" to 0
+                )
+            ).await()
     }
 
     // 채팅방 채팅 목록 실시간으로 가져오기 (Realtime Database)
@@ -431,15 +441,19 @@ class ChatRepositoryImpl @Inject constructor(
 
             // 시스템 메시지가 아닐 경우 Firestore 업데이트
             if (type != MessageType.SYSTEM) {
+                val updateMap = participants.associate { participant ->
+                    "unreadCounts.${participant.id}" to if (participant.id == sender.id) 0L else FieldValue.increment(1)
+                }.toMutableMap()
+                updateMap["lastMessage"] = content
+                updateMap["lastMessageTimestamp"] = FieldValue.serverTimestamp()
+                updateMap["totalMessagesCount"] = FieldValue.increment(1)
+
+
                 firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM)
                     .document(chatRoomId)
-                    .update(
-                        mapOf(
-                            "lastMessage" to content,
-                            "lastMessageTimestamp" to FieldValue.serverTimestamp(),
-                            "totalMessagesCount" to FieldValue.increment(1)
-                        )
-                    ).await()
+                    .update(updateMap)
+                    .await()
+
 
                 // FCM 메시지 전송
                 sendFcmMessage(
@@ -503,14 +517,18 @@ class ChatRepositoryImpl @Inject constructor(
                 .await()
 
             // Firestore 업데이트
-            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM).document(chatRoomId)
-                .update(
-                    mapOf(
-                        "lastMessage" to content,
-                        "lastMessageTimestamp" to FieldValue.serverTimestamp(),
-                        "totalMessagesCount" to FieldValue.increment(1)
-                    )
-                ).await()
+            val updateMap = participants.associate { participant ->
+                "unreadCounts.${participant.id}" to if (participant.id == sender.id) 0L else FieldValue.increment(1)
+            }.toMutableMap()
+            updateMap["lastMessage"] = content
+            updateMap["lastMessageTimestamp"] = FieldValue.serverTimestamp()
+            updateMap["totalMessagesCount"] = FieldValue.increment(1)
+
+
+            firebaseFireStore.collection(Constants.FirebaseReferences.CHATROOM)
+                .document(chatRoomId)
+                .update(updateMap)
+                .await()
 
             // FCM 메시지 전송
             sendFcmMessage(
@@ -588,7 +606,7 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    //FCM 메시지 전송
+//FCM 메시지 전송
 //    private suspend fun sendFcmMessage(
 //        chatRoomId: String,
 //        sender: User,

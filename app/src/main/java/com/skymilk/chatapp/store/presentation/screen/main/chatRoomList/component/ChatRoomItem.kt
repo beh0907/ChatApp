@@ -1,5 +1,6 @@
 package com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material3.Icon
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,8 +54,7 @@ fun ChatRoomItem(
         val otherParticipants = chatRoom.participants.filterNot { it.id == currentUser.id }
 
         //읽지 않은 메시지 수
-//        val unreadMessageCount =
-//            chatRoom.totalMessagesCount - currentParticipant.participantStatus.lastReadMessageCount
+        val unreadMessageCount = chatRoom.unreadCount
 
         //채팅방 참여 유저 프로필 그리드
         ChatProfileGrid(otherParticipants = otherParticipants.take(4))
@@ -135,21 +137,21 @@ fun ChatRoomItem(
 
                 Spacer(Modifier.width(5.dp))
 
-//                읽지 않은 메시지 수 표시
-//                if (unreadMessageCount > 0) {
-//                    Text(
-//                        modifier = Modifier
-//                            .clip(CircleShape)
-//                            .background(
-//                                MaterialTheme.colorScheme.primary
-//                            )
-//                            .padding(3.dp),
-//                        text = if (unreadMessageCount > 300) " 300+ " else " $unreadMessageCount ",
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        fontWeight = FontWeight.SemiBold,
-//                        color = MaterialTheme.colorScheme.surface
-//                    )
-//                }
+                //읽지 않은 메시지 수 표시
+                if (unreadMessageCount > 0) {
+                    Text(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(
+                                MaterialTheme.colorScheme.primary
+                            )
+                            .padding(3.dp),
+                        text = if (unreadMessageCount > 99) " 99+ " else " $unreadMessageCount ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.surface
+                    )
+                }
             }
         }
     }
