@@ -49,6 +49,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import com.skymilk.chatapp.R
+import com.skymilk.chatapp.store.presentation.common.HandleDoubleBackPress
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthEvent
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthState
 import com.skymilk.chatapp.store.presentation.screen.auth.AuthViewModel
@@ -67,6 +68,9 @@ fun SignInScreen(
     onNavigateToHome: () -> Unit
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
+
+    //뒤로가기 더블클릭 종료 처리
+    HandleDoubleBackPress()
 
     //로그인 상태일때 자동으로 홈 화면으로 이동시킨다
     LaunchedEffect(authState) {

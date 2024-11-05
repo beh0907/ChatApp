@@ -24,12 +24,30 @@
 -keep class com.kakao.sdk.**.model.* { <fields>; }
 -keep class * extends com.google.gson.TypeAdapter { <init>(); }
 -keep class com.google.googlesignin.** { *; }
--keep class retrofit2.** { *; }
 
+# Retrofit2 관련 규칙
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class retrofit2.** { *; }
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+-keepclassmembernames interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# Google API Client 관련 규칙
+-keep class com.google.api.client.** { *; }
+-keep class com.google.api.services.** { *; }
+-dontwarn com.google.api.client.extensions.android.**
+-dontwarn com.google.api.client.googleapis.extensions.android.**
+
+# FCM 관련 규칙
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
 
 # API 관련 클래스 보존
 -keep class com.skymilk.chatapp.store.data.dto.** { *; }
-#-keep class com.skymilk.chatapp.store.domain.model.** { *; }
 -keep class com.skymilk.chatapp.store.presentation.navigation.** { *; }
 
 # Java Management 관련 경고 무시

@@ -60,7 +60,6 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credential" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credential" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 coil-transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformations" }
 easycrop = { module = "io.github.mr0xf00:easycrop", version.ref = "easycrop" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }

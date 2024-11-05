@@ -162,7 +162,6 @@ dependencies {
 
     // Coil Image
     implementation(libs.coil)
-    implementation(libs.coil.svg)
     implementation(libs.coil.transformations)
 
     //Image Cropper
@@ -218,8 +217,4 @@ dependencies {
 
     //Datastore
     implementation(libs.androidx.datastore.preferences)
-
-    //gemini AI
-    implementation(libs.generativeai)
-
 }

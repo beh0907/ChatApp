@@ -47,9 +47,6 @@ fun MainBottomBar(
                             }
                         }
                     ) {
-
-                        Log.d("TAG", "MainBottomBar: ${item.badge}")
-
                         Icon(
                             imageVector = if (selected == index) item.selectedIcon else item.icon,
                             contentDescription = null,

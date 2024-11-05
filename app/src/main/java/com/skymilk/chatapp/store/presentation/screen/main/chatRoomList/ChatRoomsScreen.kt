@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skymilk.chatapp.store.data.dto.User
 import com.skymilk.chatapp.store.presentation.common.EmptyScreen
 import com.skymilk.chatapp.store.presentation.common.ErrorScreen
+import com.skymilk.chatapp.store.presentation.common.HandleDoubleBackPress
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomList
 import com.skymilk.chatapp.store.presentation.screen.main.chatRoomList.component.ChatRoomListShimmer
 
@@ -36,6 +37,9 @@ fun ChatRoomsScreen(
 ) {
     val chatRoomsState by viewModel.chatRoomsState.collectAsStateWithLifecycle()
     val chatRoomAlarmsDisabled by viewModel.chatRoomAlarmsDisabled.collectAsStateWithLifecycle()
+
+    //뒤로가기 더블클릭 종료 처리
+    HandleDoubleBackPress()
 
     Column(
         modifier = modifier.fillMaxSize()

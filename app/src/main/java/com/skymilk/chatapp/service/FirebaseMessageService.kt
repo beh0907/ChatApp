@@ -75,32 +75,24 @@ class FirebaseMessageService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        Log.d("onMessageReceived", "1")
-
         //알림 텍스트
         val title = message.notification?.title ?: message.data["title"]
         val body = message.notification?.body ?: message.data["body"]
 
-        Log.d("onMessageReceived", "2")
         // Wake Lock 획득
         acquireWakeLock()
 
-        Log.d("onMessageReceived", "3")
         // 코루틴 스코프에서 실행
         scope.launch {
             try {
-                Log.d("onMessageReceived", "4")
                 showNotification(title, body, message.data)
             } catch (e: Exception) {
-                Log.d("onMessageReceived", "4-1")
                 e.printStackTrace()
             } finally {
                 // Wake Lock 해제
-                Log.d("onMessageReceived", "5")
                 releaseWakeLock()
             }
         }
-        Log.d("onMessageReceived", "6")
     }
 
 
@@ -130,30 +122,23 @@ class FirebaseMessageService : FirebaseMessagingService() {
         val senderId = messageData["senderId"] ?: return
         val chatRoomId = messageData["chatRoomId"] ?: return
 
-        Log.d("showNotification", "1")
-
         //로그인한 유저만 알림 발생
         if (firebaseAuth.currentUser == null) return
-        Log.d("showNotification", "2")
 
         //전송한 유저와 일치하지 않은 유저
         if (firebaseAuth.currentUser?.uid == senderId) return
-        Log.d("showNotification", "3")
 
         //유저 알람 설정 여부
         if (!userSettingUseCases.getUserAlarmSetting().first()) return
-        Log.d("showNotification", "4")
 
         // 채팅방 알람 비활설화 여부 확인
         if (chatRoomSettingUseCases.getAlarmSetting(chatRoomId).first()) return
-        Log.d("showNotification", "5")
 
         //현재 화면이 알람이 발생한 채팅방과 동일한 채팅방인지 체크
         val navigationState = sharedUseCases.getCurrentDestination()
         if (navigationState.destination == Routes.ChatRoomScreen.javaClass.toString()
             && navigationState.params["chatRoomId"] == chatRoomId
         ) return
-        Log.d("showNotification", "6")
 
         withContext(Dispatchers.Main) {
             val notificationManager = getSystemService<NotificationManager>()!!
@@ -161,20 +146,17 @@ class FirebaseMessageService : FirebaseMessagingService() {
             val channel = NotificationChannel("messages", "메시지 알림", NotificationManager.IMPORTANCE_HIGH)
             notificationManager.createNotificationChannel(channel)
 
-            Log.d("showNotification", "7")
             //딥링크 전송
             val activityIntent =
                 Intent(this@FirebaseMessageService, MainActivity::class.java).apply {
                     this.data = "chatapp://chatrooms/$chatRoomId?userId=${firebaseAuth.currentUser?.uid}".toUri()
                 }
 
-            Log.d("showNotification", "8")
             val pendingIntent = TaskStackBuilder.create(this@FirebaseMessageService).run {
                 addNextIntentWithParentStack(activityIntent)
                 getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
             }
 
-            Log.d("showNotification", "9")
             val notificationId = Random.nextInt(1000)
             val notification = NotificationCompat.Builder(this@FirebaseMessageService, "messages")
                 .setContentTitle(title)
@@ -188,9 +170,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
                 .setContentIntent(pendingIntent)  // 알림 클릭 시 인텐트 실행
                 .build()
 
-            Log.d("showNotification", "10")
             notificationManager.notify(notificationId, notification)
-            Log.d("showNotification", "11")
         }
     }
 }
