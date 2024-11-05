@@ -28,11 +28,11 @@
     * [Google](https://github.com/googleapis/google-auth-library-java) - Google 로그인을 위한 OAuth 2.0 인증, 권한을 부여를 통해 Google 계정 로그인을 지원합니다.
     * [KaKao](https://developers.kakao.com/docs/latest/ko/kakaologin/common) - 커스텀 OIDC를 적용, Firebase Auth와 연동하여 카카오톡 및 계정 로그인을 지원합니다. 
 * Firebase
-    * [Auth](https://coil-kt.github.io/coil/README-ko/) - 유저의 인증을 관리하여 이메일/비밀번호 및 소셜 로그인과 연계하여 계정 관리
-    * [FireStore](https://coil-kt.github.io/coil/README-ko/) - 구조화된 유저와 채팅방 정보를 관리하는 NoSQL 클라우드 데이터베이스
-    * [Realtime Database](https://coil-kt.github.io/coil/README-ko/) - 실시간 채팅 정보와 상태 정보를 관리하는 NoSQL 클라우드 데이터베이스
-    * [Storage](https://coil-kt.github.io/coil/README-ko/) - 유저별 프로필, 채팅방 내 이미지를 저장하고 관리하는 스토리지 서비스
-    * [Messaging](https://coil-kt.github.io/coil/README-ko/) - 현재 참여하지 않는 채팅방 내 실시간 채팅 정보를 제공하기 위한 알림 푸시 알림 서비스 
+    * [Auth](https://firebase.google.com/docs/auth?hl=ko) - 유저의 인증을 관리하여 이메일/비밀번호 및 소셜 로그인과 연계하여 계정 관리
+    * [FireStore](https://firebase.google.com/docs/firestore?hl=ko) - 구조화된 유저와 채팅방 정보를 관리하는 NoSQL 클라우드 데이터베이스
+    * [Realtime Database](https://firebase.google.com/docs/database/android/start?hl=ko) - 실시간 채팅 정보와 상태 정보를 관리하는 NoSQL 클라우드 데이터베이스
+    * [Storage](https://firebase.google.com/docs/storage/android/start?hl=ko) - 유저별 프로필, 채팅방 내 이미지를 저장하고 관리하는 스토리지 서비스
+    * [Messaging](https://firebase.google.com/docs/cloud-messaging/android/client?hl=ko) - 현재 참여하지 않는 채팅방 내 실시간 채팅 정보를 제공하기 위한 알림 푸시 알림 서비스 
 * 이미지 관리
     * [Coil](https://coil-kt.github.io/coil/README-ko/) - Coroutine기반으로 효율적인 비동기 이미지를 로드하고 적용합니다.
     * [TedImagePicker](https://github.com/ParkSangGwon/TedImagePicker) - 갤러리로부터 복수의 이미지, 동영상을 선택하거나 카메라 기능과 연계하여 이미지를 업로드합니다.
@@ -59,6 +59,6 @@
 |---|---|---|
 |![채팅방 화면](https://github.com/user-attachments/assets/6dfb38e4-1cc5-4c3e-949a-03edafd60ea7)|![채팅방 드로어 화면](https://github.com/user-attachments/assets/117dc811-83db-4eac-8be0-b17511a5f161)|![이미지 페이저 화면](https://github.com/user-attachments/assets/d93155c1-df05-4e58-918b-a67938f4b190)|
 
-|유저 검색 화면|대화상대 초대 화면||
-|---|---|---|
-|![유저 검색 화면](https://github.com/user-attachments/assets/632c093f-f0eb-44d8-b96d-2f07f64a36d4)|![대화상대 초대 화면](https://github.com/user-attachments/assets/9caf1e14-4163-4cec-81b6-ed45bd274831)||
+|유저 검색 화면|대화상대 초대 화면|
+|---|---|
+|![유저 검색 화면](https://github.com/user-attachments/assets/632c093f-f0eb-44d8-b96d-2f07f64a36d4)|![대화상대 초대 화면](https://github.com/user-attachments/assets/9caf1e14-4163-4cec-81b6-ed45bd274831)|
