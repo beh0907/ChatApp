@@ -49,7 +49,7 @@
 
 |친구 목록 화면(기본 화면)|채팅방 목록 화면|설정 화면|
 |---|---|---|
-|![친구목록 화면](https://github.com/user-attachments/assets/2f618c2b-af85-4d86-bc4e-39206440e4b4)|![채팅방 목록 화면](https://github.com/user-attachments/assets/01479fd9-6068-4065-b492-ac5624fc26dd)|![설정 화면](https://github.com/user-attachments/assets/9f89c0ab-0b77-47da-be7c-16b717f61dcd)|
+|![친구목록 화면](https://github.com/user-attachments/assets/2f618c2b-af85-4d86-bc4e-39206440e4b4)|![채팅방 목록 화면](https://github.com/user-attachments/assets/545dba3f-3cba-413e-87f0-636b901fd8e9)|![설정 화면](https://github.com/user-attachments/assets/9f89c0ab-0b77-47da-be7c-16b717f61dcd)|
 
 |나의 프로필 화면|친구 프로필 화면|프로필 편집 화면|
 |---|---|---|

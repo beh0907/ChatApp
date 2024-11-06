@@ -653,7 +653,8 @@ class ChatRepositoryImpl @Inject constructor(
                 "chatRoomId" to chatRoomId,
                 "senderId" to sender.id,
                 "title" to sender.username,
-                "body" to body
+                "body" to body,
+                "largeIcon" to sender.profileImageUrl
             ),
             android = FcmAndroidSetting(priority = "high")
         )

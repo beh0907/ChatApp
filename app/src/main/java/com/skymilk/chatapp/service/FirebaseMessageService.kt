@@ -5,11 +5,18 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.PowerManager
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.size.Scale
+import coil.size.Size
+import coil.transform.Transformation
+import com.commit451.coiltransformations.CropTransformation
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -19,6 +26,7 @@ import com.skymilk.chatapp.store.domain.usecase.chatRoomSetting.ChatRoomSettingU
 import com.skymilk.chatapp.store.domain.usecase.shared.SharedUseCases
 import com.skymilk.chatapp.store.domain.usecase.user.UserUseCases
 import com.skymilk.chatapp.store.domain.usecase.userSetting.UserSettingUseCases
+import com.skymilk.chatapp.store.presentation.common.SquircleTransformation
 import com.skymilk.chatapp.store.presentation.navigation.routes.Routes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +58,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
     // Job을 따로 보관하여 관리
     private var serviceJob = SupervisorJob()
+
     // scope를 lazy하게 초기화하여 서비스 생명주기에 맞춤
     private val scope by lazy {
         CoroutineScope(serviceJob + Dispatchers.IO)
@@ -121,6 +130,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
     ) {
         val senderId = messageData["senderId"] ?: return
         val chatRoomId = messageData["chatRoomId"] ?: return
+        val largeIcon = messageData["largeIcon"] ?: ""
 
         //로그인한 유저만 알림 발생
         if (firebaseAuth.currentUser == null) return
@@ -142,14 +152,53 @@ class FirebaseMessageService : FirebaseMessagingService() {
 
         withContext(Dispatchers.Main) {
             val notificationManager = getSystemService<NotificationManager>()!!
+            val imageSize = 256
 
-            val channel = NotificationChannel("messages", "메시지 알림", NotificationManager.IMPORTANCE_HIGH)
+            // 기본 이미지를 Bitmap으로 변환
+            val defaultIcon =
+                ResourcesCompat.getDrawable(resources, R.drawable.bg_default_profile, null)
+                    ?.toBitmap()?.let { bitmap ->
+                        SquircleTransformation().transform(
+                            bitmap,
+                            Size(imageSize, imageSize)
+                        )
+                    }
+
+
+            // 프로필 이미지 로드
+            val largeIcon = try {
+                if (largeIcon.isBlank()) defaultIcon
+                else {
+                    // Coil을 사용하여 URL 이미지 로드
+                    ImageLoader(applicationContext).execute(
+                        ImageRequest.Builder(applicationContext)
+                            .data(largeIcon)
+                            .size(imageSize) // 적절한 크기로 조정
+                            .scale(Scale.FIT) // 이미지를 지정된 크기로 확대/축소
+                            .transformations(
+                                CropTransformation(),
+                                SquircleTransformation()
+                            )
+                            .fallback(R.drawable.bg_default_profile)
+                            .error(R.drawable.bg_default_profile)
+                            .allowHardware(false) // NotificationManager에서 하드웨어 비트맵 사용 불가
+                            .build()
+                    ).drawable?.toBitmap()
+                } ?: defaultIcon
+            } catch (e: Exception) {
+                // 에러 발생시 기본 이미지 사용
+                defaultIcon
+            }
+
+            val channel =
+                NotificationChannel("messages", "메시지 알림", NotificationManager.IMPORTANCE_HIGH)
             notificationManager.createNotificationChannel(channel)
 
             //딥링크 전송
             val activityIntent =
                 Intent(this@FirebaseMessageService, MainActivity::class.java).apply {
-                    this.data = "chatapp://chatrooms/$chatRoomId?userId=${firebaseAuth.currentUser?.uid}".toUri()
+                    this.data =
+                        "chatapp://chatrooms/$chatRoomId?userId=${firebaseAuth.currentUser?.uid}".toUri()
                 }
 
             val pendingIntent = TaskStackBuilder.create(this@FirebaseMessageService).run {
@@ -161,6 +210,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
             val notification = NotificationCompat.Builder(this@FirebaseMessageService, "messages")
                 .setContentTitle(title)
                 .setContentText(message)
+                .setLargeIcon(largeIcon)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 //.setOngoing(true) // [사용자가 알림 못지우게 설정 >> 클릭해야 메시지 읽음 상태]
@@ -168,6 +218,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
                 .setShowWhen(true) // [푸시 알림 받은 시간 커스텀 설정 표시]
                 .setAutoCancel(true)// [알림 클릭 시 삭제 여부]
                 .setContentIntent(pendingIntent)  // 알림 클릭 시 인텐트 실행
+                .setGroup(chatRoomId)
                 .build()
 
             notificationManager.notify(notificationId, notification)
