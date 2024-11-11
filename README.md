@@ -1,5 +1,4 @@
 # <div align=center>ChatApp</div>
-
 [Firebase](https://firebase.google.com/)를 활용한 kotlin 언어 기반의 채팅 안드로이드 어플리케이션입니다.
 
 # 특징
